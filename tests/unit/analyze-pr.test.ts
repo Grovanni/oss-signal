@@ -96,6 +96,48 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("request_split");
     expect(analysis.questions.length).toBeLessThanOrEqual(5);
   });
+
+  it("routes CI-only workflow changes to wait_for_ci instead of security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Updates CI workflow.",
+        files: [changedFile(".github/workflows/ci.yml", 12)]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toEqual(
+      expect.arrayContaining(["ci_changed", "security_sensitive_file_changed"])
+    );
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("wait_for_ci");
+  });
+
+  it("does not treat environment as an env secret path", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update dependencies.",
+        files: [changedFile("playground/environment-react-ssr/package.json", 6)]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
+  });
+
+  it("prioritizes dependency files before CI workflows in dependency-heavy PRs", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Updates dependencies and workflows.",
+        files: [
+          changedFile(".github/workflows/ci.yml", 20),
+          changedFile("package.json", 4),
+          changedFile("pnpm-lock.yaml", 120)
+        ]
+      })
+    );
+
+    expect(analysis.priority_files[0]?.path).toBe("pnpm-lock.yaml");
+    expect(analysis.priority_files[1]?.path).toBe("package.json");
+  });
 });
 
 function signalIds(signals: Array<{ id: string }>): string[] {

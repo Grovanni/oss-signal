@@ -1,11 +1,11 @@
 # PR Brief
 
 ## Summary
-- PR: #102 - Update package dependency
-- Repository: example/oss-signal-demo
-- Author: dependency-contributor
+- PR: #19201 - Update babel to v8.0.0-rc.6
+- Repository: prettier/prettier
+- Author: renovate[bot]
 - Target branch: main
-- Size: 2 files, +80 / -75 lines
+- Size: 2 files, +38 / -38 lines
 - Attention: medium
 
 ## Recommended Action
@@ -13,21 +13,21 @@ Review dependency changes before normal code review.
 
 ## Why
 - Small pull request: This PR is small by file and line thresholds.
-  - Evidence: 2 files, +80 / -75 (<= 5 files and <= 200 changed lines)
+  - Evidence: 2 files, +38 / -38 (<= 5 files and <= 200 changed lines)
 - Dependency manifest changed: A dependency manifest changed.
   - Evidence: package.json (dependency manifest)
 - Dependency lockfile changed: A dependency lockfile changed.
-  - Evidence: package-lock.json (dependency lockfile)
+  - Evidence: yarn.lock (dependency lockfile)
 - Dependency change without code: Dependency files changed with little or no code change detected.
   - Evidence: package.json (dependency change without code category)
-  - Evidence: package-lock.json (dependency change without code category)
+  - Evidence: yarn.lock (dependency change without code category)
 
 ## Areas Touched
 - dependencies: 2
 - release: 1
 
 ## Priority Files
-1. package-lock.json - dependency manifest or lockfile
+1. yarn.lock - dependency manifest or lockfile
 2. package.json - dependency manifest or lockfile
 
 ## Questions

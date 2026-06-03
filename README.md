@@ -102,7 +102,7 @@ OSS Signal does not print or write the full diff. Reports contain facts, signals
 
 ## Examples
 
-The `examples/` directory contains five stable public fixtures with generated outputs:
+The `examples/` directory contains five real public PR examples with generated outputs:
 
 - `01-docs-only`
 - `02-dependency-change`
@@ -110,7 +110,7 @@ The `examples/` directory contains five stable public fixtures with generated ou
 - `04-auth-security`
 - `05-large-mixed`
 
-Each example includes `source.md`, fixture data, terminal output, `review-brief.md`, `review-brief.json` and `agent-context.md`.
+Each example includes `source.md`, terminal output, `review-brief.md`, `review-brief.json` and `agent-context.md`.
 
 ## Non-goals
 

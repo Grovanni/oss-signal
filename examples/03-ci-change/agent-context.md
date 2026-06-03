@@ -4,21 +4,25 @@
 Use this context to decide where human review attention should go first. Do not treat it as an approval, rejection or quality score.
 
 ## Known Facts
-- Repository: example/oss-signal-demo
-- PR: #103 - Adjust CI workflow cache
-- Author: ci-contributor
-- Branches: ci/cache -> main
-- Size: 1 files, +12 / -3 lines
-- Attention: high
-- Recommended action: security_review
+- Repository: cli/cli
+- PR: #13491 - SHA pin first-party GitHub Actions
+- Author: williammartin
+- Branches: wm-sha-pin -> trunk
+- Size: 7 files, +31 / -31 lines
+- Attention: medium
+- Recommended action: wait_for_ci
 
 ## Priority Files
-- .github/workflows/ci.yml: security-sensitive path
+- .github/workflows/deployment.yml: CI workflow or pipeline
+- .github/workflows/codeql.yml: CI workflow or pipeline
+- .github/workflows/go.yml: CI workflow or pipeline
+- .github/workflows/lint.yml: CI workflow or pipeline
+- .github/workflows/govulncheck.yml: CI workflow or pipeline
 
 ## Signals
-- small_pr (info): Small pull request
+- medium_pr (info): Medium pull request
 - ci_changed (medium): CI changed
-- security_sensitive_file_changed (high): Security-sensitive path changed
+- security_sensitive_file_changed (medium): Security-sensitive path changed
 - configuration_changed (info): Configuration changed
 
 ## Suggested Questions

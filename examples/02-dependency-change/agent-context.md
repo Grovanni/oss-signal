@@ -4,16 +4,16 @@
 Use this context to decide where human review attention should go first. Do not treat it as an approval, rejection or quality score.
 
 ## Known Facts
-- Repository: example/oss-signal-demo
-- PR: #102 - Update package dependency
-- Author: dependency-contributor
-- Branches: deps/update -> main
-- Size: 2 files, +80 / -75 lines
+- Repository: prettier/prettier
+- PR: #19201 - Update babel to v8.0.0-rc.6
+- Author: renovate[bot]
+- Branches: renovate/babel -> main
+- Size: 2 files, +38 / -38 lines
 - Attention: medium
 - Recommended action: dependency_review
 
 ## Priority Files
-- package-lock.json: dependency manifest or lockfile
+- yarn.lock: dependency manifest or lockfile
 - package.json: dependency manifest or lockfile
 
 ## Signals

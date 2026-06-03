@@ -4,17 +4,16 @@
 Use this context to decide where human review attention should go first. Do not treat it as an approval, rejection or quality score.
 
 ## Known Facts
-- Repository: example/oss-signal-demo
-- PR: #101 - Clarify installation docs
-- Author: docs-contributor
-- Branches: docs/install -> main
-- Size: 2 files, +16 / -4 lines
+- Repository: pallets/flask
+- PR: #5827 - clarify 415 vs 400 errors for request.json
+- Author: adityasah104
+- Branches: docs-clarify-json-415-error -> stable
+- Size: 1 files, +5 / -3 lines
 - Attention: low
 - Recommended action: normal_review
 
 ## Priority Files
-- README.md: documentation
-- docs/usage.md: documentation
+- docs/patterns/javascript.rst: documentation
 
 ## Signals
 - small_pr (info): Small pull request

@@ -1,6 +1,6 @@
 # Examples
 
-The repository includes five stable public fixtures with generated outputs:
+The repository includes five real public PR examples with generated outputs:
 
 ```text
 examples/
@@ -11,13 +11,12 @@ examples/
   05-large-mixed/
 ```
 
-Each example should include:
+Each example includes:
 
 - `source.md`;
-- fixture metadata, changed files and diff;
 - `terminal.txt`;
 - `review-brief.md`;
 - `review-brief.json`;
 - `agent-context.md`;
 
-The examples use synthetic public fixtures rather than live PRs. This keeps documentation stable and avoids depending on mutable third-party PRs. Live PR checks are still supported by the CLI.
+The generated outputs are committed so readers can inspect them without network access. Live PR checks are still supported by the CLI.

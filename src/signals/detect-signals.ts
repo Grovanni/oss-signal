@@ -17,7 +17,7 @@ export type SignalInput = {
 };
 
 const authTerms = ["auth", "login", "session", "token", "jwt", "oauth"];
-const secretTerms = ["secret", "env", "credential", "credentials", "key"];
+const secretTerms = ["secret", "credential", "credentials", "key"];
 const ciDescriptionTerms = ["ci", "workflow", "workflows", "build", "action", "actions"];
 const dependencyDescriptionTerms = [
   "dependency",
@@ -42,6 +42,8 @@ export function detectSignals(input: SignalInput): Signal[] {
   const dependencyFiles = input.files.filter((file) => hasCategory(file, "dependencies"));
   const ciFiles = input.files.filter((file) => hasCategory(file, "ci"));
   const securityFiles = input.files.filter((file) => hasCategory(file, "security"));
+  const authFiles = input.files.filter((file) => normalizedPathIncludes(file.path, authTerms));
+  const secretFiles = input.files.filter((file) => isSecretRelatedPath(file.path));
   const migrationFiles = input.files.filter((file) => hasCategory(file, "migrations"));
   const configurationFiles = input.files.filter((file) => hasCategory(file, "configuration"));
   const documentationFiles = input.files.filter((file) => hasCategory(file, "documentation"));
@@ -141,10 +143,11 @@ export function detectSignals(input: SignalInput): Signal[] {
   }
 
   if (securityFiles.length > 0) {
+    const securityLevel = authFiles.length > 0 || secretFiles.length > 0 ? "high" : "medium";
     signals.push(
       signal(
         "security_sensitive_file_changed",
-        "high",
+        securityLevel,
         "Security-sensitive path changed",
         "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
         fileEvidence(securityFiles, "path contains auth, secrets, credentials, policy, Dockerfile, or CI")
@@ -152,14 +155,12 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  const authFiles = input.files.filter((file) => normalizedPathIncludes(file.path, authTerms));
   if (authFiles.length > 0) {
     signals.push(
       signal("auth_related_change", "high", "Authentication-related path changed", "A path references authentication, sessions or tokens.", fileEvidence(authFiles, "path contains auth/login/session/token/jwt/oauth"))
     );
   }
 
-  const secretFiles = input.files.filter((file) => normalizedPathIncludes(file.path, secretTerms));
   if (secretFiles.length > 0) {
     signals.push(
       signal("secret_related_change", "high", "Secret-related path changed", "A path references secrets, env files, credentials or keys.", fileEvidence(secretFiles, "path contains secret/env/credential/key"))
@@ -261,4 +262,17 @@ function descriptionEvidence(value: string, reason: string): Evidence {
 function mentionsAny(text: string, terms: string[]): boolean {
   const normalized = text.toLowerCase();
   return terms.some((term) => normalized.includes(term));
+}
+
+function isSecretRelatedPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+  const segments = normalized.split("/");
+  const filename = segments.at(-1) ?? normalized;
+
+  return (
+    filename === ".env" ||
+    filename.startsWith(".env.") ||
+    segments.includes("env") ||
+    secretTerms.some((term) => normalized.includes(term))
+  );
 }

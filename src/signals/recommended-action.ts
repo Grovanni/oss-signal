@@ -6,12 +6,7 @@ export function chooseRecommendedAction(
 ): RecommendedAction {
   const ids = new Set(signals.map((signal) => signal.id));
 
-  if (
-    attention === "high" &&
-    (ids.has("security_sensitive_file_changed") ||
-      ids.has("auth_related_change") ||
-      ids.has("secret_related_change"))
-  ) {
+  if (attention === "high" && (ids.has("auth_related_change") || ids.has("secret_related_change"))) {
     return "security_review";
   }
 
@@ -31,7 +26,7 @@ export function chooseRecommendedAction(
     return "migration_review";
   }
 
-  if (ids.has("ci_changed_with_dependency_change")) {
+  if (ids.has("ci_changed_with_dependency_change") || ids.has("ci_changed")) {
     return "wait_for_ci";
   }
 

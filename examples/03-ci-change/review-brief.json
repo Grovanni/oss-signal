@@ -1,53 +1,53 @@
 {
   "schema_version": "review-brief.v1",
   "repository": {
-    "owner": "example",
-    "name": "oss-signal-demo",
-    "full_name": "example/oss-signal-demo",
-    "html_url": "https://github.com/example/oss-signal-demo"
+    "owner": "cli",
+    "name": "cli",
+    "full_name": "cli/cli",
+    "html_url": "https://github.com/cli/cli"
   },
   "pull_request": {
-    "number": 103,
-    "title": "Adjust CI workflow cache",
-    "author": "ci-contributor",
-    "html_url": "https://github.com/example/oss-signal-demo/pull/103",
-    "state": "open",
+    "number": 13491,
+    "title": "SHA pin first-party GitHub Actions",
+    "author": "williammartin",
+    "html_url": "https://github.com/cli/cli/pull/13491",
+    "state": "closed",
     "draft": false,
-    "created_at": "2026-06-01T10:00:00Z",
-    "updated_at": "2026-06-01T12:00:00Z",
-    "merged_at": null,
+    "created_at": "2026-05-22T14:10:18Z",
+    "updated_at": "2026-05-22T16:39:34Z",
+    "merged_at": "2026-05-22T16:39:32Z",
     "head": {
-      "ref": "ci/cache",
-      "sha": "1111111111111111111111111111111111111103",
-      "repo_full_name": "ci-contributor/oss-signal-demo"
+      "ref": "wm-sha-pin",
+      "sha": "94e3b1fca0f8549b7edb43e0b6971b235d69f0b8",
+      "repo_full_name": "cli/cli"
     },
     "base": {
-      "ref": "main",
-      "sha": "2222222222222222222222222222222222222203",
-      "repo_full_name": "example/oss-signal-demo"
+      "ref": "trunk",
+      "sha": "8bd56966ac5e2fe7d3162ad424dd11d877f4815e",
+      "repo_full_name": "cli/cli"
     },
     "commits": 1,
-    "additions": 12,
-    "deletions": 3,
-    "changed_files": 1,
+    "additions": 31,
+    "deletions": 31,
+    "changed_files": 7,
     "body_present": true,
-    "body_length": 62
+    "body_length": 2999
   },
   "size": {
-    "files": 1,
-    "additions": 12,
-    "deletions": 3,
-    "diff_bytes": 214,
-    "diff_lines": 8
+    "files": 7,
+    "additions": 31,
+    "deletions": 31,
+    "diff_bytes": 8794,
+    "diff_lines": 237
   },
   "categories": {
     "code": 0,
     "tests": 0,
     "documentation": 0,
-    "ci": 1,
+    "ci": 7,
     "dependencies": 0,
-    "configuration": 1,
-    "security": 1,
+    "configuration": 7,
+    "security": 7,
     "migrations": 0,
     "release": 0,
     "build": 0,
@@ -56,15 +56,15 @@
   },
   "signals": [
     {
-      "id": "small_pr",
+      "id": "medium_pr",
       "level": "info",
-      "title": "Small pull request",
-      "message": "This PR is small by file and line thresholds.",
+      "title": "Medium pull request",
+      "message": "This PR is not tiny and may need a normal review pass.",
       "evidence": [
         {
           "kind": "metadata",
-          "value": "1 files, +12 / -3",
-          "reason": "<= 5 files and <= 200 changed lines"
+          "value": "7 files, +31 / -31",
+          "reason": "6-20 files or 201-800 changed lines"
         }
       ]
     },
@@ -76,20 +76,60 @@
       "evidence": [
         {
           "kind": "file",
-          "value": ".github/workflows/ci.yml",
+          "value": ".github/workflows/bump-go.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/codeql.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/deployment.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/detect-spam.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/go.yml",
           "reason": "CI path"
         }
       ]
     },
     {
       "id": "security_sensitive_file_changed",
-      "level": "high",
+      "level": "medium",
       "title": "Security-sensitive path changed",
       "message": "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
       "evidence": [
         {
           "kind": "file",
-          "value": ".github/workflows/ci.yml",
+          "value": ".github/workflows/bump-go.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/codeql.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/deployment.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/detect-spam.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/go.yml",
           "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
         }
       ]
@@ -102,24 +142,84 @@
       "evidence": [
         {
           "kind": "file",
-          "value": ".github/workflows/ci.yml",
+          "value": ".github/workflows/bump-go.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/codeql.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/deployment.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/detect-spam.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/go.yml",
           "reason": "configuration file or directory"
         }
       ]
     }
   ],
-  "attention": "high",
-  "recommended_action": "security_review",
+  "attention": "medium",
+  "recommended_action": "wait_for_ci",
   "priority_files": [
     {
-      "path": ".github/workflows/ci.yml",
+      "path": ".github/workflows/deployment.yml",
       "categories": [
         "ci",
         "configuration",
         "security"
       ],
-      "changes": 15,
-      "reason": "security-sensitive path"
+      "changes": 24,
+      "reason": "CI workflow or pipeline"
+    },
+    {
+      "path": ".github/workflows/codeql.yml",
+      "categories": [
+        "ci",
+        "configuration",
+        "security"
+      ],
+      "changes": 10,
+      "reason": "CI workflow or pipeline"
+    },
+    {
+      "path": ".github/workflows/go.yml",
+      "categories": [
+        "ci",
+        "configuration",
+        "security"
+      ],
+      "changes": 8,
+      "reason": "CI workflow or pipeline"
+    },
+    {
+      "path": ".github/workflows/lint.yml",
+      "categories": [
+        "ci",
+        "configuration",
+        "security"
+      ],
+      "changes": 8,
+      "reason": "CI workflow or pipeline"
+    },
+    {
+      "path": ".github/workflows/govulncheck.yml",
+      "categories": [
+        "ci",
+        "configuration",
+        "security"
+      ],
+      "changes": 6,
+      "reason": "CI workflow or pipeline"
     }
   ],
   "questions": [
@@ -129,7 +229,7 @@
     }
   ],
   "data_confidence": {
-    "source": "fixture",
+    "source": "github",
     "diff_available": true,
     "file_count_matches_metadata": true
   },

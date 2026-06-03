@@ -30,6 +30,7 @@ describe("classifyChangedFile", () => {
   it("classifies documentation, tests, migrations and generated files", () => {
     expect(classifyChangedFile(file("docs/guide.md")).categories).toEqual(["documentation"]);
     expect(classifyChangedFile(file("tests/unit/parser.test.ts")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("test/session.js")).categories).toEqual(["tests", "security"]);
     expect(classifyChangedFile(file("prisma/migrations/001_init.sql")).categories).toEqual([
       "migrations"
     ]);

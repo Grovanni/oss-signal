@@ -217,6 +217,9 @@ function isDocumentationPath(path: string, name: string): boolean {
 
 function isTestPath(path: string, name: string): boolean {
   return (
+    path.startsWith("test/") ||
+    path.startsWith("tests/") ||
+    path.startsWith("spec/") ||
     path.includes("/test/") ||
     path.includes("/tests/") ||
     path.includes("/spec/") ||

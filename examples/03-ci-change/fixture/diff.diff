@@ -1,7 +1,0 @@
-diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
---- a/.github/workflows/ci.yml
-+++ b/.github/workflows/ci.yml
-@@ -8,6 +8,9 @@
-+      - uses: actions/cache@v4
-+        with:
-+          path: ~/.npm

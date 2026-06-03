@@ -64,8 +64,10 @@ function buildPriorityFiles(files: ClassifiedFile[]): PriorityFile[] {
 function scoreFile(file: ClassifiedFile): number {
   let score = Math.min(file.changes, 500) / 10;
 
-  if (hasCategory(file, "security")) {
+  if (hasCategory(file, "security") && isHighSecurityPriorityPath(file.path)) {
     score += 100;
+  } else if (hasCategory(file, "security")) {
+    score += 10;
   }
 
   if (hasCategory(file, "migrations")) {
@@ -73,7 +75,7 @@ function scoreFile(file: ClassifiedFile): number {
   }
 
   if (hasCategory(file, "dependencies")) {
-    score += 60;
+    score += 90;
   }
 
   if (hasCategory(file, "ci")) {
@@ -100,7 +102,7 @@ function scoreFile(file: ClassifiedFile): number {
 }
 
 function priorityReason(file: ClassifiedFile): string {
-  if (hasCategory(file, "security")) {
+  if (hasCategory(file, "security") && isHighSecurityPriorityPath(file.path)) {
     return "security-sensitive path";
   }
 
@@ -121,4 +123,26 @@ function priorityReason(file: ClassifiedFile): string {
   }
 
   return file.categories.join(", ");
+}
+
+function isHighSecurityPriorityPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+  const filename = normalized.split("/").at(-1) ?? normalized;
+
+  return (
+    filename === ".env" ||
+    filename.startsWith(".env.") ||
+    normalized.includes("auth") ||
+    normalized.includes("login") ||
+    normalized.includes("session") ||
+    normalized.includes("token") ||
+    normalized.includes("jwt") ||
+    normalized.includes("oauth") ||
+    normalized.includes("password") ||
+    normalized.includes("secret") ||
+    normalized.includes("credential") ||
+    normalized.includes("crypto") ||
+    normalized.includes("permission") ||
+    normalized.includes("security")
+  );
 }

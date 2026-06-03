@@ -32,7 +32,7 @@ Changed files can be classified into these categories:
 - `generated`
 - `unknown`
 
-Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `configuration` and `security` because workflow changes can affect execution permissions and secrets.
+Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `configuration` and `security` because workflow changes can affect execution permissions and secrets. Workflow-only changes are treated as CI attention first; they do not automatically become a `security_review` action.
 
 ## Current signal set
 

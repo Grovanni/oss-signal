@@ -1,6 +1,6 @@
-OSS Signal: example/oss-signal-demo#104
+OSS Signal: expressjs/session#1027
 Attention: high
 Action: security_review
-Size: 1 files, +42 / -12
-Signals: small_pr, code_without_tests, security_sensitive_file_changed
+Size: 4 files, +97 / -3
+Signals: small_pr, tests_changed, docs_changed
 Outputs: examples\04-auth-security\review-brief.md, examples\04-auth-security\review-brief.json, examples\04-auth-security\agent-context.md

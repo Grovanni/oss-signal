@@ -4,26 +4,31 @@
 Use this context to decide where human review attention should go first. Do not treat it as an approval, rejection or quality score.
 
 ## Known Facts
-- Repository: example/oss-signal-demo
-- PR: #104 - Adjust session token handling
-- Author: security-contributor
-- Branches: auth/session-token -> main
-- Size: 1 files, +42 / -12 lines
+- Repository: expressjs/session
+- PR: #1027 - feat: add support to dynamic cookie options
+- Author: lincond
+- Branches: master -> master
+- Size: 4 files, +97 / -3 lines
 - Attention: high
 - Recommended action: security_review
 
 ## Priority Files
-- src/auth/session.ts: security-sensitive path
+- test/session.js: security-sensitive path
+- index.js: source code change
+- HISTORY.md: documentation
+- README.md: documentation
 
 ## Signals
 - small_pr (info): Small pull request
-- code_without_tests (medium): Code changed without tests
+- tests_changed (info): Tests changed
+- docs_changed (info): Documentation changed
 - security_sensitive_file_changed (high): Security-sensitive path changed
 - auth_related_change (high): Authentication-related path changed
+- mixed_concerns (medium): Mixed concerns
 
 ## Suggested Questions
-- Quels tests couvrent les fichiers de code modifies ?
 - Le changement d'authentification ou de session est-il couvert par des tests ?
+- Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?
 
 ## Constraints
 - Do not execute code from the PR.

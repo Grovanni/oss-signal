@@ -1,44 +1,44 @@
 {
   "schema_version": "review-brief.v1",
   "repository": {
-    "owner": "example",
-    "name": "oss-signal-demo",
-    "full_name": "example/oss-signal-demo",
-    "html_url": "https://github.com/example/oss-signal-demo"
+    "owner": "prettier",
+    "name": "prettier",
+    "full_name": "prettier/prettier",
+    "html_url": "https://github.com/prettier/prettier"
   },
   "pull_request": {
-    "number": 102,
-    "title": "Update package dependency",
-    "author": "dependency-contributor",
-    "html_url": "https://github.com/example/oss-signal-demo/pull/102",
-    "state": "open",
+    "number": 19201,
+    "title": "Update babel to v8.0.0-rc.6",
+    "author": "renovate[bot]",
+    "html_url": "https://github.com/prettier/prettier/pull/19201",
+    "state": "closed",
     "draft": false,
-    "created_at": "2026-06-01T10:00:00Z",
-    "updated_at": "2026-06-01T12:00:00Z",
-    "merged_at": null,
+    "created_at": "2026-05-25T18:16:32Z",
+    "updated_at": "2026-05-26T16:38:06Z",
+    "merged_at": "2026-05-26T16:38:02Z",
     "head": {
-      "ref": "deps/update",
-      "sha": "1111111111111111111111111111111111111102",
-      "repo_full_name": "dependency-contributor/oss-signal-demo"
+      "ref": "renovate/babel",
+      "sha": "a8e3ca2e26849b8c0e95c720c00ea068b134aa1f",
+      "repo_full_name": "prettier/prettier"
     },
     "base": {
       "ref": "main",
-      "sha": "2222222222222222222222222222222222222202",
-      "repo_full_name": "example/oss-signal-demo"
+      "sha": "c74ee98369fa9fcf17261ba985287fbb92d75619",
+      "repo_full_name": "prettier/prettier"
     },
     "commits": 1,
-    "additions": 80,
-    "deletions": 75,
+    "additions": 38,
+    "deletions": 38,
     "changed_files": 2,
     "body_present": true,
-    "body_length": 80
+    "body_length": 9541
   },
   "size": {
     "files": 2,
-    "additions": 80,
-    "deletions": 75,
-    "diff_bytes": 296,
-    "diff_lines": 13
+    "additions": 38,
+    "deletions": 38,
+    "diff_bytes": 6308,
+    "diff_lines": 159
   },
   "categories": {
     "code": 0,
@@ -63,7 +63,7 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "2 files, +80 / -75",
+          "value": "2 files, +38 / -38",
           "reason": "<= 5 files and <= 200 changed lines"
         }
       ]
@@ -89,7 +89,7 @@
       "evidence": [
         {
           "kind": "file",
-          "value": "package-lock.json",
+          "value": "yarn.lock",
           "reason": "dependency lockfile"
         }
       ]
@@ -107,7 +107,7 @@
         },
         {
           "kind": "file",
-          "value": "package-lock.json",
+          "value": "yarn.lock",
           "reason": "dependency change without code category"
         }
       ]
@@ -117,11 +117,11 @@
   "recommended_action": "dependency_review",
   "priority_files": [
     {
-      "path": "package-lock.json",
+      "path": "yarn.lock",
       "categories": [
         "dependencies"
       ],
-      "changes": 151,
+      "changes": 68,
       "reason": "dependency manifest or lockfile"
     },
     {
@@ -130,7 +130,7 @@
         "dependencies",
         "release"
       ],
-      "changes": 4,
+      "changes": 8,
       "reason": "dependency manifest or lockfile"
     }
   ],
@@ -145,7 +145,7 @@
     }
   ],
   "data_confidence": {
-    "source": "fixture",
+    "source": "github",
     "diff_available": true,
     "file_count_matches_metadata": true
   },

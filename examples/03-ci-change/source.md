@@ -1,9 +1,10 @@
 # Source
 
-PR: https://github.com/example/oss-signal-demo/pull/103
+PR: https://github.com/cli/cli/pull/13491
 Type: CI change
-Date generated: 2026-06-03
+Date generated: 2026-06-04
 
 Why this example:
-- Shows CI workflow detection and security-sensitive workflow attention.
-- Uses a synthetic public fixture so the example remains stable.
+- Real public PR in GitHub CLI.
+- Shows CI workflow detection across multiple workflow files.
+- The brief should ask attention to CI without turning every workflow edit into a security verdict.

@@ -1,6 +1,6 @@
-OSS Signal: example/oss-signal-demo#103
-Attention: high
-Action: security_review
-Size: 1 files, +12 / -3
-Signals: small_pr, ci_changed, security_sensitive_file_changed
+OSS Signal: cli/cli#13491
+Attention: medium
+Action: wait_for_ci
+Size: 7 files, +31 / -31
+Signals: medium_pr, ci_changed, security_sensitive_file_changed
 Outputs: examples\03-ci-change\review-brief.md, examples\03-ci-change\review-brief.json, examples\03-ci-change\agent-context.md

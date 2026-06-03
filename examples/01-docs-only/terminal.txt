@@ -1,6 +1,6 @@
-OSS Signal: example/oss-signal-demo#101
+OSS Signal: pallets/flask#5827
 Attention: low
 Action: normal_review
-Size: 2 files, +16 / -4
+Size: 1 files, +5 / -3
 Signals: small_pr, docs_only
 Outputs: examples\01-docs-only\review-brief.md, examples\01-docs-only\review-brief.json, examples\01-docs-only\agent-context.md

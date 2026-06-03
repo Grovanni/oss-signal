@@ -1,11 +1,11 @@
 # PR Brief
 
 ## Summary
-- PR: #101 - Clarify installation docs
-- Repository: example/oss-signal-demo
-- Author: docs-contributor
-- Target branch: main
-- Size: 2 files, +16 / -4 lines
+- PR: #5827 - clarify 415 vs 400 errors for request.json
+- Repository: pallets/flask
+- Author: adityasah104
+- Target branch: stable
+- Size: 1 files, +5 / -3 lines
 - Attention: low
 
 ## Recommended Action
@@ -13,17 +13,15 @@ Proceed with normal review.
 
 ## Why
 - Small pull request: This PR is small by file and line thresholds.
-  - Evidence: 2 files, +16 / -4 (<= 5 files and <= 200 changed lines)
+  - Evidence: 1 files, +5 / -3 (<= 5 files and <= 200 changed lines)
 - Documentation-only change: All changed files are documentation.
-  - Evidence: README.md (all changed files are documentation)
-  - Evidence: docs/usage.md (all changed files are documentation)
+  - Evidence: docs/patterns/javascript.rst (all changed files are documentation)
 
 ## Areas Touched
-- documentation: 2
+- documentation: 1
 
 ## Priority Files
-1. README.md - documentation
-2. docs/usage.md - documentation
+1. docs/patterns/javascript.rst - documentation
 
 ## Questions
 No specific question generated from detected signals.

@@ -1,33 +1,43 @@
 # PR Brief
 
 ## Summary
-- PR: #103 - Adjust CI workflow cache
-- Repository: example/oss-signal-demo
-- Author: ci-contributor
-- Target branch: main
-- Size: 1 files, +12 / -3 lines
-- Attention: high
+- PR: #13491 - SHA pin first-party GitHub Actions
+- Repository: cli/cli
+- Author: williammartin
+- Target branch: trunk
+- Size: 7 files, +31 / -31 lines
+- Attention: medium
 
 ## Recommended Action
-Route attention to a security-sensitive review path first.
+Wait for CI or inspect CI context before deep review.
 
 ## Why
-- Small pull request: This PR is small by file and line thresholds.
-  - Evidence: 1 files, +12 / -3 (<= 5 files and <= 200 changed lines)
+- Medium pull request: This PR is not tiny and may need a normal review pass.
+  - Evidence: 7 files, +31 / -31 (6-20 files or 201-800 changed lines)
 - CI changed: A CI workflow or pipeline file changed.
-  - Evidence: .github/workflows/ci.yml (CI path)
+  - Evidence: .github/workflows/bump-go.yml (CI path)
+  - Evidence: .github/workflows/codeql.yml (CI path)
+  - Evidence: .github/workflows/deployment.yml (CI path)
 - Security-sensitive path changed: This does not mean a vulnerability exists. It only indicates that extra attention may be useful.
-  - Evidence: .github/workflows/ci.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
+  - Evidence: .github/workflows/bump-go.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
+  - Evidence: .github/workflows/codeql.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
+  - Evidence: .github/workflows/deployment.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
 - Configuration changed: A configuration file changed.
-  - Evidence: .github/workflows/ci.yml (configuration file or directory)
+  - Evidence: .github/workflows/bump-go.yml (configuration file or directory)
+  - Evidence: .github/workflows/codeql.yml (configuration file or directory)
+  - Evidence: .github/workflows/deployment.yml (configuration file or directory)
 
 ## Areas Touched
-- ci: 1
-- configuration: 1
-- security: 1
+- ci: 7
+- configuration: 7
+- security: 7
 
 ## Priority Files
-1. .github/workflows/ci.yml - security-sensitive path
+1. .github/workflows/deployment.yml - CI workflow or pipeline
+2. .github/workflows/codeql.yml - CI workflow or pipeline
+3. .github/workflows/go.yml - CI workflow or pipeline
+4. .github/workflows/lint.yml - CI workflow or pipeline
+5. .github/workflows/govulncheck.yml - CI workflow or pipeline
 
 ## Questions
 1. Pourquoi le workflow CI doit-il changer dans cette PR ?

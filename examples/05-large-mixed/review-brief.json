@@ -1,55 +1,55 @@
 {
   "schema_version": "review-brief.v1",
   "repository": {
-    "owner": "example",
-    "name": "oss-signal-demo",
-    "full_name": "example/oss-signal-demo",
-    "html_url": "https://github.com/example/oss-signal-demo"
+    "owner": "vitejs",
+    "name": "vite",
+    "full_name": "vitejs/vite",
+    "html_url": "https://github.com/vitejs/vite"
   },
   "pull_request": {
-    "number": 105,
-    "title": "Refactor storage layer and migration",
-    "author": "mixed-contributor",
-    "html_url": "https://github.com/example/oss-signal-demo/pull/105",
-    "state": "open",
+    "number": 22471,
+    "title": "fix(deps): update all non-major dependencies",
+    "author": "renovate[bot]",
+    "html_url": "https://github.com/vitejs/vite/pull/22471",
+    "state": "closed",
     "draft": false,
-    "created_at": "2026-06-01T10:00:00Z",
-    "updated_at": "2026-06-01T12:00:00Z",
-    "merged_at": null,
+    "created_at": "2026-05-18T00:54:25Z",
+    "updated_at": "2026-05-21T04:37:22Z",
+    "merged_at": "2026-05-21T04:37:20Z",
     "head": {
-      "ref": "storage/refactor",
-      "sha": "1111111111111111111111111111111111111105",
-      "repo_full_name": "mixed-contributor/oss-signal-demo"
+      "ref": "renovate/all-minor-patch",
+      "sha": "9225f8dcc3786326917ce60754c051442831d920",
+      "repo_full_name": "vitejs/vite"
     },
     "base": {
       "ref": "main",
-      "sha": "2222222222222222222222222222222222222205",
-      "repo_full_name": "example/oss-signal-demo"
+      "sha": "698cab12849c6453f6d6a72c1bc4236d1f9127d3",
+      "repo_full_name": "vitejs/vite"
     },
-    "commits": 6,
-    "additions": 920,
-    "deletions": 140,
-    "changed_files": 5,
+    "commits": 1,
+    "additions": 594,
+    "deletions": 888,
+    "changed_files": 32,
     "body_present": true,
-    "body_length": 24
+    "body_length": 58000
   },
   "size": {
-    "files": 5,
-    "additions": 920,
-    "deletions": 140,
-    "diff_bytes": 892,
-    "diff_lines": 27
+    "files": 32,
+    "additions": 594,
+    "deletions": 888,
+    "diff_bytes": 128892,
+    "diff_lines": 3559
   },
   "categories": {
-    "code": 1,
-    "tests": 1,
+    "code": 0,
+    "tests": 0,
     "documentation": 1,
-    "ci": 0,
-    "dependencies": 1,
-    "configuration": 0,
-    "security": 0,
-    "migrations": 1,
-    "release": 1,
+    "ci": 5,
+    "dependencies": 27,
+    "configuration": 6,
+    "security": 5,
+    "migrations": 0,
+    "release": 26,
     "build": 0,
     "generated": 0,
     "unknown": 0
@@ -63,21 +63,21 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "5 files, +920 / -140",
+          "value": "32 files, +594 / -888",
           "reason": "> 20 files or > 800 changed lines"
         }
       ]
     },
     {
-      "id": "tests_changed",
-      "level": "info",
-      "title": "Tests changed",
-      "message": "At least one test file changed.",
+      "id": "many_files_changed",
+      "level": "high",
+      "title": "Many files changed",
+      "message": "The number of changed files is high.",
       "evidence": [
         {
-          "kind": "file",
-          "value": "tests/storage.test.ts",
-          "reason": "tests"
+          "kind": "metadata",
+          "value": "32",
+          "reason": "> 20 files changed"
         }
       ]
     },
@@ -89,7 +89,7 @@
       "evidence": [
         {
           "kind": "file",
-          "value": "docs/storage.md",
+          "value": "docs/package.json",
           "reason": "documentation changed"
         }
       ]
@@ -102,52 +102,211 @@
       "evidence": [
         {
           "kind": "file",
+          "value": "docs/package.json",
+          "reason": "dependency manifest"
+        },
+        {
+          "kind": "file",
           "value": "package.json",
+          "reason": "dependency manifest"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/package.json",
+          "reason": "dependency manifest"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/template-lit-ts/package.json",
+          "reason": "dependency manifest"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/template-lit/package.json",
           "reason": "dependency manifest"
         }
       ]
     },
     {
-      "id": "migration_changed",
+      "id": "dependency_lockfile_changed",
       "level": "medium",
-      "title": "Migration or schema changed",
-      "message": "A migration, schema or database path changed.",
+      "title": "Dependency lockfile changed",
+      "message": "A dependency lockfile changed.",
       "evidence": [
         {
           "kind": "file",
-          "value": "prisma/migrations/20260603000000_storage/schema.sql",
-          "reason": "migration/schema/database path"
+          "value": "pnpm-lock.yaml",
+          "reason": "dependency lockfile"
         }
       ]
     },
     {
-      "id": "short_description_for_large_pr",
-      "level": "high",
-      "title": "Short description for large PR",
-      "message": "The PR is large but the description is short.",
-      "evidence": [
-        {
-          "kind": "metadata",
-          "value": "5 files, 1060 changed lines",
-          "reason": "large PR threshold reached"
-        },
-        {
-          "kind": "description",
-          "value": "24 characters",
-          "reason": "< 120 characters"
-        }
-      ]
-    },
-    {
-      "id": "description_missing_dependency_context",
+      "id": "dependency_change_without_code",
       "level": "medium",
-      "title": "Dependency context missing from description",
-      "message": "Dependency files changed but the description does not mention dependency context.",
+      "title": "Dependency change without code",
+      "message": "Dependency files changed with little or no code change detected.",
       "evidence": [
+        {
+          "kind": "file",
+          "value": "docs/package.json",
+          "reason": "dependency change without code category"
+        },
         {
           "kind": "file",
           "value": "package.json",
-          "reason": "dependency changed without matching description context"
+          "reason": "dependency change without code category"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/package.json",
+          "reason": "dependency change without code category"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/template-lit-ts/package.json",
+          "reason": "dependency change without code category"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/template-lit/package.json",
+          "reason": "dependency change without code category"
+        }
+      ]
+    },
+    {
+      "id": "ci_changed",
+      "level": "medium",
+      "title": "CI changed",
+      "message": "A CI workflow or pipeline file changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": ".github/workflows/ci.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/copilot-setup-steps.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/preview-release.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/publish.yml",
+          "reason": "CI path"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/zizmor.yml",
+          "reason": "CI path"
+        }
+      ]
+    },
+    {
+      "id": "ci_changed_with_dependency_change",
+      "level": "high",
+      "title": "CI and dependencies changed together",
+      "message": "CI and dependency files changed in the same PR.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": ".github/workflows/ci.yml",
+          "reason": "CI changed"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/copilot-setup-steps.yml",
+          "reason": "CI changed"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/preview-release.yml",
+          "reason": "CI changed"
+        },
+        {
+          "kind": "file",
+          "value": "docs/package.json",
+          "reason": "dependency changed"
+        },
+        {
+          "kind": "file",
+          "value": "package.json",
+          "reason": "dependency changed"
+        },
+        {
+          "kind": "file",
+          "value": "packages/create-vite/package.json",
+          "reason": "dependency changed"
+        }
+      ]
+    },
+    {
+      "id": "security_sensitive_file_changed",
+      "level": "medium",
+      "title": "Security-sensitive path changed",
+      "message": "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": ".github/workflows/ci.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/copilot-setup-steps.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/preview-release.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/publish.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/zizmor.yml",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        }
+      ]
+    },
+    {
+      "id": "configuration_changed",
+      "level": "info",
+      "title": "Configuration changed",
+      "message": "A configuration file changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": ".github/workflows/ci.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/copilot-setup-steps.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/preview-release.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/publish.yml",
+          "reason": "configuration file or directory"
+        },
+        {
+          "kind": "file",
+          "value": ".github/workflows/zizmor.yml",
+          "reason": "configuration file or directory"
         }
       ]
     },
@@ -159,7 +318,7 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "code, tests, documentation, dependencies, migrations, release",
+          "value": "documentation, ci, dependencies, configuration, security, release",
           "reason": ">= 4 strong categories touched"
         }
       ]
@@ -169,20 +328,23 @@
   "recommended_action": "request_split",
   "priority_files": [
     {
-      "path": "prisma/migrations/20260603000000_storage/schema.sql",
+      "path": "pnpm-lock.yaml",
       "categories": [
-        "migrations"
+        "dependencies",
+        "configuration"
       ],
-      "changes": 434,
-      "reason": "migration or schema path"
+      "changes": 1350,
+      "reason": "dependency manifest or lockfile"
     },
     {
-      "path": "src/storage/index.ts",
+      "path": "docs/package.json",
       "categories": [
-        "code"
+        "documentation",
+        "dependencies",
+        "release"
       ],
-      "changes": 400,
-      "reason": "source code change"
+      "changes": 4,
+      "reason": "dependency manifest or lockfile"
     },
     {
       "path": "package.json",
@@ -190,24 +352,26 @@
         "dependencies",
         "release"
       ],
-      "changes": 6,
+      "changes": 12,
       "reason": "dependency manifest or lockfile"
     },
     {
-      "path": "tests/storage.test.ts",
+      "path": "packages/create-vite/template-react-ts/package.json",
       "categories": [
-        "tests"
+        "dependencies",
+        "release"
       ],
-      "changes": 132,
-      "reason": "tests"
+      "changes": 12,
+      "reason": "dependency manifest or lockfile"
     },
     {
-      "path": "docs/storage.md",
+      "path": "packages/vite/package.json",
       "categories": [
-        "documentation"
+        "dependencies",
+        "release"
       ],
-      "changes": 88,
-      "reason": "documentation"
+      "changes": 10,
+      "reason": "dependency manifest or lockfile"
     }
   ],
   "questions": [
@@ -220,12 +384,12 @@
       "question": "Pourquoi cette dependance est-elle necessaire dans cette PR ?"
     },
     {
-      "signal_id": "migration_changed",
-      "question": "La migration est-elle backward compatible et reversible ?"
+      "signal_id": "dependency_lockfile_changed",
+      "question": "Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?"
     },
     {
-      "signal_id": "short_description_for_large_pr",
-      "question": "Pouvez-vous ajouter contexte, comportement attendu et strategie de test ?"
+      "signal_id": "ci_changed",
+      "question": "Pourquoi le workflow CI doit-il changer dans cette PR ?"
     },
     {
       "signal_id": "mixed_concerns",
@@ -233,7 +397,7 @@
     }
   ],
   "data_confidence": {
-    "source": "fixture",
+    "source": "github",
     "diff_available": true,
     "file_count_matches_metadata": true
   },

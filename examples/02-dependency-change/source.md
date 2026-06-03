@@ -1,9 +1,10 @@
 # Source
 
-PR: https://github.com/example/oss-signal-demo/pull/102
+PR: https://github.com/prettier/prettier/pull/19201
 Type: dependency change
-Date generated: 2026-06-03
+Date generated: 2026-06-04
 
 Why this example:
+- Real public PR in Prettier.
 - Shows dependency manifest and lockfile detection.
-- Uses a synthetic public fixture so the example remains stable.
+- The brief should recommend dependency review without overstating risk.

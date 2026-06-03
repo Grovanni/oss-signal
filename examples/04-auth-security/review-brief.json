@@ -1,49 +1,49 @@
 {
   "schema_version": "review-brief.v1",
   "repository": {
-    "owner": "example",
-    "name": "oss-signal-demo",
-    "full_name": "example/oss-signal-demo",
-    "html_url": "https://github.com/example/oss-signal-demo"
+    "owner": "expressjs",
+    "name": "session",
+    "full_name": "expressjs/session",
+    "html_url": "https://github.com/expressjs/session"
   },
   "pull_request": {
-    "number": 104,
-    "title": "Adjust session token handling",
-    "author": "security-contributor",
-    "html_url": "https://github.com/example/oss-signal-demo/pull/104",
-    "state": "open",
+    "number": 1027,
+    "title": "feat: add support to dynamic cookie options",
+    "author": "lincond",
+    "html_url": "https://github.com/expressjs/session/pull/1027",
+    "state": "closed",
     "draft": false,
-    "created_at": "2026-06-01T10:00:00Z",
-    "updated_at": "2026-06-01T12:00:00Z",
-    "merged_at": null,
+    "created_at": "2025-02-26T13:40:48Z",
+    "updated_at": "2026-01-19T14:44:14Z",
+    "merged_at": "2026-01-19T14:44:13Z",
     "head": {
-      "ref": "auth/session-token",
-      "sha": "1111111111111111111111111111111111111104",
-      "repo_full_name": "security-contributor/oss-signal-demo"
+      "ref": "master",
+      "sha": "7434695c3a4f6777b2fb421f53afd432fdcf8b11",
+      "repo_full_name": "lincond/session"
     },
     "base": {
-      "ref": "main",
-      "sha": "2222222222222222222222222222222222222204",
-      "repo_full_name": "example/oss-signal-demo"
+      "ref": "master",
+      "sha": "73e0193afbee24bca8744e4fc8a67b92810301e8",
+      "repo_full_name": "expressjs/session"
     },
-    "commits": 1,
-    "additions": 42,
-    "deletions": 12,
-    "changed_files": 1,
+    "commits": 5,
+    "additions": 97,
+    "deletions": 3,
+    "changed_files": 4,
     "body_present": true,
-    "body_length": 31
+    "body_length": 2193
   },
   "size": {
-    "files": 1,
-    "additions": 42,
-    "deletions": 12,
-    "diff_bytes": 184,
-    "diff_lines": 8
+    "files": 4,
+    "additions": 97,
+    "deletions": 3,
+    "diff_bytes": 5894,
+    "diff_lines": 159
   },
   "categories": {
     "code": 1,
-    "tests": 0,
-    "documentation": 0,
+    "tests": 1,
+    "documentation": 2,
     "ci": 0,
     "dependencies": 0,
     "configuration": 0,
@@ -63,21 +63,39 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "1 files, +42 / -12",
+          "value": "4 files, +97 / -3",
           "reason": "<= 5 files and <= 200 changed lines"
         }
       ]
     },
     {
-      "id": "code_without_tests",
-      "level": "medium",
-      "title": "Code changed without tests",
-      "message": "Code files changed but no test file was detected.",
+      "id": "tests_changed",
+      "level": "info",
+      "title": "Tests changed",
+      "message": "At least one test file changed.",
       "evidence": [
         {
           "kind": "file",
-          "value": "src/auth/session.ts",
-          "reason": "code without detected tests"
+          "value": "test/session.js",
+          "reason": "tests"
+        }
+      ]
+    },
+    {
+      "id": "docs_changed",
+      "level": "info",
+      "title": "Documentation changed",
+      "message": "Documentation changed with other categories.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "HISTORY.md",
+          "reason": "documentation changed"
+        },
+        {
+          "kind": "file",
+          "value": "README.md",
+          "reason": "documentation changed"
         }
       ]
     },
@@ -89,7 +107,7 @@
       "evidence": [
         {
           "kind": "file",
-          "value": "src/auth/session.ts",
+          "value": "test/session.js",
           "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
         }
       ]
@@ -102,8 +120,21 @@
       "evidence": [
         {
           "kind": "file",
-          "value": "src/auth/session.ts",
+          "value": "test/session.js",
           "reason": "path contains auth/login/session/token/jwt/oauth"
+        }
+      ]
+    },
+    {
+      "id": "mixed_concerns",
+      "level": "medium",
+      "title": "Mixed concerns",
+      "message": "At least four strong file categories changed in the same PR.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "code, tests, documentation, security",
+          "reason": ">= 4 strong categories touched"
         }
       ]
     }
@@ -112,27 +143,51 @@
   "recommended_action": "security_review",
   "priority_files": [
     {
-      "path": "src/auth/session.ts",
+      "path": "test/session.js",
       "categories": [
-        "security",
+        "tests",
+        "security"
+      ],
+      "changes": 52,
+      "reason": "security-sensitive path"
+    },
+    {
+      "path": "index.js",
+      "categories": [
         "code"
       ],
-      "changes": 54,
-      "reason": "security-sensitive path"
+      "changes": 7,
+      "reason": "source code change"
+    },
+    {
+      "path": "HISTORY.md",
+      "categories": [
+        "documentation"
+      ],
+      "changes": 21,
+      "reason": "documentation"
+    },
+    {
+      "path": "README.md",
+      "categories": [
+        "documentation"
+      ],
+      "changes": 20,
+      "reason": "documentation"
     }
   ],
   "questions": [
     {
-      "signal_id": "code_without_tests",
-      "question": "Quels tests couvrent les fichiers de code modifies ?"
-    },
-    {
       "signal_id": "auth_related_change",
       "question": "Le changement d'authentification ou de session est-il couvert par des tests ?"
+    },
+    {
+      "signal_id": "mixed_concerns",
+      "question": "Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?"
     }
   ],
   "data_confidence": {
-    "source": "fixture",
+    "source": "github",
     "diff_available": true,
     "file_count_matches_metadata": true
   },
