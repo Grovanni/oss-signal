@@ -6,6 +6,15 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+## 0.1.1 - 2026-06-04
+
+- Added GitHub CI status/check fetching and compact CI summaries in terminal, Markdown, JSON and agent context outputs.
+- Added `ci_checks_failed`, `ci_checks_pending` and `ci_status_unavailable` signals.
+- Refined `wait_for_ci` so CI-green workflow-only PRs can proceed to normal review.
+- Regenerated the real public examples with GitHub CI state.
+
+## 0.1.0 - 2026-06-04
+
 - Initial project planning.
 - Added TypeScript CLI skeleton with `oss-signal pr <url> --dry-run`.
 - Added deterministic GitHub Pull Request URL parser with unit tests.
@@ -16,6 +25,4 @@ The format should follow clear release notes. The project uses semantic versioni
 - Added five public examples with generated outputs.
 - Replaced synthetic examples with five real public PR examples.
 - Reduced noisy security routing for workflow-only changes and environment-like paths.
-- Added GitHub CI status/check fetching, CI summary output and `ci_checks_failed` / `ci_checks_pending` / `ci_status_unavailable` signals.
-- Refined `wait_for_ci` so CI-green workflow-only PRs can proceed to normal review.
 - Added npm scripts for build, test, lint, format, and check.

@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-V0.1 local test version. The CLI fetches GitHub Pull Request data, GitHub CI statuses/checks, changed files and diff metadata, classifies changed files, detects deterministic signals, computes attention level, recommends a next review action and writes three output files.
+V0.1 local test version. The CLI fetches GitHub Pull Request data, changed files, diff metadata and GitHub CI statuses/checks when available, then classifies changed files, detects deterministic signals, computes attention level, recommends a next review action and writes three output files.
 
 ## Goal
 
@@ -100,7 +100,7 @@ node dist/cli/index.js pr <url> --format json --no-agent
 node dist/cli/index.js pr <url> --quiet
 ```
 
-OSS Signal does not print or write the full diff. Reports contain facts, signals and evidence references.
+OSS Signal does not print or write the full diff. Reports contain facts, signals, GitHub CI state when available and evidence references.
 
 ## Examples
 
