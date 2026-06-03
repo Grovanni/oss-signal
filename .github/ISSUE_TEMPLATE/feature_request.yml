@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest an improvement for OSS Signal
+title: "[Feature]: "
+labels: ["heuristic"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What reviewer problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence available to OSS Signal
+      description: Explain what metadata, file path or diff evidence would trigger this.
+    validations:
+      required: true
+  - type: textarea
+    id: noise
+    attributes:
+      label: False positive or noise risk
+    validations:
+      required: true
+

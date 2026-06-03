@@ -1,0 +1,34 @@
+name: Bug report
+description: Report incorrect behavior in OSS Signal
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the incorrect behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Paste the command you ran.
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: pr
+    attributes:
+      label: Pull Request URL
+      description: If public, share the PR URL that triggered the issue.
+    validations:
+      required: false
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
