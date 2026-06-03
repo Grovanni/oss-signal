@@ -1,0 +1,22 @@
+[
+  {
+    "filename": "src/github/parse-url.ts",
+    "status": "modified",
+    "additions": 8,
+    "deletions": 1,
+    "changes": 9,
+    "patch": "@@ -1,2 +1,3 @@\n export function parse() {}\n+export function normalize() {}\n",
+    "blob_url": "https://github.com/org/repo/blob/sha/src/github/parse-url.ts",
+    "raw_url": "https://github.com/org/repo/raw/sha/src/github/parse-url.ts"
+  },
+  {
+    "filename": "tests/unit/parse-url.test.ts",
+    "status": "added",
+    "additions": 10,
+    "deletions": 2,
+    "changes": 12,
+    "patch": "@@ -0,0 +1,2 @@\n+import { expect, it } from \"vitest\";\n+it(\"parses\", () => expect(true).toBe(true));\n",
+    "blob_url": "https://github.com/org/repo/blob/sha/tests/unit/parse-url.test.ts",
+    "raw_url": "https://github.com/org/repo/raw/sha/tests/unit/parse-url.test.ts"
+  }
+]

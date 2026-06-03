@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-Early project. Phase 1 currently provides a TypeScript CLI skeleton and GitHub Pull Request URL parsing in dry-run mode.
+Early project. Phase 2 currently fetches and normalizes GitHub Pull Request metadata, changed files and unified diff data. Final report rendering is still planned.
 
 ## Goal
 
@@ -52,19 +52,41 @@ oss-signal-output/
 ```bash
 npm install
 npm run build
+node dist/cli/index.js pr https://github.com/org/repo/pull/123
+```
+
+Set `GITHUB_TOKEN` or `GH_TOKEN` for private repositories or a higher GitHub rate limit. The token is only sent as an Authorization header and is never included in output.
+
+Use `--dry-run` to validate URL parsing without network access:
+
+```bash
 node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
 ```
 
-Current dry-run output confirms URL parsing and does not fetch GitHub data yet.
+Use `--fixture` to run against local fixture files instead of the network:
+
+```bash
+node dist/cli/index.js pr https://github.com/org/repo/pull/123 --fixture tests/fixtures/github-basic
+```
+
+Current output is an intermediate normalized JSON summary. It includes diff byte and line counts, but it does not print the full diff or full PR description.
 
 ```json
 {
-  "mode": "dry-run",
+  "mode": "github",
   "pull_request": {
-    "owner": "org",
-    "repo": "repo",
-    "pullNumber": 123,
-    "htmlUrl": "https://github.com/org/repo/pull/123"
+    "number": 123,
+    "title": "Example pull request",
+    "changed_files": 2
+  },
+  "files": {
+    "count": 2
+  },
+  "diff": {
+    "format": "unified",
+    "bytes": 1200,
+    "lines": 80,
+    "available": true
   }
 }
 ```

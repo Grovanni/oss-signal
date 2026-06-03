@@ -45,10 +45,17 @@ npm run lint
 npm run check
 ```
 
-Verifier la CLI Phase 1 :
+Verifier la CLI sans reseau :
 
 ```bash
 node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
+node dist/cli/index.js pr https://github.com/org/repo/pull/123 --fixture tests/fixtures/github-basic
+```
+
+Verifier la recuperation GitHub sur une PR publique :
+
+```bash
+node dist/cli/index.js pr https://github.com/org/repo/pull/123
 ```
 
 ## Style
@@ -65,3 +72,4 @@ node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
 - Ne jamais ecrire un token dans un fichier genere.
 - Ne jamais executer du code issu d'une PR analysee.
 - Valider les URLs GitHub.
+- Ne pas imprimer le diff complet dans la sortie terminal.
