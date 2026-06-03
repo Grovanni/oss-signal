@@ -1,6 +1,6 @@
 # Review brief JSON schema
 
-The JSON output is versioned.
+The final `review-brief.json` output is planned for the report rendering phase. The current CLI prints an intermediate JSON summary with GitHub data and analysis.
 
 Required top-level fields:
 
@@ -45,3 +45,20 @@ Do not remove or rename fields inside the same `schema_version`.
 
 If a breaking change is needed, increment `schema_version`.
 
+## Current analysis shape
+
+The current intermediate output includes:
+
+```json
+{
+  "analysis": {
+    "categories": {},
+    "classified_files": [],
+    "signals": [],
+    "attention": "medium",
+    "recommended_action": "ask_for_tests",
+    "priority_files": [],
+    "questions": []
+  }
+}
+```

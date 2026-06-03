@@ -1,3 +1,5 @@
+import type { PullRequestAnalysis } from "../analyze/analyze-pr.js";
+
 export type PullRequestDataSource = "github" | "fixture";
 
 export type GitHubRepositorySummary = {
@@ -74,4 +76,5 @@ export type GitHubPullRequestOutput = Omit<GitHubPullRequestData, "diff" | "file
   diff: Omit<GitHubDiffData, "text"> & {
     available: boolean;
   };
+  analysis: PullRequestAnalysis;
 };

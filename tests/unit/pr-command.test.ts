@@ -17,6 +17,10 @@ describe("buildPrResult", () => {
       diff: {
         available: true,
         format: "unified"
+      },
+      analysis: {
+        attention: "low",
+        recommended_action: "normal_review"
       }
     });
     expect(JSON.stringify(result)).not.toContain("export function normalize");

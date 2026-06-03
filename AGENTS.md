@@ -65,6 +65,7 @@ node dist/cli/index.js pr https://github.com/org/repo/pull/123
 - Noms explicites.
 - Pas de dependance lourde sans justification.
 - Pas de reseau dans les tests unitaires.
+- Les signaux doivent rester deterministes et lies a des preuves.
 
 ## Securite
 
@@ -73,3 +74,4 @@ node dist/cli/index.js pr https://github.com/org/repo/pull/123
 - Ne jamais executer du code issu d'une PR analysee.
 - Valider les URLs GitHub.
 - Ne pas imprimer le diff complet dans la sortie terminal.
+- Ne pas imprimer le corps complet de PR dans la sortie terminal.

@@ -1,8 +1,11 @@
+import { analyzePullRequestData } from "../analyze/analyze-pr.js";
 import type { GitHubPullRequestData, GitHubPullRequestOutput } from "./types.js";
 
 export function summarizeGitHubPullRequestData(
   data: GitHubPullRequestData
 ): GitHubPullRequestOutput {
+  const analysis = analyzePullRequestData(data);
+
   return {
     mode: data.source,
     schema_version: data.schema_version,
@@ -37,6 +40,7 @@ export function summarizeGitHubPullRequestData(
       lines: data.diff.lines,
       available: data.diff.text.length > 0
     },
+    analysis,
     limitations: data.limitations
   };
 }

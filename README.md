@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-Early project. Phase 2 currently fetches and normalizes GitHub Pull Request metadata, changed files and unified diff data. Final report rendering is still planned.
+Early project. Phase 3 currently fetches GitHub Pull Request data, classifies changed files, detects deterministic signals, computes attention level and recommends a next review action. Final report file rendering is still planned.
 
 ## Goal
 
@@ -87,6 +87,18 @@ Current output is an intermediate normalized JSON summary. It includes diff byte
     "bytes": 1200,
     "lines": 80,
     "available": true
+  },
+  "analysis": {
+    "attention": "low",
+    "recommended_action": "normal_review",
+    "signals": [
+      {
+        "id": "small_pr",
+        "level": "info",
+        "evidence": []
+      }
+    ],
+    "questions": []
   }
 }
 ```
