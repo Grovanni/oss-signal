@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-V0.1 local test version. The CLI fetches GitHub Pull Request data, classifies changed files, detects deterministic signals, computes attention level, recommends a next review action and writes three output files.
+V0.1 local test version. The CLI fetches GitHub Pull Request data, GitHub CI statuses/checks, changed files and diff metadata, classifies changed files, detects deterministic signals, computes attention level, recommends a next review action and writes three output files.
 
 ## Goal
 
@@ -27,6 +27,7 @@ It does not decide whether a PR is good or bad. It highlights observable facts:
 - tests present or absent;
 - dependency changes;
 - CI changes;
+- GitHub CI status/check results;
 - sensitive paths;
 - migrations;
 - mixed concerns;
@@ -64,6 +65,7 @@ OSS Signal: org/repo#123
 Attention: high
 Action: request_split
 Size: 5 files, +920 / -140
+CI: pending (0 failed, 2 pending)
 Signals: large_pr, tests_changed, docs_changed
 Outputs: oss-signal-output/review-brief.md, oss-signal-output/review-brief.json, oss-signal-output/agent-context.md
 ```

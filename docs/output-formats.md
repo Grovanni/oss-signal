@@ -12,6 +12,7 @@ Main sections:
 
 - summary;
 - recommended action;
+- CI status summary;
 - top reasons with evidence;
 - areas touched;
 - priority files;
@@ -30,13 +31,13 @@ Current schema version:
 review-brief.v1
 ```
 
-The JSON includes repository and PR metadata, size, categories, signals with evidence, attention, recommended action, priority files, questions, data confidence and limitations.
+The JSON includes repository and PR metadata, size, GitHub CI status/check summary, categories, signals with evidence, attention, recommended action, priority files, questions, data confidence and limitations.
 
 ## `agent-context.md`
 
 Compact briefing for coding agents.
 
-It contains known facts, priority files, suggested review questions and constraints.
+It contains known facts, GitHub CI state, priority files, suggested review questions and constraints.
 
 It must not contain long diff dumps or speculative conclusions.
 

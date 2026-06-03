@@ -17,7 +17,16 @@ export function renderTerminalSummary(
     `Attention: ${result.analysis.attention}`,
     `Action: ${result.analysis.recommended_action}`,
     `Size: ${result.files.count} files, +${result.pull_request.additions} / -${result.pull_request.deletions}`,
+    `CI: ${formatCiSummary(result)}`,
     `Signals: ${signals || "none"}`,
     `Outputs: ${outputs || "none"}`
   ].join("\n");
+}
+
+function formatCiSummary(result: GitHubPullRequestOutput): string {
+  if (result.ci.total === 0) {
+    return result.ci.state;
+  }
+
+  return `${result.ci.state} (${result.ci.failed} failed, ${result.ci.pending} pending)`;
 }

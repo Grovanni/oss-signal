@@ -16,4 +16,6 @@ The format should follow clear release notes. The project uses semantic versioni
 - Added five public examples with generated outputs.
 - Replaced synthetic examples with five real public PR examples.
 - Reduced noisy security routing for workflow-only changes and environment-like paths.
+- Added GitHub CI status/check fetching, CI summary output and `ci_checks_failed` / `ci_checks_pending` / `ci_status_unavailable` signals.
+- Refined `wait_for_ci` so CI-green workflow-only PRs can proceed to normal review.
 - Added npm scripts for build, test, lint, format, and check.

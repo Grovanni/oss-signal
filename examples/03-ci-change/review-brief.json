@@ -40,6 +40,89 @@
     "diff_bytes": 8794,
     "diff_lines": 237
   },
+  "ci": {
+    "head_sha": "94e3b1fca0f8549b7edb43e0b6971b235d69f0b8",
+    "state": "success",
+    "total": 9,
+    "successful": 9,
+    "failed": 0,
+    "pending": 0,
+    "skipped": 0,
+    "items": [
+      {
+        "kind": "check_run",
+        "name": "CodeQL",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/runs/77399152034"
+      },
+      {
+        "kind": "check_run",
+        "name": "CodeQL-Build (actions)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287690/job/77399005155"
+      },
+      {
+        "kind": "check_run",
+        "name": "CodeQL-Build (go)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287690/job/77399004842"
+      },
+      {
+        "kind": "check_run",
+        "name": "build (windows-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004786"
+      },
+      {
+        "kind": "check_run",
+        "name": "build (macos-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004758"
+      },
+      {
+        "kind": "check_run",
+        "name": "build (ubuntu-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004729"
+      },
+      {
+        "kind": "check_run",
+        "name": "integration-tests (windows-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004726"
+      },
+      {
+        "kind": "check_run",
+        "name": "integration-tests (ubuntu-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004702"
+      },
+      {
+        "kind": "check_run",
+        "name": "integration-tests (macos-latest)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/cli/cli/actions/runs/26293287682/job/77399004697"
+      }
+    ]
+  },
   "categories": {
     "code": 0,
     "tests": 0,
@@ -169,7 +252,7 @@
     }
   ],
   "attention": "medium",
-  "recommended_action": "wait_for_ci",
+  "recommended_action": "normal_review",
   "priority_files": [
     {
       "path": ".github/workflows/deployment.yml",
@@ -231,7 +314,8 @@
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": [
     "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",

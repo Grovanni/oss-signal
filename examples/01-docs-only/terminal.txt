@@ -2,5 +2,6 @@ OSS Signal: pallets/flask#5827
 Attention: low
 Action: normal_review
 Size: 1 files, +5 / -3
+CI: success (0 failed, 0 pending)
 Signals: small_pr, docs_only
 Outputs: examples\01-docs-only\review-brief.md, examples\01-docs-only\review-brief.json, examples\01-docs-only\agent-context.md

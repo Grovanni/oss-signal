@@ -40,6 +40,345 @@
     "diff_bytes": 6308,
     "diff_lines": 159
   },
+  "ci": {
+    "head_sha": "a8e3ca2e26849b8c0e95c720c00ea068b134aa1f",
+    "state": "failure",
+    "total": 41,
+    "successful": 39,
+    "failed": 2,
+    "pending": 0,
+    "skipped": 2,
+    "items": [
+      {
+        "kind": "check_run",
+        "name": "codecov/patch",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/runs/77755146844"
+      },
+      {
+        "kind": "check_run",
+        "name": "codecov/project",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/runs/77755145222"
+      },
+      {
+        "kind": "check_run",
+        "name": "CodeQL",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/runs/77754703755"
+      },
+      {
+        "kind": "check_run",
+        "name": "Continuous Releases",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/runs/77754675174"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 20 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644613"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 18 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644609"
+      },
+      {
+        "kind": "check_run",
+        "name": "[Full Test]  Node.js 26 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644605"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 14 on MacOS",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644604"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 14 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644602"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 22 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644581"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 14 on Windows",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644574"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 16 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644564"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 26 on MacOS",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644534"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 26 on Windows",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644527"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 24 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644516"
+      },
+      {
+        "kind": "check_run",
+        "name": "Browser(firefox) on Windows",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644480"
+      },
+      {
+        "kind": "check_run",
+        "name": "[Full Test]  Browser(chrome) on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644472"
+      },
+      {
+        "kind": "check_run",
+        "name": "Preview release",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644460"
+      },
+      {
+        "kind": "check_run",
+        "name": "CLI",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644457"
+      },
+      {
+        "kind": "check_run",
+        "name": "Browser(firefox) on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644444"
+      },
+      {
+        "kind": "check_run",
+        "name": "Lint",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754644441"
+      },
+      {
+        "kind": "check_run",
+        "name": "Redirect rules",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/runs/77754558955"
+      },
+      {
+        "kind": "check_run",
+        "name": "Header rules",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "neutral",
+        "url": "https://github.com/prettier/prettier/runs/77754558271"
+      },
+      {
+        "kind": "check_run",
+        "name": "Run automated fix / Run automated fix",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054816/job/77754557757"
+      },
+      {
+        "kind": "check_run",
+        "name": "Analyze",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054723/job/77754557703"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 20 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557645"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 22 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557642"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 20 on Windows",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557641"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 26 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557639"
+      },
+      {
+        "kind": "check_run",
+        "name": "[Full Test]  Node.js 24 on Linux",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557637"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 20 on MacOS",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557636"
+      },
+      {
+        "kind": "check_run",
+        "name": "Test with yarn",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054725/job/77754557635"
+      },
+      {
+        "kind": "check_run",
+        "name": "Test with npm",
+        "state": "failure",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054725/job/77754557633"
+      },
+      {
+        "kind": "check_run",
+        "name": "Test with pnpm",
+        "state": "failure",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054725/job/77754557632"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 26 on Windows",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557629"
+      },
+      {
+        "kind": "check_run",
+        "name": "Node.js 26 on MacOS",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054703/job/77754557622"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build / Build",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054724/job/77754557604"
+      },
+      {
+        "kind": "check_run",
+        "name": "Pages changed",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "neutral",
+        "url": "https://github.com/prettier/prettier/runs/77754557494"
+      },
+      {
+        "kind": "check_run",
+        "name": "Lint",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054705/job/77754557479"
+      },
+      {
+        "kind": "check_run",
+        "name": "Check Sizes",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/prettier/prettier/actions/runs/26414054726/job/77754557470"
+      },
+      {
+        "kind": "status",
+        "name": "deploy/netlify",
+        "state": "success",
+        "status": "success",
+        "conclusion": "success",
+        "url": "https://deploy-preview-19201--prettier.netlify.app"
+      }
+    ]
+  },
   "categories": {
     "code": 0,
     "tests": 0,
@@ -111,10 +450,28 @@
           "reason": "dependency change without code category"
         }
       ]
+    },
+    {
+      "id": "ci_checks_failed",
+      "level": "high",
+      "title": "CI checks failed",
+      "message": "GitHub reports failing or errored checks for the PR head commit.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "check_run:Test with npm",
+          "reason": "failing CI item; status=completed; conclusion=failure"
+        },
+        {
+          "kind": "metadata",
+          "value": "check_run:Test with pnpm",
+          "reason": "failing CI item; status=completed; conclusion=failure"
+        }
+      ]
     }
   ],
-  "attention": "medium",
-  "recommended_action": "dependency_review",
+  "attention": "high",
+  "recommended_action": "wait_for_ci",
   "priority_files": [
     {
       "path": "yarn.lock",
@@ -142,12 +499,17 @@
     {
       "signal_id": "dependency_lockfile_changed",
       "question": "Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?"
+    },
+    {
+      "signal_id": "ci_checks_failed",
+      "question": "Quel check CI echoue et doit-il etre corrige avant la review approfondie ?"
     }
   ],
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": [
     "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",

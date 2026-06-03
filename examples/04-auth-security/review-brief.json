@@ -40,6 +40,249 @@
     "diff_bytes": 5894,
     "diff_lines": 159
   },
+  "ci": {
+    "head_sha": "7434695c3a4f6777b2fb421f53afd432fdcf8b11",
+    "state": "success",
+    "total": 29,
+    "successful": 29,
+    "failed": 0,
+    "pending": 0,
+    "skipped": 0,
+    "items": [
+      {
+        "kind": "check_run",
+        "name": "CodeQL",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/runs/60796752865"
+      },
+      {
+        "kind": "check_run",
+        "name": "coverage",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796722849"
+      },
+      {
+        "kind": "check_run",
+        "name": "Analyze",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559829/job/60796652365"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 9.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652165"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 21.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652118"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 14.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652107"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 20.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652099"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 8.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652093"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 7.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652088"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 13.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652080"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 17.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652078"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 15.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652072"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 12.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652069"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 16.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652068"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 5.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652063"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 18.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652062"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 10.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652060"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 11.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652059"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 0.10)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652045"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 6.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652040"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 19.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652037"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 0.8)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652011"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (io.js 3.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652005"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 4.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796652002"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (io.js 1.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796651997"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (Node.js 0.12)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796651991"
+      },
+      {
+        "kind": "check_run",
+        "name": "test (io.js 2.x)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/actions/runs/21141559806/job/60796651986"
+      },
+      {
+        "kind": "check_run",
+        "name": "Socket Security: Pull Request Alerts",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/runs/60796643668"
+      },
+      {
+        "kind": "check_run",
+        "name": "Socket Security: Project Report",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/expressjs/session/runs/60796640791"
+      }
+    ]
+  },
   "categories": {
     "code": 1,
     "tests": 1,
@@ -189,7 +432,8 @@
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": [
     "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",

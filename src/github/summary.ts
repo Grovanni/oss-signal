@@ -11,6 +11,7 @@ export function summarizeGitHubPullRequestData(
     schema_version: data.schema_version,
     source: data.source,
     repository: data.repository,
+    ci: data.ci,
     pull_request: {
       number: data.pull_request.number,
       title: data.pull_request.title,

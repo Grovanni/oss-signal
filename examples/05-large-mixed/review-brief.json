@@ -40,6 +40,185 @@
     "diff_bytes": 128892,
     "diff_lines": 3559
   },
+  "ci": {
+    "head_sha": "9225f8dcc3786326917ce60754c051442831d920",
+    "state": "failure",
+    "total": 21,
+    "successful": 19,
+    "failed": 2,
+    "pending": 0,
+    "skipped": 3,
+    "items": [
+      {
+        "kind": "check_run",
+        "name": "Build & Test Passed or Skipped",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "skipped",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100966669"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build & Test Failed",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100966481"
+      },
+      {
+        "kind": "check_run",
+        "name": "CodeQL",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/runs/77100493981"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build&Test: node-24, macos-latest",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100463650"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build&Test: node-24, ubuntu-latest",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100463647"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build&Test: node-22, ubuntu-latest",
+        "state": "failure",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100463646"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build&Test: node-24, windows-latest",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100463644"
+      },
+      {
+        "kind": "check_run",
+        "name": "Build&Test: node-20, ubuntu-latest",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100463629"
+      },
+      {
+        "kind": "check_run",
+        "name": "Semantic Pull Request",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204200568/job/77100454256"
+      },
+      {
+        "kind": "check_run",
+        "name": "preview",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "skipped",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198816/job/77100449548"
+      },
+      {
+        "kind": "check_run",
+        "name": "Run zizmor",
+        "state": "failure",
+        "status": "completed",
+        "conclusion": "failure",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198807/job/77100449412"
+      },
+      {
+        "kind": "check_run",
+        "name": "copilot-setup-steps",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198806/job/77100449279"
+      },
+      {
+        "kind": "check_run",
+        "name": "Get changed files",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100449227"
+      },
+      {
+        "kind": "check_run",
+        "name": "Lint: node-24, ubuntu-latest",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204198757/job/77100449216"
+      },
+      {
+        "kind": "check_run",
+        "name": "Redirect rules - vite-docs-main",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/runs/77100449193"
+      },
+      {
+        "kind": "check_run",
+        "name": "Header rules - vite-docs-main",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/runs/77100448703"
+      },
+      {
+        "kind": "check_run",
+        "name": "Pages changed - vite-docs-main",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "neutral",
+        "url": "https://github.com/vitejs/vite/runs/77100448216"
+      },
+      {
+        "kind": "check_run",
+        "name": "Semantic Pull Request",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204197857/job/77100446376"
+      },
+      {
+        "kind": "check_run",
+        "name": "Analyze (actions)",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204197071/job/77100445739"
+      },
+      {
+        "kind": "check_run",
+        "name": "copilot-setup-steps",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/vitejs/vite/actions/runs/26204197449/job/77100445391"
+      },
+      {
+        "kind": "status",
+        "name": "netlify/vite-docs-main/deploy-preview",
+        "state": "success",
+        "status": "success",
+        "conclusion": "success",
+        "url": "https://deploy-preview-22471--vite-docs-main.netlify.app"
+      }
+    ]
+  },
   "categories": {
     "code": 0,
     "tests": 0,
@@ -207,6 +386,24 @@
       ]
     },
     {
+      "id": "ci_checks_failed",
+      "level": "high",
+      "title": "CI checks failed",
+      "message": "GitHub reports failing or errored checks for the PR head commit.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "check_run:Build&Test: node-22, ubuntu-latest",
+          "reason": "failing CI item; status=completed; conclusion=failure"
+        },
+        {
+          "kind": "metadata",
+          "value": "check_run:Run zizmor",
+          "reason": "failing CI item; status=completed; conclusion=failure"
+        }
+      ]
+    },
+    {
       "id": "ci_changed_with_dependency_change",
       "level": "high",
       "title": "CI and dependencies changed together",
@@ -318,14 +515,14 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "documentation, ci, dependencies, configuration, security, release",
+          "value": "documentation, ci, dependencies, configuration, release",
           "reason": ">= 4 strong categories touched"
         }
       ]
     }
   ],
   "attention": "high",
-  "recommended_action": "request_split",
+  "recommended_action": "wait_for_ci",
   "priority_files": [
     {
       "path": "pnpm-lock.yaml",
@@ -392,14 +589,15 @@
       "question": "Pourquoi le workflow CI doit-il changer dans cette PR ?"
     },
     {
-      "signal_id": "mixed_concerns",
-      "question": "Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?"
+      "signal_id": "ci_checks_failed",
+      "question": "Quel check CI echoue et doit-il etre corrige avant la review approfondie ?"
     }
   ],
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": [
     "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",

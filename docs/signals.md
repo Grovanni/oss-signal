@@ -9,6 +9,9 @@ Examples:
 - `code_without_tests`
 - `dependency_lockfile_changed`
 - `ci_changed`
+- `ci_checks_failed`
+- `ci_checks_pending`
+- `ci_status_unavailable`
 - `security_sensitive_file_changed`
 - `mixed_concerns`
 - `short_description_for_large_pr`
@@ -52,6 +55,9 @@ The Phase 3 implementation can emit these deterministic signals:
 - `dependency_change_without_code`
 - `ci_changed`
 - `ci_changed_with_dependency_change`
+- `ci_checks_failed`
+- `ci_checks_pending`
+- `ci_status_unavailable`
 - `security_sensitive_file_changed`
 - `auth_related_change`
 - `secret_related_change`
@@ -80,6 +86,8 @@ Recommended actions are non-authoritative:
 - `migration_review`
 
 Questions are limited to five and are only generated from detected signals.
+
+GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Passing CI is shown in the output summary but does not emit a signal by itself.
 
 Bad:
 

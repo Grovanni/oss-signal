@@ -9,8 +9,9 @@ Use this context to decide where human review attention should go first. Do not 
 - Author: renovate[bot]
 - Branches: renovate/all-minor-patch -> main
 - Size: 32 files, +594 / -888 lines
+- CI: failure (21 checks/statuses: 19 successful, 2 failed, 0 pending)
 - Attention: high
-- Recommended action: request_split
+- Recommended action: wait_for_ci
 
 ## Priority Files
 - pnpm-lock.yaml: dependency manifest or lockfile
@@ -27,14 +28,14 @@ Use this context to decide where human review attention should go first. Do not 
 - dependency_lockfile_changed (medium): Dependency lockfile changed
 - dependency_change_without_code (medium): Dependency change without code
 - ci_changed (medium): CI changed
-- ci_changed_with_dependency_change (high): CI and dependencies changed together
+- ci_checks_failed (high): CI checks failed
 
 ## Suggested Questions
 - Cette PR peut-elle etre separee en plusieurs changements plus petits ?
 - Pourquoi cette dependance est-elle necessaire dans cette PR ?
 - Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?
 - Pourquoi le workflow CI doit-il changer dans cette PR ?
-- Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?
+- Quel check CI echoue et doit-il etre corrige avant la review approfondie ?
 
 ## Constraints
 - Do not execute code from the PR.

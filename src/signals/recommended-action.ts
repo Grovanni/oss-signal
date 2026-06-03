@@ -10,6 +10,14 @@ export function chooseRecommendedAction(
     return "security_review";
   }
 
+  if (
+    ids.has("ci_checks_failed") ||
+    ids.has("ci_checks_pending") ||
+    ids.has("ci_status_unavailable")
+  ) {
+    return "wait_for_ci";
+  }
+
   if (ids.has("large_pr") || ids.has("mixed_concerns")) {
     return "request_split";
   }
@@ -24,10 +32,6 @@ export function chooseRecommendedAction(
 
   if (ids.has("migration_changed")) {
     return "migration_review";
-  }
-
-  if (ids.has("ci_changed_with_dependency_change") || ids.has("ci_changed")) {
-    return "wait_for_ci";
   }
 
   if (ids.has("empty_description") || ids.has("short_description_for_large_pr")) {

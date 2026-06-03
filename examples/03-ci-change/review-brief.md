@@ -6,10 +6,15 @@
 - Author: williammartin
 - Target branch: trunk
 - Size: 7 files, +31 / -31 lines
+- CI: success (9 checks/statuses: 9 successful, 0 failed, 0 pending)
 - Attention: medium
 
 ## Recommended Action
-Wait for CI or inspect CI context before deep review.
+Proceed with normal review.
+
+## CI
+- State: success (9 checks/statuses: 9 successful, 0 failed, 0 pending)
+- No failed or pending GitHub CI item detected.
 
 ## Why
 - Medium pull request: This PR is not tiny and may need a normal review pass.

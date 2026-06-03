@@ -20,5 +20,6 @@ describe("loadGitHubPullRequestFixture", () => {
       "tests/unit/parse-url.test.ts"
     ]);
     expect(data.diff.text).toContain("diff --git");
+    expect(data.ci.state).toBe("unknown");
   });
 });

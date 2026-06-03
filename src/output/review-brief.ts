@@ -13,6 +13,7 @@ export type DataConfidence = {
   source: "github" | "fixture";
   diff_available: boolean;
   file_count_matches_metadata: boolean;
+  ci_available: boolean;
 };
 
 export type ReviewBriefJson = {
@@ -26,6 +27,7 @@ export type ReviewBriefJson = {
     diff_bytes: number;
     diff_lines: number;
   };
+  ci: GitHubPullRequestOutput["ci"];
   categories: Record<FileCategory, number>;
   signals: Signal[];
   attention: AttentionLevel;
@@ -48,6 +50,7 @@ export function buildReviewBriefJson(result: GitHubPullRequestOutput): ReviewBri
       diff_bytes: result.diff.bytes,
       diff_lines: result.diff.lines
     },
+    ci: result.ci,
     categories: result.analysis.categories,
     signals: result.analysis.signals,
     attention: result.analysis.attention,
@@ -57,7 +60,8 @@ export function buildReviewBriefJson(result: GitHubPullRequestOutput): ReviewBri
     data_confidence: {
       source: result.source,
       diff_available: result.diff.available,
-      file_count_matches_metadata: result.files.count === result.pull_request.changed_files
+      file_count_matches_metadata: result.files.count === result.pull_request.changed_files,
+      ci_available: result.ci.state !== "unknown"
     },
     limitations: [
       ...result.limitations,
@@ -89,10 +93,14 @@ export function renderReviewBriefMarkdown(result: GitHubPullRequestOutput): stri
     `- Author: ${brief.pull_request.author ?? "unknown"}`,
     `- Target branch: ${brief.pull_request.base.ref}`,
     `- Size: ${brief.size.files} files, +${brief.size.additions} / -${brief.size.deletions} lines`,
+    `- CI: ${formatCiSummary(brief.ci)}`,
     `- Attention: ${brief.attention}`,
     "",
     "## Recommended Action",
     formatAction(brief.recommended_action),
+    "",
+    "## CI",
+    ...formatCiSection(brief.ci),
     "",
     "## Why",
     ...(topSignals.length > 0
@@ -134,6 +142,7 @@ export function renderAgentContextMarkdown(result: GitHubPullRequestOutput): str
     `- Author: ${brief.pull_request.author ?? "unknown"}`,
     `- Branches: ${brief.pull_request.head.ref} -> ${brief.pull_request.base.ref}`,
     `- Size: ${brief.size.files} files, +${brief.size.additions} / -${brief.size.deletions} lines`,
+    `- CI: ${formatCiSummary(brief.ci)}`,
     `- Attention: ${brief.attention}`,
     `- Recommended action: ${brief.recommended_action}`,
     "",
@@ -160,6 +169,38 @@ export function renderAgentContextMarkdown(result: GitHubPullRequestOutput): str
 
 function formatEvidence(evidence: Evidence[]): string[] {
   return evidence.slice(0, 3).map((entry) => `  - Evidence: ${entry.value} (${entry.reason})`);
+}
+
+function formatCiSummary(ci: GitHubPullRequestOutput["ci"]): string {
+  if (ci.total === 0) {
+    return `${ci.state} (no GitHub CI items found)`;
+  }
+
+  return `${ci.state} (${ci.total} checks/statuses: ${ci.successful} successful, ${ci.failed} failed, ${ci.pending} pending)`;
+}
+
+function formatCiSection(ci: GitHubPullRequestOutput["ci"]): string[] {
+  const lines = [`- State: ${formatCiSummary(ci)}`];
+  const attentionItems = ci.items
+    .filter((item) => item.state === "failure" || item.state === "pending")
+    .slice(0, 5);
+
+  if (attentionItems.length > 0) {
+    lines.push(
+      ...attentionItems.map(
+        (item) => `- ${item.name}: ${item.state} (${item.status}/${item.conclusion ?? "none"})`
+      )
+    );
+    return lines;
+  }
+
+  if (ci.state === "success") {
+    lines.push("- No failed or pending GitHub CI item detected.");
+  } else {
+    lines.push("- CI data unavailable or no status/check run reported by GitHub.");
+  }
+
+  return lines;
 }
 
 function formatAction(action: RecommendedAction): string {

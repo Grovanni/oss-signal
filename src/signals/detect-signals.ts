@@ -49,9 +49,7 @@ export function detectSignals(input: SignalInput): Signal[] {
   const documentationFiles = input.files.filter((file) => hasCategory(file, "documentation"));
   const testFiles = input.files.filter((file) => hasCategory(file, "tests"));
   const codeFiles = input.files.filter((file) => hasCategory(file, "code"));
-  const strongCategoriesTouched = strongFileCategories.filter(
-    (category) => input.categoryCounts[category] > 0
-  );
+  const strongCategoriesTouched = mixedConcernCategories(input.files);
 
   if (largePr) {
     signals.push(
@@ -130,6 +128,42 @@ export function detectSignals(input: SignalInput): Signal[] {
   if (ciFiles.length > 0) {
     signals.push(
       signal("ci_changed", "medium", "CI changed", "A CI workflow or pipeline file changed.", fileEvidence(ciFiles, "CI path"))
+    );
+  }
+
+  if (input.data.ci.state === "failure") {
+    signals.push(
+      signal(
+        "ci_checks_failed",
+        "high",
+        "CI checks failed",
+        "GitHub reports failing or errored checks for the PR head commit.",
+        ciEvidence(input.data.ci.items.filter((item) => item.state === "failure"), "failing CI item")
+      )
+    );
+  }
+
+  if (input.data.ci.state === "pending") {
+    signals.push(
+      signal(
+        "ci_checks_pending",
+        "medium",
+        "CI checks pending",
+        "GitHub reports pending or in-progress checks for the PR head commit.",
+        ciEvidence(input.data.ci.items.filter((item) => item.state === "pending"), "pending CI item")
+      )
+    );
+  }
+
+  if (input.data.ci.state === "unknown" && ciFiles.length > 0) {
+    signals.push(
+      signal(
+        "ci_status_unavailable",
+        "medium",
+        "CI status unavailable",
+        "GitHub did not expose check or status data for the PR head commit.",
+        fileEvidence(ciFiles, "CI changed but GitHub CI state is unknown")
+      )
     );
   }
 
@@ -243,6 +277,19 @@ function fileEvidence(files: ClassifiedFile[], reason: string, limit = 5): Evide
   }));
 }
 
+function ciEvidence(
+  items: Array<{ kind: string; name: string; status: string; conclusion: string | null }>,
+  reason: string
+): Evidence[] {
+  const evidence = items.slice(0, 5).map((item) => ({
+    kind: "metadata" as const,
+    value: `${item.kind}:${item.name}`,
+    reason: `${reason}; status=${item.status}; conclusion=${item.conclusion ?? "none"}`
+  }));
+
+  return evidence.length > 0 ? evidence : [metadataEvidence("github-ci", "GitHub CI state")];
+}
+
 function metadataEvidence(value: string, reason: string): Evidence {
   return {
     kind: "metadata",
@@ -259,9 +306,50 @@ function descriptionEvidence(value: string, reason: string): Evidence {
   };
 }
 
+function mixedConcernCategories(files: ClassifiedFile[]): FileCategory[] {
+  const categories = new Set<FileCategory>();
+
+  for (const file of files) {
+    addCategoryIfPresent(categories, file, "code");
+    addCategoryIfPresent(categories, file, "tests");
+    addCategoryIfPresent(categories, file, "documentation");
+    addCategoryIfPresent(categories, file, "dependencies");
+    addCategoryIfPresent(categories, file, "migrations");
+    addCategoryIfPresent(categories, file, "release");
+
+    if (hasCategory(file, "ci")) {
+      categories.add("ci");
+    }
+
+    if (hasCategory(file, "configuration") && !hasCategory(file, "ci")) {
+      categories.add("configuration");
+    }
+
+    if (hasCategory(file, "security") && isSecurityConcernPath(file.path)) {
+      categories.add("security");
+    }
+  }
+
+  return strongFileCategories.filter((category) => categories.has(category));
+}
+
+function addCategoryIfPresent(
+  categories: Set<FileCategory>,
+  file: ClassifiedFile,
+  category: FileCategory
+): void {
+  if (hasCategory(file, category)) {
+    categories.add(category);
+  }
+}
+
 function mentionsAny(text: string, terms: string[]): boolean {
   const normalized = text.toLowerCase();
   return terms.some((term) => normalized.includes(term));
+}
+
+function isSecurityConcernPath(path: string): boolean {
+  return normalizedPathIncludes(path, authTerms) || isSecretRelatedPath(path);
 }
 
 function isSecretRelatedPath(path: string): boolean {

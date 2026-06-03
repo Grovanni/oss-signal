@@ -10,6 +10,7 @@ Required top-level fields:
   "repository": {},
   "pull_request": {},
   "size": {},
+  "ci": {},
   "categories": {},
   "signals": [],
   "attention": {},
@@ -19,7 +20,8 @@ Required top-level fields:
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": []
 }
@@ -42,6 +44,25 @@ Required top-level fields:
   ]
 }
 ```
+
+## CI shape
+
+```json
+{
+  "ci": {
+    "head_sha": "1111111111111111111111111111111111111111",
+    "state": "success",
+    "total": 3,
+    "successful": 3,
+    "failed": 0,
+    "pending": 0,
+    "skipped": 0,
+    "items": []
+  }
+}
+```
+
+`state` is `success`, `failure`, `pending` or `unknown`. Items are GitHub check runs and commit statuses normalized into a compact shape.
 
 ## Compatibility rule
 

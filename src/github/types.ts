@@ -53,6 +53,28 @@ export type GitHubDiffData = {
   lines: number;
 };
 
+export type GitHubCiState = "success" | "failure" | "pending" | "unknown";
+
+export type GitHubCiItem = {
+  kind: "check_run" | "status";
+  name: string;
+  state: GitHubCiState;
+  status: string;
+  conclusion: string | null;
+  url: string | null;
+};
+
+export type GitHubCiSummary = {
+  head_sha: string;
+  state: GitHubCiState;
+  total: number;
+  successful: number;
+  failed: number;
+  pending: number;
+  skipped: number;
+  items: GitHubCiItem[];
+};
+
 export type GitHubPullRequestData = {
   schema_version: "github-pr.v1";
   source: PullRequestDataSource;
@@ -60,6 +82,7 @@ export type GitHubPullRequestData = {
   pull_request: GitHubPullRequestSummary;
   files: GitHubChangedFileSummary[];
   diff: GitHubDiffData;
+  ci: GitHubCiSummary;
   limitations: string[];
 };
 

@@ -6,10 +6,16 @@
 - Author: renovate[bot]
 - Target branch: main
 - Size: 32 files, +594 / -888 lines
+- CI: failure (21 checks/statuses: 19 successful, 2 failed, 0 pending)
 - Attention: high
 
 ## Recommended Action
-Consider asking whether this PR can be split before deep review.
+Wait for CI or inspect CI context before deep review.
+
+## CI
+- State: failure (21 checks/statuses: 19 successful, 2 failed, 0 pending)
+- Build&Test: node-22, ubuntu-latest: failure (completed/failure)
+- Run zizmor: failure (completed/failure)
 
 ## Why
 - Large pull request: This PR changes many files or lines.
@@ -45,7 +51,7 @@ Consider asking whether this PR can be split before deep review.
 2. Pourquoi cette dependance est-elle necessaire dans cette PR ?
 3. Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?
 4. Pourquoi le workflow CI doit-il changer dans cette PR ?
-5. Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?
+5. Quel check CI echoue et doit-il etre corrige avant la review approfondie ?
 
 ## Limitations
 - This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.

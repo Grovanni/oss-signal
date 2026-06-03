@@ -1,6 +1,7 @@
 OSS Signal: vitejs/vite#22471
 Attention: high
-Action: request_split
+Action: wait_for_ci
 Size: 32 files, +594 / -888
+CI: failure (2 failed, 0 pending)
 Signals: large_pr, many_files_changed, docs_changed
 Outputs: examples\05-large-mixed\review-brief.md, examples\05-large-mixed\review-brief.json, examples\05-large-mixed\agent-context.md

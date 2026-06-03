@@ -40,6 +40,41 @@
     "diff_bytes": 1183,
     "diff_lines": 27
   },
+  "ci": {
+    "head_sha": "3962683c5bd9477182d980a1081f5effb46c8ed2",
+    "state": "success",
+    "total": 3,
+    "successful": 3,
+    "failed": 0,
+    "pending": 0,
+    "skipped": 0,
+    "items": [
+      {
+        "kind": "check_run",
+        "name": "main",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/pallets/flask/actions/runs/21325681472/job/61382292009"
+      },
+      {
+        "kind": "check_run",
+        "name": "main",
+        "state": "success",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/pallets/flask/actions/runs/21325625491/job/61382150782"
+      },
+      {
+        "kind": "status",
+        "name": "docs/readthedocs.org:flask",
+        "state": "success",
+        "status": "success",
+        "conclusion": "success",
+        "url": "https://flask--5827.org.readthedocs.build/en/5827/"
+      }
+    ]
+  },
   "categories": {
     "code": 0,
     "tests": 0,
@@ -98,7 +133,8 @@
   "data_confidence": {
     "source": "github",
     "diff_available": true,
-    "file_count_matches_metadata": true
+    "file_count_matches_metadata": true,
+    "ci_available": true
   },
   "limitations": [
     "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",

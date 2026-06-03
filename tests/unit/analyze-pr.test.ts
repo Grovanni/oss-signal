@@ -5,7 +5,11 @@ import { describe, expect, it } from "vitest";
 import { analyzePullRequestData } from "../../src/analyze/analyze-pr.js";
 import { loadGitHubPullRequestFixture } from "../../src/github/fixtures.js";
 import { parseGitHubPullRequestUrl } from "../../src/github/parse-url.js";
-import type { GitHubChangedFileSummary, GitHubPullRequestData } from "../../src/github/types.js";
+import type {
+  GitHubChangedFileSummary,
+  GitHubCiSummary,
+  GitHubPullRequestData
+} from "../../src/github/types.js";
 
 describe("analyzePullRequestData", () => {
   it("keeps a small code-with-tests PR low attention", async () => {
@@ -106,10 +110,25 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toEqual(
-      expect.arrayContaining(["ci_changed", "security_sensitive_file_changed"])
+      expect.arrayContaining(["ci_changed", "security_sensitive_file_changed", "ci_status_unavailable"])
     );
     expect(analysis.attention).toBe("medium");
     expect(analysis.recommended_action).toBe("wait_for_ci");
+  });
+
+  it("does not wait for CI-only workflow changes when GitHub CI passed", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Updates CI workflow.",
+        files: [changedFile(".github/workflows/ci.yml", 12)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("ci_changed");
+    expect(signalIds(analysis.signals)).not.toContain("ci_status_unavailable");
+    expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
+    expect(analysis.recommended_action).toBe("normal_review");
   });
 
   it("does not treat environment as an env secret path", () => {
@@ -138,6 +157,33 @@ describe("analyzePullRequestData", () => {
     expect(analysis.priority_files[0]?.path).toBe("pnpm-lock.yaml");
     expect(analysis.priority_files[1]?.path).toBe("package.json");
   });
+
+  it("routes failing GitHub CI checks to wait_for_ci", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update dependency versions for compatibility.",
+        files: [changedFile("package.json", 8), changedFile("package-lock.json", 120)],
+        ci: ciWith("failure")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("ci_checks_failed");
+    expect(analysis.attention).toBe("high");
+    expect(analysis.recommended_action).toBe("wait_for_ci");
+  });
+
+  it("routes pending GitHub CI checks to wait_for_ci", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update source code.",
+        files: [changedFile("src/app.ts", 12), changedFile("tests/app.test.ts", 6)],
+        ci: ciWith("pending")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("ci_checks_pending");
+    expect(analysis.recommended_action).toBe("wait_for_ci");
+  });
 });
 
 function signalIds(signals: Array<{ id: string }>): string[] {
@@ -149,6 +195,7 @@ function dataWith(options: {
   files: GitHubChangedFileSummary[];
   additions?: number;
   deletions?: number;
+  ci?: GitHubCiSummary;
 }): GitHubPullRequestData {
   const additions =
     options.additions ?? options.files.reduce((total, file) => total + file.additions, 0);
@@ -197,7 +244,35 @@ function dataWith(options: {
       bytes: 0,
       lines: 0
     },
+    ci: options.ci ?? ciWith("unknown"),
     limitations: []
+  };
+}
+
+function ciWith(state: GitHubCiSummary["state"]): GitHubCiSummary {
+  const item =
+    state === "unknown"
+      ? []
+      : [
+          {
+            kind: "check_run" as const,
+            name: state === "failure" ? "test" : "build",
+            state,
+            status: state === "pending" ? "in_progress" : "completed",
+            conclusion: state === "failure" ? "failure" : state === "success" ? "success" : null,
+            url: null
+          }
+        ];
+
+  return {
+    head_sha: "1111111111111111111111111111111111111111",
+    state,
+    total: item.length,
+    successful: state === "success" ? 1 : 0,
+    failed: state === "failure" ? 1 : 0,
+    pending: state === "pending" ? 1 : 0,
+    skipped: 0,
+    items: item
   };
 }
 

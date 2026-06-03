@@ -1,6 +1,7 @@
 OSS Signal: cli/cli#13491
 Attention: medium
-Action: wait_for_ci
+Action: normal_review
 Size: 7 files, +31 / -31
+CI: success (0 failed, 0 pending)
 Signals: medium_pr, ci_changed, security_sensitive_file_changed
 Outputs: examples\03-ci-change\review-brief.md, examples\03-ci-change\review-brief.json, examples\03-ci-change\agent-context.md

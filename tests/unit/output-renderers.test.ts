@@ -24,8 +24,11 @@ describe("output renderers", () => {
     expect(json.schema_version).toBe("review-brief.v1");
     expect(json.attention).toBe("low");
     expect(json.recommended_action).toBe("normal_review");
+    expect(json.ci.state).toBe("unknown");
+    expect(json.data_confidence.ci_available).toBe(false);
     expect(json.signals.map((signal) => signal.id)).toContain("small_pr");
     expect(markdown).toContain("# PR Brief");
+    expect(markdown).toContain("## CI");
     expect(markdown).toContain("## Recommended Action");
     expect(agentContext).toContain("# Agent Context");
     expect(agentContext).toContain("## Review Objective");

@@ -13,6 +13,9 @@ const questionBySignalId = new Map<string, string>([
     "Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?"
   ],
   ["ci_changed", "Pourquoi le workflow CI doit-il changer dans cette PR ?"],
+  ["ci_checks_failed", "Quel check CI echoue et doit-il etre corrige avant la review approfondie ?"],
+  ["ci_checks_pending", "Quels checks CI restent en attente avant la review approfondie ?"],
+  ["ci_status_unavailable", "Les checks GitHub sont-ils disponibles ailleurs pour cette PR ?"],
   ["migration_changed", "La migration est-elle backward compatible et reversible ?"],
   ["large_pr", "Cette PR peut-elle etre separee en plusieurs changements plus petits ?"],
   [

@@ -2,5 +2,6 @@ OSS Signal: expressjs/session#1027
 Attention: high
 Action: security_review
 Size: 4 files, +97 / -3
+CI: success (0 failed, 0 pending)
 Signals: small_pr, tests_changed, docs_changed
 Outputs: examples\04-auth-security\review-brief.md, examples\04-auth-security\review-brief.json, examples\04-auth-security\agent-context.md

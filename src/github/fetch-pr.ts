@@ -4,6 +4,9 @@ import { z } from "zod";
 
 import type { ParsedGitHubPullRequestUrl } from "./parse-url.js";
 import type {
+  GitHubCiItem,
+  GitHubCiState,
+  GitHubCiSummary,
   GitHubChangedFileSummary,
   GitHubPullRequestData,
   PullRequestDataSource
@@ -95,8 +98,46 @@ export const githubChangedFileApiSchema = z
 
 export const githubChangedFilesApiSchema = z.array(githubChangedFileApiSchema);
 
+const githubCommitStatusApiSchema = z
+  .object({
+    state: z.string(),
+    total_count: z.number().int().nonnegative().default(0),
+    statuses: z
+      .array(
+        z
+          .object({
+            context: z.string(),
+            state: z.string(),
+            target_url: z.string().url().nullable().optional()
+          })
+          .passthrough()
+      )
+      .default([])
+  })
+  .passthrough();
+
+const githubCheckRunsApiSchema = z
+  .object({
+    total_count: z.number().int().nonnegative().default(0),
+    check_runs: z
+      .array(
+        z
+          .object({
+            name: z.string(),
+            status: z.string(),
+            conclusion: z.string().nullable(),
+            html_url: z.string().url().nullable().optional()
+          })
+          .passthrough()
+      )
+      .default([])
+  })
+  .passthrough();
+
 export type GitHubPullRequestApiResponse = z.infer<typeof githubPullRequestApiSchema>;
 export type GitHubChangedFileApiResponse = z.infer<typeof githubChangedFileApiSchema>;
+export type GitHubCommitStatusApiResponse = z.infer<typeof githubCommitStatusApiSchema>;
+export type GitHubCheckRunsApiResponse = z.infer<typeof githubCheckRunsApiSchema>;
 
 export type FetchGitHubPullRequestOptions = {
   token?: string;
@@ -110,6 +151,7 @@ type NormalizeOptions = {
   pullRequest: GitHubPullRequestApiResponse;
   files: GitHubChangedFileApiResponse[];
   diffText: string;
+  ci?: GitHubCiSummary;
   limitations?: string[];
 };
 
@@ -144,6 +186,10 @@ export async function fetchGitHubPullRequest(
   );
   const { files, limitations } = await fetchChangedFiles(parsedUrl, { ...options, fetchImpl });
   const diffText = await fetchDiff(apiPullUrl, { ...options, fetchImpl });
+  const { ci, limitations: ciLimitations } = await fetchCiSummary(parsedUrl, pullRequest.head.sha, {
+    ...options,
+    fetchImpl
+  });
 
   return normalizeGitHubPullRequestData({
     source: "github",
@@ -151,7 +197,8 @@ export async function fetchGitHubPullRequest(
     pullRequest,
     files,
     diffText,
-    limitations
+    ci,
+    limitations: [...limitations, ...ciLimitations]
   });
 }
 
@@ -201,6 +248,7 @@ export function normalizeGitHubPullRequestData(options: NormalizeOptions): GitHu
       bytes: diffBytes,
       lines: countLines(options.diffText)
     },
+    ci: options.ci ?? buildUnknownCiSummary(options.pullRequest.head.sha),
     limitations: options.limitations ?? []
   };
 }
@@ -261,6 +309,70 @@ async function fetchDiff(
   }
 
   return response.text();
+}
+
+async function fetchCiSummary(
+  parsedUrl: ParsedGitHubPullRequestUrl,
+  headSha: string,
+  options: RequiredPick<FetchGitHubPullRequestOptions, "fetchImpl"> & FetchGitHubPullRequestOptions
+): Promise<{ ci: GitHubCiSummary; limitations: string[] }> {
+  const limitations: string[] = [];
+  const unavailableCodes: string[] = [];
+  let statusResponse: GitHubCommitStatusApiResponse = {
+    state: "unknown",
+    total_count: 0,
+    statuses: []
+  };
+  let checkRunsResponse: GitHubCheckRunsApiResponse = {
+    total_count: 0,
+    check_runs: []
+  };
+
+  try {
+    statusResponse = await fetchJson(
+      buildCommitStatusApiUrl(parsedUrl, headSha),
+      githubCommitStatusApiSchema,
+      "commit status",
+      options
+    );
+  } catch (error) {
+    if (!(error instanceof GitHubFetchError)) {
+      throw error;
+    }
+
+    unavailableCodes.push(error.code);
+    limitations.push(`GitHub commit status unavailable: ${error.code}.`);
+  }
+
+  try {
+    checkRunsResponse = await fetchJson(
+      buildCheckRunsApiUrl(parsedUrl, headSha),
+      githubCheckRunsApiSchema,
+      "check runs",
+      options
+    );
+  } catch (error) {
+    if (!(error instanceof GitHubFetchError)) {
+      throw error;
+    }
+
+    unavailableCodes.push(error.code);
+    limitations.push(`GitHub check runs unavailable: ${error.code}.`);
+  }
+
+  if (unavailableCodes.length === 2) {
+    limitations.push(`GitHub CI status unavailable: ${[...new Set(unavailableCodes)].join(", ")}.`);
+    return { ci: buildUnknownCiSummary(headSha), limitations };
+  }
+
+  if (checkRunsResponse.total_count > checkRunsResponse.check_runs.length) {
+    limitations.push("GitHub check runs may be truncated after 100 items.");
+  }
+
+  return {
+    ci: normalizeCiSummary(headSha, statusResponse, checkRunsResponse),
+    limitations
+  };
 }
 
 async function fetchJson<T>(
@@ -379,12 +491,140 @@ function buildChangedFilesApiUrl(parsedUrl: ParsedGitHubPullRequestUrl, page: nu
   return `${buildPullRequestApiUrl(parsedUrl)}/files?per_page=100&page=${page}`;
 }
 
+function buildCommitStatusApiUrl(parsedUrl: ParsedGitHubPullRequestUrl, headSha: string): string {
+  return `https://api.github.com/repos/${parsedUrl.owner}/${parsedUrl.repo}/commits/${headSha}/status`;
+}
+
+function buildCheckRunsApiUrl(parsedUrl: ParsedGitHubPullRequestUrl, headSha: string): string {
+  return `https://api.github.com/repos/${parsedUrl.owner}/${parsedUrl.repo}/commits/${headSha}/check-runs?per_page=100`;
+}
+
 function countLines(text: string): number {
   if (text.length === 0) {
     return 0;
   }
 
   return text.split(/\r\n|\r|\n/).length;
+}
+
+function normalizeCiSummary(
+  headSha: string,
+  statusResponse: GitHubCommitStatusApiResponse,
+  checkRunsResponse: GitHubCheckRunsApiResponse
+): GitHubCiSummary {
+  const items: GitHubCiItem[] = [
+    ...checkRunsResponse.check_runs.map(normalizeCheckRun),
+    ...statusResponse.statuses.map(normalizeCommitStatus)
+  ];
+
+  const successful = items.filter((item) => item.state === "success").length;
+  const failed = items.filter((item) => item.state === "failure").length;
+  const pending = items.filter((item) => item.state === "pending").length;
+  const skipped = items.filter(
+    (item) => item.conclusion === "skipped" || item.conclusion === "neutral"
+  ).length;
+
+  return {
+    head_sha: headSha,
+    state: summarizeCiState(items),
+    total: items.length,
+    successful,
+    failed,
+    pending,
+    skipped,
+    items
+  };
+}
+
+function normalizeCheckRun(checkRun: GitHubCheckRunsApiResponse["check_runs"][number]): GitHubCiItem {
+  return {
+    kind: "check_run",
+    name: checkRun.name,
+    state: normalizeCheckRunState(checkRun.status, checkRun.conclusion),
+    status: checkRun.status,
+    conclusion: checkRun.conclusion,
+    url: checkRun.html_url ?? null
+  };
+}
+
+function normalizeCommitStatus(status: GitHubCommitStatusApiResponse["statuses"][number]): GitHubCiItem {
+  return {
+    kind: "status",
+    name: status.context,
+    state: normalizeCommitStatusState(status.state),
+    status: status.state,
+    conclusion: status.state,
+    url: status.target_url ?? null
+  };
+}
+
+function normalizeCheckRunState(status: string, conclusion: string | null): GitHubCiState {
+  if (status !== "completed") {
+    return "pending";
+  }
+
+  switch (conclusion) {
+    case "success":
+    case "neutral":
+    case "skipped":
+      return "success";
+    case "failure":
+    case "timed_out":
+    case "action_required":
+    case "startup_failure":
+    case "cancelled":
+    case "stale":
+      return "failure";
+    default:
+      return "unknown";
+  }
+}
+
+function normalizeCommitStatusState(state: string): GitHubCiState {
+  switch (state) {
+    case "success":
+      return "success";
+    case "failure":
+    case "error":
+      return "failure";
+    case "pending":
+      return "pending";
+    default:
+      return "unknown";
+  }
+}
+
+function summarizeCiState(items: GitHubCiItem[]): GitHubCiState {
+  if (items.length === 0) {
+    return "unknown";
+  }
+
+  if (items.some((item) => item.state === "failure")) {
+    return "failure";
+  }
+
+  if (items.some((item) => item.state === "pending")) {
+    return "pending";
+  }
+
+  if (items.every((item) => item.state === "success")) {
+    return "success";
+  }
+
+  return "unknown";
+}
+
+function buildUnknownCiSummary(headSha: string): GitHubCiSummary {
+  return {
+    head_sha: headSha,
+    state: "unknown",
+    total: 0,
+    successful: 0,
+    failed: 0,
+    pending: 0,
+    skipped: 0,
+    items: []
+  };
 }
 
 type RequiredPick<T, K extends keyof T> = T & Required<Pick<T, K>>;

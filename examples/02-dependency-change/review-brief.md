@@ -6,10 +6,16 @@
 - Author: renovate[bot]
 - Target branch: main
 - Size: 2 files, +38 / -38 lines
-- Attention: medium
+- CI: failure (41 checks/statuses: 39 successful, 2 failed, 0 pending)
+- Attention: high
 
 ## Recommended Action
-Review dependency changes before normal code review.
+Wait for CI or inspect CI context before deep review.
+
+## CI
+- State: failure (41 checks/statuses: 39 successful, 2 failed, 0 pending)
+- Test with npm: failure (completed/failure)
+- Test with pnpm: failure (completed/failure)
 
 ## Why
 - Small pull request: This PR is small by file and line thresholds.
@@ -21,6 +27,9 @@ Review dependency changes before normal code review.
 - Dependency change without code: Dependency files changed with little or no code change detected.
   - Evidence: package.json (dependency change without code category)
   - Evidence: yarn.lock (dependency change without code category)
+- CI checks failed: GitHub reports failing or errored checks for the PR head commit.
+  - Evidence: check_run:Test with npm (failing CI item; status=completed; conclusion=failure)
+  - Evidence: check_run:Test with pnpm (failing CI item; status=completed; conclusion=failure)
 
 ## Areas Touched
 - dependencies: 2
@@ -33,6 +42,7 @@ Review dependency changes before normal code review.
 ## Questions
 1. Pourquoi cette dependance est-elle necessaire dans cette PR ?
 2. Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?
+3. Quel check CI echoue et doit-il etre corrige avant la review approfondie ?
 
 ## Limitations
 - This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.

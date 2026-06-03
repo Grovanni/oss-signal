@@ -69,6 +69,34 @@ const filesPayload = [
 ];
 
 const diffText = "diff --git a/file.ts b/file.ts\n+secret-looking-content-is-not-printed-by-summary\n";
+const commitStatusPayload = {
+  state: "success",
+  total_count: 1,
+  statuses: [
+    {
+      context: "legacy-ci",
+      state: "success",
+      target_url: "https://ci.example.test/legacy"
+    }
+  ]
+};
+const checkRunsPayload = {
+  total_count: 2,
+  check_runs: [
+    {
+      name: "build",
+      status: "completed",
+      conclusion: "success",
+      html_url: "https://github.com/org/repo/actions/runs/1"
+    },
+    {
+      name: "test",
+      status: "completed",
+      conclusion: "success",
+      html_url: "https://github.com/org/repo/actions/runs/2"
+    }
+  ]
+};
 
 describe("fetchGitHubPullRequest", () => {
   it("fetches and normalizes metadata, changed files and diff", async () => {
@@ -81,7 +109,11 @@ describe("fetchGitHubPullRequest", () => {
         jsonResponse(filesPayload),
       "application/vnd.github.v3.diff https://api.github.com/repos/org/repo/pulls/123": textResponse(
         diffText
-      )
+      ),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/status":
+        jsonResponse(commitStatusPayload),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/check-runs?per_page=100":
+        jsonResponse(checkRunsPayload)
     }, calls);
 
     const data = await fetchGitHubPullRequest(
@@ -102,12 +134,46 @@ describe("fetchGitHubPullRequest", () => {
     });
     expect(data.diff.text).toBe(diffText);
     expect(data.diff.bytes).toBeGreaterThan(0);
+    expect(data.ci).toMatchObject({
+      state: "success",
+      total: 3,
+      successful: 3,
+      failed: 0,
+      pending: 0
+    });
     expect(calls.map((call) => call.authorization)).toEqual([
+      "Bearer test-token",
+      "Bearer test-token",
       "Bearer test-token",
       "Bearer test-token",
       "Bearer test-token"
     ]);
     expect(JSON.stringify(data)).not.toContain("test-token");
+  });
+
+  it("keeps PR data usable when GitHub CI status is unavailable", async () => {
+    const fetchImpl = createFetchMock({
+      "application/vnd.github+json https://api.github.com/repos/org/repo/pulls/123": jsonResponse(
+        pullRequestPayload
+      ),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/pulls/123/files?per_page=100&page=1":
+        jsonResponse(filesPayload),
+      "application/vnd.github.v3.diff https://api.github.com/repos/org/repo/pulls/123": textResponse(
+        diffText
+      ),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/status":
+        new Response(JSON.stringify({ message: "forbidden" }), { status: 403 }),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/check-runs?per_page=100":
+        new Response(JSON.stringify({ message: "forbidden" }), { status: 403 })
+    });
+
+    const data = await fetchGitHubPullRequest(
+      parseGitHubPullRequestUrl("https://github.com/org/repo/pull/123"),
+      { fetchImpl }
+    );
+
+    expect(data.ci.state).toBe("unknown");
+    expect(data.limitations).toContain("GitHub CI status unavailable: forbidden.");
   });
 
   it("maps GitHub rate limit responses to a readable error", async () => {
