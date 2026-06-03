@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Build and coverage
+dist/
+coverage/
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Generated output
+oss-signal-output/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

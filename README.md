@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-Early project. The first target is a local CLI MVP.
+Early project. Phase 1 currently provides a TypeScript CLI skeleton and GitHub Pull Request URL parsing in dry-run mode.
 
 ## Goal
 
@@ -47,6 +47,28 @@ oss-signal-output/
   agent-context.md
 ```
 
+## Current local usage
+
+```bash
+npm install
+npm run build
+node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
+```
+
+Current dry-run output confirms URL parsing and does not fetch GitHub data yet.
+
+```json
+{
+  "mode": "dry-run",
+  "pull_request": {
+    "owner": "org",
+    "repo": "repo",
+    "pullNumber": 123,
+    "htmlUrl": "https://github.com/org/repo/pull/123"
+  }
+}
+```
+
 ## Non-goals
 
 OSS Signal does not:
@@ -65,4 +87,4 @@ Maintainers and coding agents both need clean context before reviewing a PR. Raw
 
 ## License
 
-Recommended default: Apache-2.0, unless the project owner chooses another OSI-approved license before first release.
+Apache-2.0.

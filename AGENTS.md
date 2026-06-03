@@ -28,14 +28,27 @@ Pour toute modification comportementale :
 - garder les rapports courts ;
 - verifier que les signaux restent explicables.
 
-## Commandes attendues
+## Commandes
 
-Les commandes exactes seront confirmees apres initialisation du projet. Cibles :
+Installer les dependances :
 
 ```bash
-npm test
+npm install
+```
+
+Verifier le projet :
+
+```bash
 npm run build
+npm test
 npm run lint
+npm run check
+```
+
+Verifier la CLI Phase 1 :
+
+```bash
+node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
 ```
 
 ## Style

@@ -7,4 +7,6 @@ The format should follow clear release notes. The project uses semantic versioni
 ## Unreleased
 
 - Initial project planning.
-
+- Added TypeScript CLI skeleton with `oss-signal pr <url> --dry-run`.
+- Added deterministic GitHub Pull Request URL parser with unit tests.
+- Added npm scripts for build, test, lint, format, and check.
