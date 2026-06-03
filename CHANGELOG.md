@@ -12,4 +12,6 @@ The format should follow clear release notes. The project uses semantic versioni
 - Added GitHub PR metadata, changed files and diff fetching with optional token support.
 - Added local GitHub PR fixtures for network-free tests.
 - Added file classification, deterministic signals, attention level, recommended action, priority files and review questions.
+- Added `review-brief.md`, `review-brief.json`, `agent-context.md` generation and short terminal summaries.
+- Added five public examples with stable fixtures and generated outputs.
 - Added npm scripts for build, test, lint, format, and check.

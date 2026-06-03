@@ -1,0 +1,7 @@
+diff --git a/src/auth/session.ts b/src/auth/session.ts
+--- a/src/auth/session.ts
++++ b/src/auth/session.ts
+@@ -12,6 +12,8 @@
++export function rotateSessionToken() {
++  return true;
++}

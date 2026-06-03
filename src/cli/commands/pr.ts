@@ -6,6 +6,9 @@ import {
 } from "../../github/fetch-pr.js";
 import { GitHubFixtureError, loadGitHubPullRequestFixture } from "../../github/fixtures.js";
 import { summarizeGitHubPullRequestData } from "../../github/summary.js";
+import type { GitHubPullRequestOutput } from "../../github/types.js";
+import { renderTerminalSummary } from "../../output/terminal.js";
+import { writeReviewOutputs } from "../../output/write-outputs.js";
 
 export type OutputFormat = "md" | "json" | "all";
 
@@ -33,12 +36,11 @@ export function buildPrDryRun(url: string, options: PrCommandOptions) {
   };
 }
 
-export async function buildPrResult(url: string, options: PrCommandOptions) {
+export async function buildPrResult(
+  url: string,
+  options: PrCommandOptions
+): Promise<GitHubPullRequestOutput> {
   const pullRequest = parseGitHubPullRequestUrl(url);
-
-  if (options.dryRun) {
-    return buildPrDryRun(url, options);
-  }
 
   const data = options.fixture
     ? await loadGitHubPullRequestFixture(options.fixture, pullRequest)
@@ -49,10 +51,25 @@ export async function buildPrResult(url: string, options: PrCommandOptions) {
 
 export async function runPrCommand(url: string, options: PrCommandOptions): Promise<void> {
   try {
+    if (options.dryRun) {
+      const result = buildPrDryRun(url, options);
+
+      if (!options.quiet) {
+        console.log(JSON.stringify(result, null, 2));
+      }
+      return;
+    }
+
     const result = await buildPrResult(url, options);
 
+    const written = await writeReviewOutputs(result, {
+      outDir: options.out,
+      format: options.format,
+      includeAgentContext: options.agent !== false
+    });
+
     if (!options.quiet) {
-      console.log(JSON.stringify(result, null, 2));
+      console.log(renderTerminalSummary(result, written));
     }
   } catch (error) {
     if (error instanceof GitHubPullRequestUrlError) {

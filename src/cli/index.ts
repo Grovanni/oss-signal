@@ -18,7 +18,7 @@ const program = new Command();
 program
   .name("oss-signal")
   .description("Generate deterministic GitHub Pull Request intake briefs.")
-  .version("0.0.0")
+  .version("0.1.0")
   .showHelpAfterError();
 
 program

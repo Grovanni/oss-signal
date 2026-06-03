@@ -1,0 +1,244 @@
+{
+  "schema_version": "review-brief.v1",
+  "repository": {
+    "owner": "example",
+    "name": "oss-signal-demo",
+    "full_name": "example/oss-signal-demo",
+    "html_url": "https://github.com/example/oss-signal-demo"
+  },
+  "pull_request": {
+    "number": 105,
+    "title": "Refactor storage layer and migration",
+    "author": "mixed-contributor",
+    "html_url": "https://github.com/example/oss-signal-demo/pull/105",
+    "state": "open",
+    "draft": false,
+    "created_at": "2026-06-01T10:00:00Z",
+    "updated_at": "2026-06-01T12:00:00Z",
+    "merged_at": null,
+    "head": {
+      "ref": "storage/refactor",
+      "sha": "1111111111111111111111111111111111111105",
+      "repo_full_name": "mixed-contributor/oss-signal-demo"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2222222222222222222222222222222222222205",
+      "repo_full_name": "example/oss-signal-demo"
+    },
+    "commits": 6,
+    "additions": 920,
+    "deletions": 140,
+    "changed_files": 5,
+    "body_present": true,
+    "body_length": 24
+  },
+  "size": {
+    "files": 5,
+    "additions": 920,
+    "deletions": 140,
+    "diff_bytes": 892,
+    "diff_lines": 27
+  },
+  "categories": {
+    "code": 1,
+    "tests": 1,
+    "documentation": 1,
+    "ci": 0,
+    "dependencies": 1,
+    "configuration": 0,
+    "security": 0,
+    "migrations": 1,
+    "release": 1,
+    "build": 0,
+    "generated": 0,
+    "unknown": 0
+  },
+  "signals": [
+    {
+      "id": "large_pr",
+      "level": "high",
+      "title": "Large pull request",
+      "message": "This PR changes many files or lines.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "5 files, +920 / -140",
+          "reason": "> 20 files or > 800 changed lines"
+        }
+      ]
+    },
+    {
+      "id": "tests_changed",
+      "level": "info",
+      "title": "Tests changed",
+      "message": "At least one test file changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "tests/storage.test.ts",
+          "reason": "tests"
+        }
+      ]
+    },
+    {
+      "id": "docs_changed",
+      "level": "info",
+      "title": "Documentation changed",
+      "message": "Documentation changed with other categories.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "docs/storage.md",
+          "reason": "documentation changed"
+        }
+      ]
+    },
+    {
+      "id": "dependency_manifest_changed",
+      "level": "medium",
+      "title": "Dependency manifest changed",
+      "message": "A dependency manifest changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "package.json",
+          "reason": "dependency manifest"
+        }
+      ]
+    },
+    {
+      "id": "migration_changed",
+      "level": "medium",
+      "title": "Migration or schema changed",
+      "message": "A migration, schema or database path changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "prisma/migrations/20260603000000_storage/schema.sql",
+          "reason": "migration/schema/database path"
+        }
+      ]
+    },
+    {
+      "id": "short_description_for_large_pr",
+      "level": "high",
+      "title": "Short description for large PR",
+      "message": "The PR is large but the description is short.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "5 files, 1060 changed lines",
+          "reason": "large PR threshold reached"
+        },
+        {
+          "kind": "description",
+          "value": "24 characters",
+          "reason": "< 120 characters"
+        }
+      ]
+    },
+    {
+      "id": "description_missing_dependency_context",
+      "level": "medium",
+      "title": "Dependency context missing from description",
+      "message": "Dependency files changed but the description does not mention dependency context.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "package.json",
+          "reason": "dependency changed without matching description context"
+        }
+      ]
+    },
+    {
+      "id": "mixed_concerns",
+      "level": "high",
+      "title": "Mixed concerns",
+      "message": "At least four strong file categories changed in the same PR.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "code, tests, documentation, dependencies, migrations, release",
+          "reason": ">= 4 strong categories touched"
+        }
+      ]
+    }
+  ],
+  "attention": "high",
+  "recommended_action": "request_split",
+  "priority_files": [
+    {
+      "path": "prisma/migrations/20260603000000_storage/schema.sql",
+      "categories": [
+        "migrations"
+      ],
+      "changes": 434,
+      "reason": "migration or schema path"
+    },
+    {
+      "path": "src/storage/index.ts",
+      "categories": [
+        "code"
+      ],
+      "changes": 400,
+      "reason": "source code change"
+    },
+    {
+      "path": "package.json",
+      "categories": [
+        "dependencies",
+        "release"
+      ],
+      "changes": 6,
+      "reason": "dependency manifest or lockfile"
+    },
+    {
+      "path": "tests/storage.test.ts",
+      "categories": [
+        "tests"
+      ],
+      "changes": 132,
+      "reason": "tests"
+    },
+    {
+      "path": "docs/storage.md",
+      "categories": [
+        "documentation"
+      ],
+      "changes": 88,
+      "reason": "documentation"
+    }
+  ],
+  "questions": [
+    {
+      "signal_id": "large_pr",
+      "question": "Cette PR peut-elle etre separee en plusieurs changements plus petits ?"
+    },
+    {
+      "signal_id": "dependency_manifest_changed",
+      "question": "Pourquoi cette dependance est-elle necessaire dans cette PR ?"
+    },
+    {
+      "signal_id": "migration_changed",
+      "question": "La migration est-elle backward compatible et reversible ?"
+    },
+    {
+      "signal_id": "short_description_for_large_pr",
+      "question": "Pouvez-vous ajouter contexte, comportement attendu et strategie de test ?"
+    },
+    {
+      "signal_id": "mixed_concerns",
+      "question": "Quels changements doivent etre relus ensemble et lesquels peuvent etre separes ?"
+    }
+  ],
+  "data_confidence": {
+    "source": "fixture",
+    "diff_available": true,
+    "file_count_matches_metadata": true
+  },
+  "limitations": [
+    "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",
+    "OSS Signal does not execute code, install dependencies, approve, reject or score the PR."
+  ]
+}

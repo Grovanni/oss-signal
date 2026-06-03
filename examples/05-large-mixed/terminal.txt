@@ -1,0 +1,6 @@
+OSS Signal: example/oss-signal-demo#105
+Attention: high
+Action: request_split
+Size: 5 files, +920 / -140
+Signals: large_pr, tests_changed, docs_changed
+Outputs: examples\05-large-mixed\review-brief.md, examples\05-large-mixed\review-brief.json, examples\05-large-mixed\agent-context.md

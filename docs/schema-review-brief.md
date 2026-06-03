@@ -1,12 +1,12 @@
 # Review brief JSON schema
 
-The final `review-brief.json` output is planned for the report rendering phase. The current CLI prints an intermediate JSON summary with GitHub data and analysis.
+`review-brief.json` is versioned.
 
 Required top-level fields:
 
 ```json
 {
-  "schema_version": "0.1",
+  "schema_version": "review-brief.v1",
   "repository": {},
   "pull_request": {},
   "size": {},
@@ -16,7 +16,11 @@ Required top-level fields:
   "recommended_action": {},
   "priority_files": [],
   "questions": [],
-  "data_confidence": {},
+  "data_confidence": {
+    "source": "github",
+    "diff_available": true,
+    "file_count_matches_metadata": true
+  },
   "limitations": []
 }
 ```
@@ -45,20 +49,17 @@ Do not remove or rename fields inside the same `schema_version`.
 
 If a breaking change is needed, increment `schema_version`.
 
-## Current analysis shape
+## Analysis fields
 
-The current intermediate output includes:
+The JSON contains the same core analysis fields used by the Markdown and agent context renderers:
 
 ```json
 {
-  "analysis": {
-    "categories": {},
-    "classified_files": [],
-    "signals": [],
-    "attention": "medium",
-    "recommended_action": "ask_for_tests",
-    "priority_files": [],
-    "questions": []
-  }
+  "categories": {},
+  "signals": [],
+  "attention": "medium",
+  "recommended_action": "ask_for_tests",
+  "priority_files": [],
+  "questions": []
 }
 ```

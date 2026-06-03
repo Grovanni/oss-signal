@@ -12,7 +12,7 @@ OSS Signal turns a GitHub Pull Request into a short, factual, auditable review b
 
 ## Status
 
-Early project. Phase 3 currently fetches GitHub Pull Request data, classifies changed files, detects deterministic signals, computes attention level and recommends a next review action. Final report file rendering is still planned.
+V0.1 local test version. The CLI fetches GitHub Pull Request data, classifies changed files, detects deterministic signals, computes attention level, recommends a next review action and writes three output files.
 
 ## Goal
 
@@ -47,7 +47,7 @@ oss-signal-output/
   agent-context.md
 ```
 
-## Current local usage
+## Local usage
 
 ```bash
 npm install
@@ -56,6 +56,26 @@ node dist/cli/index.js pr https://github.com/org/repo/pull/123
 ```
 
 Set `GITHUB_TOKEN` or `GH_TOKEN` for private repositories or a higher GitHub rate limit. The token is only sent as an Authorization header and is never included in output.
+
+Terminal output is intentionally short:
+
+```text
+OSS Signal: org/repo#123
+Attention: high
+Action: request_split
+Size: 5 files, +920 / -140
+Signals: large_pr, tests_changed, docs_changed
+Outputs: oss-signal-output/review-brief.md, oss-signal-output/review-brief.json, oss-signal-output/agent-context.md
+```
+
+Generated files:
+
+```text
+oss-signal-output/
+  review-brief.md
+  review-brief.json
+  agent-context.md
+```
 
 Use `--dry-run` to validate URL parsing without network access:
 
@@ -69,39 +89,28 @@ Use `--fixture` to run against local fixture files instead of the network:
 node dist/cli/index.js pr https://github.com/org/repo/pull/123 --fixture tests/fixtures/github-basic
 ```
 
-Current output is an intermediate normalized JSON summary. It includes diff byte and line counts, but it does not print the full diff or full PR description.
+Useful options:
 
-```json
-{
-  "mode": "github",
-  "pull_request": {
-    "number": 123,
-    "title": "Example pull request",
-    "changed_files": 2
-  },
-  "files": {
-    "count": 2
-  },
-  "diff": {
-    "format": "unified",
-    "bytes": 1200,
-    "lines": 80,
-    "available": true
-  },
-  "analysis": {
-    "attention": "low",
-    "recommended_action": "normal_review",
-    "signals": [
-      {
-        "id": "small_pr",
-        "level": "info",
-        "evidence": []
-      }
-    ],
-    "questions": []
-  }
-}
+```bash
+node dist/cli/index.js pr <url> --out ./brief
+node dist/cli/index.js pr <url> --format md
+node dist/cli/index.js pr <url> --format json --no-agent
+node dist/cli/index.js pr <url> --quiet
 ```
+
+OSS Signal does not print or write the full diff. Reports contain facts, signals and evidence references.
+
+## Examples
+
+The `examples/` directory contains five stable public fixtures with generated outputs:
+
+- `01-docs-only`
+- `02-dependency-change`
+- `03-ci-change`
+- `04-auth-security`
+- `05-large-mixed`
+
+Each example includes `source.md`, fixture data, terminal output, `review-brief.md`, `review-brief.json` and `agent-context.md`.
 
 ## Non-goals
 

@@ -1,0 +1,12 @@
+[
+  {
+    "filename": ".github/workflows/ci.yml",
+    "status": "modified",
+    "additions": 12,
+    "deletions": 3,
+    "changes": 15,
+    "patch": "@@ -8,6 +8,9 @@\n+      - uses: actions/cache@v4\n+        with:\n+          path: ~/.npm\n",
+    "blob_url": "https://github.com/example/oss-signal-demo/blob/sha/.github/workflows/ci.yml",
+    "raw_url": "https://github.com/example/oss-signal-demo/raw/sha/.github/workflows/ci.yml"
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "number": 104,
+  "html_url": "https://github.com/example/oss-signal-demo/pull/104",
+  "title": "Adjust session token handling",
+  "body": "Updates session token handling.",
+  "user": {
+    "login": "security-contributor"
+  },
+  "state": "open",
+  "draft": false,
+  "created_at": "2026-06-01T10:00:00Z",
+  "updated_at": "2026-06-01T12:00:00Z",
+  "merged_at": null,
+  "head": {
+    "ref": "auth/session-token",
+    "sha": "1111111111111111111111111111111111111104",
+    "repo": {
+      "name": "oss-signal-demo",
+      "full_name": "security-contributor/oss-signal-demo",
+      "html_url": "https://github.com/security-contributor/oss-signal-demo",
+      "owner": {
+        "login": "security-contributor"
+      }
+    }
+  },
+  "base": {
+    "ref": "main",
+    "sha": "2222222222222222222222222222222222222204",
+    "repo": {
+      "name": "oss-signal-demo",
+      "full_name": "example/oss-signal-demo",
+      "html_url": "https://github.com/example/oss-signal-demo",
+      "owner": {
+        "login": "example"
+      }
+    }
+  },
+  "commits": 1,
+  "additions": 42,
+  "deletions": 12,
+  "changed_files": 1
+}

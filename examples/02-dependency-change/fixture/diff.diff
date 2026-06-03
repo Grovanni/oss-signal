@@ -1,0 +1,12 @@
+diff --git a/package.json b/package.json
+--- a/package.json
++++ b/package.json
+@@ -10,7 +10,7 @@
+-"demo-lib": "1.0.0"
++"demo-lib": "1.1.0"
+diff --git a/package-lock.json b/package-lock.json
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -20,7 +20,7 @@
+-"version": "1.0.0"
++"version": "1.1.0"

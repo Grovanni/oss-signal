@@ -1,0 +1,143 @@
+{
+  "schema_version": "review-brief.v1",
+  "repository": {
+    "owner": "example",
+    "name": "oss-signal-demo",
+    "full_name": "example/oss-signal-demo",
+    "html_url": "https://github.com/example/oss-signal-demo"
+  },
+  "pull_request": {
+    "number": 104,
+    "title": "Adjust session token handling",
+    "author": "security-contributor",
+    "html_url": "https://github.com/example/oss-signal-demo/pull/104",
+    "state": "open",
+    "draft": false,
+    "created_at": "2026-06-01T10:00:00Z",
+    "updated_at": "2026-06-01T12:00:00Z",
+    "merged_at": null,
+    "head": {
+      "ref": "auth/session-token",
+      "sha": "1111111111111111111111111111111111111104",
+      "repo_full_name": "security-contributor/oss-signal-demo"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2222222222222222222222222222222222222204",
+      "repo_full_name": "example/oss-signal-demo"
+    },
+    "commits": 1,
+    "additions": 42,
+    "deletions": 12,
+    "changed_files": 1,
+    "body_present": true,
+    "body_length": 31
+  },
+  "size": {
+    "files": 1,
+    "additions": 42,
+    "deletions": 12,
+    "diff_bytes": 184,
+    "diff_lines": 8
+  },
+  "categories": {
+    "code": 1,
+    "tests": 0,
+    "documentation": 0,
+    "ci": 0,
+    "dependencies": 0,
+    "configuration": 0,
+    "security": 1,
+    "migrations": 0,
+    "release": 0,
+    "build": 0,
+    "generated": 0,
+    "unknown": 0
+  },
+  "signals": [
+    {
+      "id": "small_pr",
+      "level": "info",
+      "title": "Small pull request",
+      "message": "This PR is small by file and line thresholds.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "1 files, +42 / -12",
+          "reason": "<= 5 files and <= 200 changed lines"
+        }
+      ]
+    },
+    {
+      "id": "code_without_tests",
+      "level": "medium",
+      "title": "Code changed without tests",
+      "message": "Code files changed but no test file was detected.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "src/auth/session.ts",
+          "reason": "code without detected tests"
+        }
+      ]
+    },
+    {
+      "id": "security_sensitive_file_changed",
+      "level": "high",
+      "title": "Security-sensitive path changed",
+      "message": "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "src/auth/session.ts",
+          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+        }
+      ]
+    },
+    {
+      "id": "auth_related_change",
+      "level": "high",
+      "title": "Authentication-related path changed",
+      "message": "A path references authentication, sessions or tokens.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "src/auth/session.ts",
+          "reason": "path contains auth/login/session/token/jwt/oauth"
+        }
+      ]
+    }
+  ],
+  "attention": "high",
+  "recommended_action": "security_review",
+  "priority_files": [
+    {
+      "path": "src/auth/session.ts",
+      "categories": [
+        "security",
+        "code"
+      ],
+      "changes": 54,
+      "reason": "security-sensitive path"
+    }
+  ],
+  "questions": [
+    {
+      "signal_id": "code_without_tests",
+      "question": "Quels tests couvrent les fichiers de code modifies ?"
+    },
+    {
+      "signal_id": "auth_related_change",
+      "question": "Le changement d'authentification ou de session est-il couvert par des tests ?"
+    }
+  ],
+  "data_confidence": {
+    "source": "fixture",
+    "diff_available": true,
+    "file_count_matches_metadata": true
+  },
+  "limitations": [
+    "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",
+    "OSS Signal does not execute code, install dependencies, approve, reject or score the PR."
+  ]
+}

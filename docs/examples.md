@@ -1,26 +1,23 @@
 # Examples
 
-The public README should include real examples once the CLI works.
-
-Target example set:
+The repository includes five stable public fixtures with generated outputs:
 
 ```text
 examples/
-  01-small-docs-pr/
+  01-docs-only/
   02-dependency-change/
   03-ci-change/
-  04-auth-change-no-tests/
-  05-large-mixed-pr/
+  04-auth-security/
+  05-large-mixed/
 ```
 
 Each example should include:
 
-- source PR URL;
-- generated terminal summary;
+- `source.md`;
+- fixture metadata, changed files and diff;
+- `terminal.txt`;
 - `review-brief.md`;
 - `review-brief.json`;
 - `agent-context.md`;
-- a short note explaining what the brief surfaces.
 
-Examples must use public PRs only.
-
+The examples use synthetic public fixtures rather than live PRs. This keeps documentation stable and avoids depending on mutable third-party PRs. Live PR checks are still supported by the CLI.

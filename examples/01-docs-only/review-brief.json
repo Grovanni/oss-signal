@@ -1,0 +1,120 @@
+{
+  "schema_version": "review-brief.v1",
+  "repository": {
+    "owner": "example",
+    "name": "oss-signal-demo",
+    "full_name": "example/oss-signal-demo",
+    "html_url": "https://github.com/example/oss-signal-demo"
+  },
+  "pull_request": {
+    "number": 101,
+    "title": "Clarify installation docs",
+    "author": "docs-contributor",
+    "html_url": "https://github.com/example/oss-signal-demo/pull/101",
+    "state": "open",
+    "draft": false,
+    "created_at": "2026-06-01T10:00:00Z",
+    "updated_at": "2026-06-01T12:00:00Z",
+    "merged_at": null,
+    "head": {
+      "ref": "docs/install",
+      "sha": "1111111111111111111111111111111111111101",
+      "repo_full_name": "docs-contributor/oss-signal-demo"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2222222222222222222222222222222222222201",
+      "repo_full_name": "example/oss-signal-demo"
+    },
+    "commits": 1,
+    "additions": 16,
+    "deletions": 4,
+    "changed_files": 2,
+    "body_present": true,
+    "body_length": 45
+  },
+  "size": {
+    "files": 2,
+    "additions": 16,
+    "deletions": 4,
+    "diff_bytes": 252,
+    "diff_lines": 13
+  },
+  "categories": {
+    "code": 0,
+    "tests": 0,
+    "documentation": 2,
+    "ci": 0,
+    "dependencies": 0,
+    "configuration": 0,
+    "security": 0,
+    "migrations": 0,
+    "release": 0,
+    "build": 0,
+    "generated": 0,
+    "unknown": 0
+  },
+  "signals": [
+    {
+      "id": "small_pr",
+      "level": "info",
+      "title": "Small pull request",
+      "message": "This PR is small by file and line thresholds.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "2 files, +16 / -4",
+          "reason": "<= 5 files and <= 200 changed lines"
+        }
+      ]
+    },
+    {
+      "id": "docs_only",
+      "level": "info",
+      "title": "Documentation-only change",
+      "message": "All changed files are documentation.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "README.md",
+          "reason": "all changed files are documentation"
+        },
+        {
+          "kind": "file",
+          "value": "docs/usage.md",
+          "reason": "all changed files are documentation"
+        }
+      ]
+    }
+  ],
+  "attention": "low",
+  "recommended_action": "normal_review",
+  "priority_files": [
+    {
+      "path": "README.md",
+      "categories": [
+        "documentation"
+      ],
+      "changes": 12,
+      "reason": "documentation"
+    },
+    {
+      "path": "docs/usage.md",
+      "categories": [
+        "documentation"
+      ],
+      "changes": 8,
+      "reason": "documentation"
+    }
+  ],
+  "questions": [],
+  "data_confidence": {
+    "source": "fixture",
+    "diff_available": true,
+    "file_count_matches_metadata": true
+  },
+  "limitations": [
+    "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",
+    "OSS Signal does not execute code, install dependencies, approve, reject or score the PR."
+  ]
+}

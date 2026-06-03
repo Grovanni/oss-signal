@@ -1,0 +1,156 @@
+{
+  "schema_version": "review-brief.v1",
+  "repository": {
+    "owner": "example",
+    "name": "oss-signal-demo",
+    "full_name": "example/oss-signal-demo",
+    "html_url": "https://github.com/example/oss-signal-demo"
+  },
+  "pull_request": {
+    "number": 102,
+    "title": "Update package dependency",
+    "author": "dependency-contributor",
+    "html_url": "https://github.com/example/oss-signal-demo/pull/102",
+    "state": "open",
+    "draft": false,
+    "created_at": "2026-06-01T10:00:00Z",
+    "updated_at": "2026-06-01T12:00:00Z",
+    "merged_at": null,
+    "head": {
+      "ref": "deps/update",
+      "sha": "1111111111111111111111111111111111111102",
+      "repo_full_name": "dependency-contributor/oss-signal-demo"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "2222222222222222222222222222222222222202",
+      "repo_full_name": "example/oss-signal-demo"
+    },
+    "commits": 1,
+    "additions": 80,
+    "deletions": 75,
+    "changed_files": 2,
+    "body_present": true,
+    "body_length": 80
+  },
+  "size": {
+    "files": 2,
+    "additions": 80,
+    "deletions": 75,
+    "diff_bytes": 296,
+    "diff_lines": 13
+  },
+  "categories": {
+    "code": 0,
+    "tests": 0,
+    "documentation": 0,
+    "ci": 0,
+    "dependencies": 2,
+    "configuration": 0,
+    "security": 0,
+    "migrations": 0,
+    "release": 1,
+    "build": 0,
+    "generated": 0,
+    "unknown": 0
+  },
+  "signals": [
+    {
+      "id": "small_pr",
+      "level": "info",
+      "title": "Small pull request",
+      "message": "This PR is small by file and line thresholds.",
+      "evidence": [
+        {
+          "kind": "metadata",
+          "value": "2 files, +80 / -75",
+          "reason": "<= 5 files and <= 200 changed lines"
+        }
+      ]
+    },
+    {
+      "id": "dependency_manifest_changed",
+      "level": "medium",
+      "title": "Dependency manifest changed",
+      "message": "A dependency manifest changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "package.json",
+          "reason": "dependency manifest"
+        }
+      ]
+    },
+    {
+      "id": "dependency_lockfile_changed",
+      "level": "medium",
+      "title": "Dependency lockfile changed",
+      "message": "A dependency lockfile changed.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "package-lock.json",
+          "reason": "dependency lockfile"
+        }
+      ]
+    },
+    {
+      "id": "dependency_change_without_code",
+      "level": "medium",
+      "title": "Dependency change without code",
+      "message": "Dependency files changed with little or no code change detected.",
+      "evidence": [
+        {
+          "kind": "file",
+          "value": "package.json",
+          "reason": "dependency change without code category"
+        },
+        {
+          "kind": "file",
+          "value": "package-lock.json",
+          "reason": "dependency change without code category"
+        }
+      ]
+    }
+  ],
+  "attention": "medium",
+  "recommended_action": "dependency_review",
+  "priority_files": [
+    {
+      "path": "package-lock.json",
+      "categories": [
+        "dependencies"
+      ],
+      "changes": 151,
+      "reason": "dependency manifest or lockfile"
+    },
+    {
+      "path": "package.json",
+      "categories": [
+        "dependencies",
+        "release"
+      ],
+      "changes": 4,
+      "reason": "dependency manifest or lockfile"
+    }
+  ],
+  "questions": [
+    {
+      "signal_id": "dependency_manifest_changed",
+      "question": "Pourquoi cette dependance est-elle necessaire dans cette PR ?"
+    },
+    {
+      "signal_id": "dependency_lockfile_changed",
+      "question": "Le lockfile a-t-il ete regenere avec la version attendue du gestionnaire de paquets ?"
+    }
+  ],
+  "data_confidence": {
+    "source": "fixture",
+    "diff_available": true,
+    "file_count_matches_metadata": true
+  },
+  "limitations": [
+    "This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.",
+    "OSS Signal does not execute code, install dependencies, approve, reject or score the PR."
+  ]
+}

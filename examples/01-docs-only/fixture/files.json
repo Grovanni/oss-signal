@@ -1,0 +1,22 @@
+[
+  {
+    "filename": "README.md",
+    "status": "modified",
+    "additions": 10,
+    "deletions": 2,
+    "changes": 12,
+    "patch": "@@ -1,2 +1,3 @@\n # Demo\n+Updated install notes.\n",
+    "blob_url": "https://github.com/example/oss-signal-demo/blob/sha/README.md",
+    "raw_url": "https://github.com/example/oss-signal-demo/raw/sha/README.md"
+  },
+  {
+    "filename": "docs/usage.md",
+    "status": "modified",
+    "additions": 6,
+    "deletions": 2,
+    "changes": 8,
+    "patch": "@@ -1,2 +1,3 @@\n # Usage\n+Clarified command examples.\n",
+    "blob_url": "https://github.com/example/oss-signal-demo/blob/sha/docs/usage.md",
+    "raw_url": "https://github.com/example/oss-signal-demo/raw/sha/docs/usage.md"
+  }
+]

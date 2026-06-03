@@ -1,0 +1,6 @@
+OSS Signal: example/oss-signal-demo#102
+Attention: medium
+Action: dependency_review
+Size: 2 files, +80 / -75
+Signals: small_pr, dependency_manifest_changed, dependency_lockfile_changed
+Outputs: examples\02-dependency-change\review-brief.md, examples\02-dependency-change\review-brief.json, examples\02-dependency-change\agent-context.md
