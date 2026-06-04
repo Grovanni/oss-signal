@@ -1,0 +1,277 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://grovanni.github.io/oss-signal/schemas/review-brief.v1.schema.json",
+  "title": "OSS Signal review brief",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "repository",
+    "pull_request",
+    "size",
+    "ci",
+    "categories",
+    "signals",
+    "attention",
+    "recommended_action",
+    "priority_files",
+    "questions",
+    "data_confidence",
+    "limitations"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "review-brief.v1"
+    },
+    "repository": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["owner", "name", "full_name", "html_url"],
+      "properties": {
+        "owner": { "type": "string" },
+        "name": { "type": "string" },
+        "full_name": { "type": "string" },
+        "html_url": { "type": "string" }
+      }
+    },
+    "pull_request": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "number",
+        "title",
+        "author",
+        "html_url",
+        "state",
+        "draft",
+        "created_at",
+        "updated_at",
+        "merged_at",
+        "head",
+        "base",
+        "commits",
+        "additions",
+        "deletions",
+        "changed_files",
+        "body_present",
+        "body_length"
+      ],
+      "properties": {
+        "number": { "type": "integer", "minimum": 1 },
+        "title": { "type": "string" },
+        "author": { "type": ["string", "null"] },
+        "html_url": { "type": "string" },
+        "state": { "type": "string" },
+        "draft": { "type": "boolean" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" },
+        "merged_at": { "type": ["string", "null"] },
+        "head": { "$ref": "#/$defs/ref" },
+        "base": { "$ref": "#/$defs/ref" },
+        "commits": { "type": "integer", "minimum": 0 },
+        "additions": { "type": "integer", "minimum": 0 },
+        "deletions": { "type": "integer", "minimum": 0 },
+        "changed_files": { "type": "integer", "minimum": 0 },
+        "body_present": { "type": "boolean" },
+        "body_length": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "size": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["files", "additions", "deletions", "diff_bytes", "diff_lines"],
+      "properties": {
+        "files": { "type": "integer", "minimum": 0 },
+        "additions": { "type": "integer", "minimum": 0 },
+        "deletions": { "type": "integer", "minimum": 0 },
+        "diff_bytes": { "type": "integer", "minimum": 0 },
+        "diff_lines": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "ci": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "head_sha",
+        "state",
+        "total",
+        "successful",
+        "failed",
+        "pending",
+        "skipped",
+        "items"
+      ],
+      "properties": {
+        "head_sha": { "type": "string" },
+        "state": { "$ref": "#/$defs/ci_state" },
+        "total": { "type": "integer", "minimum": 0 },
+        "successful": { "type": "integer", "minimum": 0 },
+        "failed": { "type": "integer", "minimum": 0 },
+        "pending": { "type": "integer", "minimum": 0 },
+        "skipped": { "type": "integer", "minimum": 0 },
+        "items": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ci_item" }
+        }
+      }
+    },
+    "categories": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 },
+      "required": [
+        "code",
+        "tests",
+        "documentation",
+        "ci",
+        "automation",
+        "dependencies",
+        "configuration",
+        "security",
+        "migrations",
+        "release",
+        "build",
+        "generated",
+        "unknown"
+      ],
+      "properties": {
+        "code": { "type": "integer", "minimum": 0 },
+        "tests": { "type": "integer", "minimum": 0 },
+        "documentation": { "type": "integer", "minimum": 0 },
+        "ci": { "type": "integer", "minimum": 0 },
+        "automation": { "type": "integer", "minimum": 0 },
+        "dependencies": { "type": "integer", "minimum": 0 },
+        "configuration": { "type": "integer", "minimum": 0 },
+        "security": { "type": "integer", "minimum": 0 },
+        "migrations": { "type": "integer", "minimum": 0 },
+        "release": { "type": "integer", "minimum": 0 },
+        "build": { "type": "integer", "minimum": 0 },
+        "generated": { "type": "integer", "minimum": 0 },
+        "unknown": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "signals": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/signal" }
+    },
+    "attention": {
+      "enum": ["low", "medium", "high"]
+    },
+    "recommended_action": {
+      "enum": [
+        "normal_review",
+        "ask_for_tests",
+        "ask_for_reproduction",
+        "ask_for_clarification",
+        "request_split",
+        "security_review",
+        "wait_for_ci",
+        "dependency_review",
+        "migration_review"
+      ]
+    },
+    "priority_files": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/priority_file" }
+    },
+    "questions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/question" }
+    },
+    "data_confidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "source",
+        "diff_available",
+        "file_count_matches_metadata",
+        "ci_available"
+      ],
+      "properties": {
+        "source": { "enum": ["github", "fixture"] },
+        "diff_available": { "type": "boolean" },
+        "file_count_matches_metadata": { "type": "boolean" },
+        "ci_available": { "type": "boolean" }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "ref": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ref", "sha", "repo_full_name"],
+      "properties": {
+        "ref": { "type": "string" },
+        "sha": { "type": "string" },
+        "repo_full_name": { "type": ["string", "null"] }
+      }
+    },
+    "ci_state": {
+      "enum": ["success", "failure", "pending", "unknown"]
+    },
+    "ci_item": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "name", "state", "status", "conclusion", "url"],
+      "properties": {
+        "kind": { "enum": ["check_run", "status"] },
+        "name": { "type": "string" },
+        "state": { "$ref": "#/$defs/ci_state" },
+        "status": { "type": "string" },
+        "conclusion": { "type": ["string", "null"] },
+        "url": { "type": ["string", "null"] }
+      }
+    },
+    "signal": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "level", "title", "message", "evidence"],
+      "properties": {
+        "id": { "type": "string" },
+        "level": { "enum": ["info", "medium", "high"] },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "evidence": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/evidence" }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind", "value", "reason"],
+      "properties": {
+        "kind": { "enum": ["file", "metadata", "description", "diff"] },
+        "value": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "priority_file": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["path", "categories", "changes", "reason"],
+      "properties": {
+        "path": { "type": "string" },
+        "categories": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "changes": { "type": "integer", "minimum": 0 },
+        "reason": { "type": "string" }
+      }
+    },
+    "question": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["signal_id", "question"],
+      "properties": {
+        "signal_id": { "type": "string" },
+        "question": { "type": "string" }
+      }
+    }
+  }
+}

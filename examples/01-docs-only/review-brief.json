@@ -80,6 +80,7 @@
     "tests": 0,
     "documentation": 1,
     "ci": 0,
+    "automation": 0,
     "dependencies": 0,
     "configuration": 0,
     "security": 0,

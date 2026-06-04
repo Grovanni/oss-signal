@@ -6,6 +6,8 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Added `schemas/review-brief.v1.schema.json` and tests that validate generated examples against it.
+- Documented the recommended action priority policy.
 - Clarified workflow sensitivity wording: GitHub workflow files are now automation-sensitive instead of generic security-sensitive.
 - Documented `review-brief.v1` compatibility rules for additive fields and future breaking schema changes.
 

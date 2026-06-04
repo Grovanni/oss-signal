@@ -384,6 +384,7 @@
     "tests": 0,
     "documentation": 0,
     "ci": 0,
+    "automation": 0,
     "dependencies": 2,
     "configuration": 0,
     "security": 0,

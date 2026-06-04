@@ -1,6 +1,10 @@
 # Review brief JSON schema
 
-`review-brief.json` is versioned.
+`review-brief.json` is versioned. The JSON Schema is committed at:
+
+```text
+schemas/review-brief.v1.schema.json
+```
 
 Required top-level fields:
 
@@ -71,6 +75,27 @@ Required top-level fields:
 Do not remove fields, rename fields or change field types inside the same `schema_version`.
 
 If a breaking change is needed, use a new major schema version such as `review-brief.v2`.
+
+## Guaranteed fields
+
+The top-level fields listed above are guaranteed in `review-brief.v1`.
+
+These nested fields are also part of the stable v1 contract:
+
+- repository identity and URL fields;
+- pull request metadata shown in the schema example;
+- size counters;
+- CI summary counters and normalized CI item shape;
+- category counts;
+- signals with evidence;
+- attention, recommended action, priority files and questions;
+- data confidence and limitations.
+
+## Optional and nullable values
+
+Some guaranteed fields can be `null` when GitHub does not provide a value, for example PR author, merge time, fork repository names or CI item URLs.
+
+OSS Signal may add new fields inside existing objects without changing `schema_version` as long as existing field names and types stay valid.
 
 ## Analysis fields
 

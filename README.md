@@ -103,6 +103,8 @@ node dist/cli/index.js pr <url> --quiet
 
 OSS Signal does not print or write the full diff. Reports contain facts, signals, GitHub CI state when available and evidence references.
 
+The recommended action priority order is documented in `docs/decision-policy.md`.
+
 ## Examples
 
 The `examples/` directory contains five real public PR examples with generated outputs:

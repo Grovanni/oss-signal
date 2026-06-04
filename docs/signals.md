@@ -76,6 +76,8 @@ The Phase 3 implementation can emit these deterministic signals:
 
 Attention is `low`, `medium` or `high`. It is not a risk score and it is not a verdict.
 
+See `docs/decision-policy.md` for the current recommended action priority order.
+
 Recommended actions are non-authoritative:
 
 - `normal_review`

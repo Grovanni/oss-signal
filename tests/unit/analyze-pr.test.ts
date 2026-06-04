@@ -189,6 +189,21 @@ describe("analyzePullRequestData", () => {
     expect(signalIds(analysis.signals)).toContain("ci_checks_pending");
     expect(analysis.recommended_action).toBe("wait_for_ci");
   });
+
+  it("keeps direct security-sensitive changes above failing CI in action priority", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Fix session token handling.",
+        files: [changedFile("src/auth/session-token.ts", 18), changedFile("tests/session.test.ts", 8)],
+        ci: ciWith("failure")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toEqual(
+      expect.arrayContaining(["security_sensitive_file_changed", "auth_related_change", "ci_checks_failed"])
+    );
+    expect(analysis.recommended_action).toBe("security_review");
+  });
 });
 
 function signalIds(signals: Array<{ id: string }>): string[] {
