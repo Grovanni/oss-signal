@@ -18,7 +18,7 @@ const program = new Command();
 program
   .name("oss-signal")
   .description("Generate deterministic GitHub Pull Request intake briefs.")
-  .version("0.1.0")
+  .version("0.2.0")
   .showHelpAfterError();
 
 program
@@ -27,6 +27,7 @@ program
   .argument("<url>", "GitHub Pull Request URL")
   .option("--dry-run", "Parse the URL without fetching GitHub data")
   .option("--fixture <dir>", "Read GitHub PR data from a local fixture instead of the network")
+  .option("--config <path>", "Read OSS Signal config from a specific file")
   .option("--out <dir>", "Output directory", "./oss-signal-output")
   .option("--format <format>", "Output format: md, json, all", parseOutputFormat, "all")
   .option("--quiet", "Reduce terminal output")

@@ -1,0 +1,66 @@
+name: OSS Signal
+description: Generate deterministic GitHub Pull Request intake briefs.
+
+inputs:
+  pr-url:
+    description: GitHub Pull Request URL. Defaults to the pull_request event URL.
+    required: false
+    default: ""
+  github-token:
+    description: GitHub token used for API rate limit and private repository access.
+    required: false
+    default: ""
+  out:
+    description: Output directory for generated brief files.
+    required: false
+    default: oss-signal-output
+  format:
+    description: Output format passed to oss-signal. Use md, json or all.
+    required: false
+    default: all
+  agent-context:
+    description: Generate agent-context.md.
+    required: false
+    default: "true"
+  config:
+    description: Optional OSS Signal config path, relative to the workflow workspace.
+    required: false
+    default: ""
+  artifact-name:
+    description: GitHub Actions artifact name.
+    required: false
+    default: oss-signal-brief
+
+runs:
+  using: composite
+  steps:
+    - name: Install OSS Signal dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ github.action_path }}
+
+    - name: Build OSS Signal CLI
+      shell: bash
+      run: npm run build
+      working-directory: ${{ github.action_path }}
+
+    - name: Generate PR brief
+      shell: bash
+      run: node scripts/github-action/run.mjs
+      working-directory: ${{ github.action_path }}
+      env:
+        INPUT_PR_URL: ${{ inputs.pr-url }}
+        INPUT_OUT: ${{ inputs.out }}
+        INPUT_FORMAT: ${{ inputs.format }}
+        INPUT_AGENT_CONTEXT: ${{ inputs.agent-context }}
+        INPUT_CONFIG: ${{ inputs.config }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        OSS_SIGNAL_WORKSPACE: ${{ github.workspace }}
+
+    - name: Upload PR brief artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ github.workspace }}/${{ inputs.out }}
+        if-no-files-found: error

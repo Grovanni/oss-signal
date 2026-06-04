@@ -39,6 +39,8 @@ Changed files can be classified into these categories:
 
 Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `automation` and `configuration` because workflow changes can affect CI, release automation, permissions and supply chain behavior. Workflow-only changes are treated as CI/automation attention first; they do not automatically become a `security_review` action.
 
+Repository-specific path patterns can add category matches through `docs/configuration.md`. Built-in rules still apply, and configured `ignore_paths` only remove matching files from classification and signal analysis.
+
 ## Current signal set
 
 The Phase 3 implementation can emit these deterministic signals:

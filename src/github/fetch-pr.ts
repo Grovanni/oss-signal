@@ -185,7 +185,10 @@ export async function fetchGitHubPullRequest(
     { ...options, fetchImpl }
   );
   const { files, limitations } = await fetchChangedFiles(parsedUrl, { ...options, fetchImpl });
-  const diffText = await fetchDiff(apiPullUrl, { ...options, fetchImpl });
+  const { diffText, limitations: diffLimitations } = await fetchDiff(apiPullUrl, {
+    ...options,
+    fetchImpl
+  });
   const { ci, limitations: ciLimitations } = await fetchCiSummary(parsedUrl, pullRequest.head.sha, {
     ...options,
     fetchImpl
@@ -198,7 +201,7 @@ export async function fetchGitHubPullRequest(
     files,
     diffText,
     ci,
-    limitations: [...limitations, ...ciLimitations]
+    limitations: [...limitations, ...diffLimitations, ...ciLimitations]
   });
 }
 
@@ -298,17 +301,31 @@ async function fetchChangedFiles(
 async function fetchDiff(
   apiPullUrl: string,
   options: RequiredPick<FetchGitHubPullRequestOptions, "fetchImpl"> & FetchGitHubPullRequestOptions
-): Promise<string> {
-  const response = await requestGitHub(apiPullUrl, "pull request diff", {
-    ...options,
-    accept: diffAccept
-  });
+): Promise<{ diffText: string; limitations: string[] }> {
+  try {
+    const response = await requestGitHub(apiPullUrl, "pull request diff", {
+      ...options,
+      accept: diffAccept
+    });
 
-  if (!response.ok) {
-    throw buildHttpError(response, "pull request diff", "diff_unavailable");
+    if (!response.ok) {
+      throw buildHttpError(response, "pull request diff", "diff_unavailable");
+    }
+
+    return {
+      diffText: await response.text(),
+      limitations: []
+    };
+  } catch (error) {
+    if (!(error instanceof GitHubFetchError)) {
+      throw error;
+    }
+
+    return {
+      diffText: "",
+      limitations: [`GitHub pull request diff unavailable: ${error.code}.`]
+    };
   }
-
-  return response.text();
 }
 
 async function fetchCiSummary(
@@ -536,7 +553,9 @@ function normalizeCiSummary(
   };
 }
 
-function normalizeCheckRun(checkRun: GitHubCheckRunsApiResponse["check_runs"][number]): GitHubCiItem {
+function normalizeCheckRun(
+  checkRun: GitHubCheckRunsApiResponse["check_runs"][number]
+): GitHubCiItem {
   return {
     kind: "check_run",
     name: checkRun.name,
@@ -547,7 +566,9 @@ function normalizeCheckRun(checkRun: GitHubCheckRunsApiResponse["check_runs"][nu
   };
 }
 
-function normalizeCommitStatus(status: GitHubCommitStatusApiResponse["statuses"][number]): GitHubCiItem {
+function normalizeCommitStatus(
+  status: GitHubCommitStatusApiResponse["statuses"][number]
+): GitHubCiItem {
   return {
     kind: "status",
     name: status.context,

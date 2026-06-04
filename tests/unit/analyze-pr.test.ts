@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { analyzePullRequestData } from "../../src/analyze/analyze-pr.js";
+import { mergeOssSignalConfig } from "../../src/config/config.js";
 import { loadGitHubPullRequestFixture } from "../../src/github/fixtures.js";
 import { parseGitHubPullRequestUrl } from "../../src/github/parse-url.js";
 import type {
@@ -47,7 +48,9 @@ describe("analyzePullRequestData", () => {
     );
     expect(analysis.attention).toBe("high");
     expect(analysis.recommended_action).toBe("security_review");
-    expect(analysis.questions.map((question) => question.signal_id)).toContain("code_without_tests");
+    expect(analysis.questions.map((question) => question.signal_id)).toContain(
+      "code_without_tests"
+    );
   });
 
   it("routes manifest and lockfile changes to dependency review", () => {
@@ -65,8 +68,24 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("dependency_review");
   });
 
+  it("routes dependency-only manifest changes to dependency review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update dependency metadata.",
+        files: [changedFile("package.json", 8)]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toEqual(
+      expect.arrayContaining(["dependency_manifest_changed", "dependency_change_without_code"])
+    );
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
   it("routes large PRs to request split", () => {
-    const files = Array.from({ length: 21 }, (_, index) => changedFile(`src/module-${index}.ts`, 10));
+    const files = Array.from({ length: 21 }, (_, index) =>
+      changedFile(`src/module-${index}.ts`, 10)
+    );
     const analysis = analyzePullRequestData(
       dataWith({
         body: "Short.",
@@ -110,7 +129,11 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toEqual(
-      expect.arrayContaining(["ci_changed", "automation_sensitive_file_changed", "ci_status_unavailable"])
+      expect.arrayContaining([
+        "ci_changed",
+        "automation_sensitive_file_changed",
+        "ci_status_unavailable"
+      ])
     );
     expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
     expect(analysis.categories.security).toBe(0);
@@ -194,15 +217,81 @@ describe("analyzePullRequestData", () => {
     const analysis = analyzePullRequestData(
       dataWith({
         body: "Fix session token handling.",
-        files: [changedFile("src/auth/session-token.ts", 18), changedFile("tests/session.test.ts", 8)],
+        files: [
+          changedFile("src/auth/session-token.ts", 18),
+          changedFile("tests/session.test.ts", 8)
+        ],
         ci: ciWith("failure")
       })
     );
 
     expect(signalIds(analysis.signals)).toEqual(
-      expect.arrayContaining(["security_sensitive_file_changed", "auth_related_change", "ci_checks_failed"])
+      expect.arrayContaining([
+        "security_sensitive_file_changed",
+        "auth_related_change",
+        "ci_checks_failed"
+      ])
     );
     expect(analysis.recommended_action).toBe("security_review");
+  });
+
+  it("uses configured size thresholds without changing default behavior", () => {
+    const config = mergeOssSignalConfig({
+      attention_thresholds: {
+        medium_files_changed: 10,
+        medium_lines_changed: 500,
+        large_files_changed: 30,
+        large_lines_changed: 1200
+      }
+    });
+    const files = Array.from({ length: 6 }, (_, index) => changedFile(`docs/page-${index}.md`, 10));
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update docs.",
+        files
+      }),
+      config
+    );
+
+    expect(signalIds(analysis.signals)).toContain("small_pr");
+    expect(signalIds(analysis.signals)).not.toContain("medium_pr");
+  });
+
+  it("uses configured paths for security-sensitive classification", () => {
+    const config = mergeOssSignalConfig({
+      paths: {
+        security: ["app/identity/**"]
+      }
+    });
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update identity lookup.",
+        files: [changedFile("app/identity/profile.ts", 12), changedFile("tests/profile.test.ts", 4)]
+      }),
+      config
+    );
+
+    expect(analysis.categories.security).toBe(1);
+    expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
+  });
+
+  it("omits configured ignore paths from signal analysis", () => {
+    const config = mergeOssSignalConfig({
+      ignore_paths: ["docs/generated/**"]
+    });
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Regenerate docs.",
+        files: Array.from({ length: 25 }, (_, index) =>
+          changedFile(`docs/generated/page-${index}.md`, 10)
+        )
+      }),
+      config
+    );
+
+    expect(analysis.classified_files).toHaveLength(0);
+    expect(signalIds(analysis.signals)).toContain("small_pr");
+    expect(signalIds(analysis.signals)).not.toContain("large_pr");
   });
 });
 

@@ -6,7 +6,10 @@ export function chooseRecommendedAction(
 ): RecommendedAction {
   const ids = new Set(signals.map((signal) => signal.id));
 
-  if (attention === "high" && (ids.has("auth_related_change") || ids.has("secret_related_change"))) {
+  if (
+    attention === "high" &&
+    (ids.has("auth_related_change") || ids.has("secret_related_change"))
+  ) {
     return "security_review";
   }
 
@@ -26,7 +29,11 @@ export function chooseRecommendedAction(
     return "ask_for_tests";
   }
 
-  if (ids.has("dependency_manifest_changed") && ids.has("dependency_lockfile_changed")) {
+  if (
+    ids.has("dependency_manifest_changed") ||
+    ids.has("dependency_lockfile_changed") ||
+    ids.has("dependency_change_without_code")
+  ) {
     return "dependency_review";
   }
 

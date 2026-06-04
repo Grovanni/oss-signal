@@ -6,8 +6,16 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Nothing yet.
+
+## 0.2.0 - 2026-06-04
+
 - Added `schemas/review-brief.v1.schema.json` and tests that validate generated examples against it.
 - Documented the recommended action priority policy.
+- Added a non-intrusive GitHub Action that writes a step summary and uploads brief artifacts.
+- Added optional `oss-signal.yml` / JSON configuration for size thresholds, path categories and ignored paths.
+- Kept PR brief generation usable when GitHub diff retrieval is unavailable.
+- Routed dependency-only manifest or lockfile PRs to `dependency_review` when no stronger action applies.
 - Clarified workflow sensitivity wording: GitHub workflow files are now automation-sensitive instead of generic security-sensitive.
 - Documented `review-brief.v1` compatibility rules for additive fields and future breaking schema changes.
 

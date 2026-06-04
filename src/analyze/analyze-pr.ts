@@ -5,6 +5,7 @@ import {
   type ClassifiedFile
 } from "../classify/classify-file.js";
 import type { FileCategory } from "../classify/categories.js";
+import { defaultOssSignalConfig, isIgnoredPath, type OssSignalConfig } from "../config/config.js";
 import type { GitHubPullRequestData } from "../github/types.js";
 import { computeAttentionLevel } from "../signals/attention-level.js";
 import { detectSignals } from "../signals/detect-signals.js";
@@ -28,13 +29,18 @@ export type PullRequestAnalysis = {
   questions: ReviewQuestion[];
 };
 
-export function analyzePullRequestData(data: GitHubPullRequestData): PullRequestAnalysis {
-  const classifiedFiles = classifyChangedFiles(data.files);
+export function analyzePullRequestData(
+  data: GitHubPullRequestData,
+  config: OssSignalConfig = defaultOssSignalConfig
+): PullRequestAnalysis {
+  const filesForAnalysis = data.files.filter((file) => !isIgnoredPath(config, file.path));
+  const classifiedFiles = classifyChangedFiles(filesForAnalysis, config);
   const categories = countCategories(classifiedFiles);
   const signals = detectSignals({
     data,
     files: classifiedFiles,
-    categoryCounts: categories
+    categoryCounts: categories,
+    config
   });
   const attention = computeAttentionLevel(signals);
 
@@ -51,7 +57,9 @@ export function analyzePullRequestData(data: GitHubPullRequestData): PullRequest
 
 function buildPriorityFiles(files: ClassifiedFile[]): PriorityFile[] {
   return [...files]
-    .sort((left, right) => scoreFile(right) - scoreFile(left) || left.path.localeCompare(right.path))
+    .sort(
+      (left, right) => scoreFile(right) - scoreFile(left) || left.path.localeCompare(right.path)
+    )
     .slice(0, 5)
     .map((file) => ({
       path: file.path,

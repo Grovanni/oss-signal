@@ -40,6 +40,8 @@ It does not decide whether a PR is good or bad. It highlights observable facts:
 npx oss-signal pr https://github.com/org/repo/pull/123
 ```
 
+GitHub Action usage is documented in `docs/github-action.md`.
+
 Generated files:
 
 ```text
@@ -98,10 +100,13 @@ Useful options:
 node dist/cli/index.js pr <url> --out ./brief
 node dist/cli/index.js pr <url> --format md
 node dist/cli/index.js pr <url> --format json --no-agent
+node dist/cli/index.js pr <url> --config oss-signal.yml
 node dist/cli/index.js pr <url> --quiet
 ```
 
 OSS Signal does not print or write the full diff. Reports contain facts, signals, GitHub CI state when available and evidence references.
+
+Optional repository configuration is documented in `docs/configuration.md`. It can tune size thresholds and path classification, but it is not required for first use.
 
 The recommended action priority order is documented in `docs/decision-policy.md`.
 

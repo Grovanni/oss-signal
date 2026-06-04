@@ -1,10 +1,12 @@
 import { analyzePullRequestData } from "../analyze/analyze-pr.js";
+import { defaultOssSignalConfig, type OssSignalConfig } from "../config/config.js";
 import type { GitHubPullRequestData, GitHubPullRequestOutput } from "./types.js";
 
 export function summarizeGitHubPullRequestData(
-  data: GitHubPullRequestData
+  data: GitHubPullRequestData,
+  config: OssSignalConfig = defaultOssSignalConfig
 ): GitHubPullRequestOutput {
-  const analysis = analyzePullRequestData(data);
+  const analysis = analyzePullRequestData(data, config);
 
   return {
     mode: data.source,

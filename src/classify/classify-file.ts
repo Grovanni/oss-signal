@@ -1,4 +1,9 @@
 import type { GitHubChangedFileSummary } from "../github/types.js";
+import {
+  defaultOssSignalConfig,
+  matchesConfiguredPath,
+  type OssSignalConfig
+} from "../config/config.js";
 
 import { createEmptyCategoryCounts, type FileCategory } from "./categories.js";
 
@@ -91,7 +96,10 @@ const sensitiveTerms = [
   "key"
 ];
 
-export function classifyChangedFile(file: GitHubChangedFileSummary): ClassifiedFile {
+export function classifyChangedFile(
+  file: GitHubChangedFileSummary,
+  config: OssSignalConfig = defaultOssSignalConfig
+): ClassifiedFile {
   const path = normalizePath(file.path);
   const name = basename(path);
   const ext = extension(name);
@@ -103,55 +111,100 @@ export function classifyChangedFile(file: GitHubChangedFileSummary): ClassifiedF
     }
   };
 
-  if (isGeneratedPath(path, name)) {
-    add("generated", "path or filename indicates generated output");
+  if (isGeneratedPath(path, name) || matchesConfiguredPath(config, "generated", path)) {
+    add(
+      "generated",
+      isGeneratedPath(path, name)
+        ? "path or filename indicates generated output"
+        : "configured generated path"
+    );
   }
 
-  if (isDocumentationPath(path, name)) {
-    add("documentation", "documentation path, filename or extension");
+  if (isDocumentationPath(path, name) || matchesConfiguredPath(config, "documentation", path)) {
+    add(
+      "documentation",
+      isDocumentationPath(path, name)
+        ? "documentation path, filename or extension"
+        : "configured documentation path"
+    );
   }
 
-  if (isTestPath(path, name)) {
-    add("tests", "test/spec path or filename");
+  if (isTestPath(path, name) || matchesConfiguredPath(config, "tests", path)) {
+    add("tests", isTestPath(path, name) ? "test/spec path or filename" : "configured test path");
   }
 
-  if (isCiPath(path, name)) {
-    add("ci", "CI workflow or pipeline path");
+  if (isCiPath(path, name) || matchesConfiguredPath(config, "ci", path)) {
+    add("ci", isCiPath(path, name) ? "CI workflow or pipeline path" : "configured CI path");
   }
 
-  if (isAutomationSensitivePath(path, name)) {
-    add("automation", "automation path can affect CI, releases, permissions or supply chain behavior");
-  }
-
-  if (isDependencyManifestName(name) || isDependencyLockfileName(name)) {
-    add("dependencies", "dependency manifest or lockfile");
-  }
-
-  if (isConfigurationPath(path, name)) {
-    add("configuration", "configuration file or directory");
-  }
-
-  if (isSecuritySensitivePath(path, name)) {
-    add("security", "path or filename touches auth, secrets, credentials or policy");
-  }
-
-  if (isMigrationPath(path)) {
-    add("migrations", "migration, schema or database path");
-  }
-
-  if (isReleasePath(path, name)) {
-    add("release", "release, changelog or version manifest");
-  }
-
-  if (isBuildPath(path, name)) {
-    add("build", "build tool or build output path");
+  if (isAutomationSensitivePath(path, name) || matchesConfiguredPath(config, "automation", path)) {
+    add(
+      "automation",
+      isAutomationSensitivePath(path, name)
+        ? "automation path can affect CI, releases, permissions or supply chain behavior"
+        : "configured automation path"
+    );
   }
 
   if (
-    codeExtensions.has(ext) &&
+    isDependencyManifestName(name) ||
+    isDependencyLockfileName(name) ||
+    matchesConfiguredPath(config, "dependencies", path)
+  ) {
+    add(
+      "dependencies",
+      isDependencyManifestName(name) || isDependencyLockfileName(name)
+        ? "dependency manifest or lockfile"
+        : "configured dependency path"
+    );
+  }
+
+  if (isConfigurationPath(path, name) || matchesConfiguredPath(config, "configuration", path)) {
+    add(
+      "configuration",
+      isConfigurationPath(path, name)
+        ? "configuration file or directory"
+        : "configured configuration path"
+    );
+  }
+
+  if (isSecuritySensitivePath(path, name) || matchesConfiguredPath(config, "security", path)) {
+    add(
+      "security",
+      isSecuritySensitivePath(path, name)
+        ? "path or filename touches auth, secrets, credentials or policy"
+        : "configured security-sensitive path"
+    );
+  }
+
+  if (isMigrationPath(path) || matchesConfiguredPath(config, "migrations", path)) {
+    add(
+      "migrations",
+      isMigrationPath(path) ? "migration, schema or database path" : "configured migration path"
+    );
+  }
+
+  if (isReleasePath(path, name) || matchesConfiguredPath(config, "release", path)) {
+    add(
+      "release",
+      isReleasePath(path, name)
+        ? "release, changelog or version manifest"
+        : "configured release path"
+    );
+  }
+
+  if (isBuildPath(path, name) || matchesConfiguredPath(config, "build", path)) {
+    add(
+      "build",
+      isBuildPath(path, name) ? "build tool or build output path" : "configured build path"
+    );
+  }
+
+  if (
+    (codeExtensions.has(ext) || matchesConfiguredPath(config, "code", path)) &&
     !reasons.some((entry) => ["documentation", "tests", "generated"].includes(entry.category))
   ) {
-    add("code", `source extension ${ext}`);
+    add("code", codeExtensions.has(ext) ? `source extension ${ext}` : "configured code path");
   }
 
   if (reasons.length === 0) {
@@ -165,8 +218,11 @@ export function classifyChangedFile(file: GitHubChangedFileSummary): ClassifiedF
   };
 }
 
-export function classifyChangedFiles(files: GitHubChangedFileSummary[]): ClassifiedFile[] {
-  return files.map(classifyChangedFile);
+export function classifyChangedFiles(
+  files: GitHubChangedFileSummary[],
+  config: OssSignalConfig = defaultOssSignalConfig
+): ClassifiedFile[] {
+  return files.map((file) => classifyChangedFile(file, config));
 }
 
 export function countCategories(files: ClassifiedFile[]): Record<FileCategory, number> {

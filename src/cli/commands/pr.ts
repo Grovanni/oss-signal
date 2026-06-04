@@ -1,9 +1,10 @@
 import { GitHubPullRequestUrlError, parseGitHubPullRequestUrl } from "../../github/parse-url.js";
 import {
-  fetchGitHubPullRequest,
-  getGitHubToken,
-  GitHubFetchError
-} from "../../github/fetch-pr.js";
+  loadOssSignalConfig,
+  OssSignalConfigError,
+  type OssSignalConfig
+} from "../../config/config.js";
+import { fetchGitHubPullRequest, getGitHubToken, GitHubFetchError } from "../../github/fetch-pr.js";
 import { GitHubFixtureError, loadGitHubPullRequestFixture } from "../../github/fixtures.js";
 import { summarizeGitHubPullRequestData } from "../../github/summary.js";
 import type { GitHubPullRequestOutput } from "../../github/types.js";
@@ -15,18 +16,25 @@ export type OutputFormat = "md" | "json" | "all";
 export type PrCommandOptions = {
   dryRun?: boolean;
   fixture?: string;
+  config?: string;
+  analysisConfig?: OssSignalConfig;
   out: string;
   format: OutputFormat;
   quiet?: boolean;
   agent?: boolean;
 };
 
-export function buildPrDryRun(url: string, options: PrCommandOptions) {
+export async function buildPrDryRun(url: string, options: PrCommandOptions) {
   const pullRequest = parseGitHubPullRequestUrl(url);
+  const loadedConfig = await resolveConfig(options);
 
   return {
     mode: "dry-run",
     pull_request: pullRequest,
+    config: {
+      path: loadedConfig.path,
+      default: loadedConfig.path === null && options.analysisConfig === undefined
+    },
     output: {
       directory: options.out,
       format: options.format,
@@ -41,18 +49,19 @@ export async function buildPrResult(
   options: PrCommandOptions
 ): Promise<GitHubPullRequestOutput> {
   const pullRequest = parseGitHubPullRequestUrl(url);
+  const loadedConfig = await resolveConfig(options);
 
   const data = options.fixture
     ? await loadGitHubPullRequestFixture(options.fixture, pullRequest)
     : await fetchGitHubPullRequest(pullRequest, { token: getGitHubToken() });
 
-  return summarizeGitHubPullRequestData(data);
+  return summarizeGitHubPullRequestData(data, loadedConfig.config);
 }
 
 export async function runPrCommand(url: string, options: PrCommandOptions): Promise<void> {
   try {
     if (options.dryRun) {
-      const result = buildPrDryRun(url, options);
+      const result = await buildPrDryRun(url, options);
 
       if (!options.quiet) {
         console.log(JSON.stringify(result, null, 2));
@@ -83,6 +92,21 @@ export async function runPrCommand(url: string, options: PrCommandOptions): Prom
       throw new Error(error.message, { cause: error });
     }
 
+    if (error instanceof OssSignalConfigError) {
+      throw new Error(error.message, { cause: error });
+    }
+
     throw error;
   }
+}
+
+async function resolveConfig(options: PrCommandOptions) {
+  if (options.analysisConfig) {
+    return {
+      config: options.analysisConfig,
+      path: null
+    };
+  }
+
+  return loadOssSignalConfig(options.config);
 }
