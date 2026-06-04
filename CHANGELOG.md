@@ -6,6 +6,10 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Kept PR brief generation usable when GitHub changed-files responses are unavailable or unexpectedly shaped.
+- Reduced remaining security false positives for generic `env` filenames, env samples, fixtures/examples, protocol/compiler session paths, third-party licenses and dependency manifests under `security` package paths.
+- Expanded Java and QA test detection for `*IT.java`, `*ITCase.java`, `*TestCase.java`, `qa/`, `src/test/`, `internalClusterTest`, `muted-tests`, `testfixtures`, `test-fixtures` and `fixtures`.
+- Reduced `ask_for_tests` routing on very small low-risk help text, type/extension metadata and incidental generated-requirements changes with green CI.
 - Reduced `ask_for_tests` routing for small source wording, comment, docstring, typo, changelog and release-note changes.
 - Expanded test path detection for `.e2e.*`, Go `_test.go`, common Java/Kotlin/C#/F# `*Test`/`*Tests` names, `test_project/` and `testsuite/`.
 - Made empty descriptions less dominant for small docs/tests/changelog/release-note/source-wording PRs while keeping clarification for automation/build/config cases.

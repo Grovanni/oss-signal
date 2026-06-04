@@ -14,7 +14,8 @@ export function chooseRecommendedAction(
     attention === "high" &&
     (ids.has("auth_related_change") ||
       ids.has("secret_related_change") ||
-      ids.has("security_sensitive_file_changed"))
+      ids.has("security_sensitive_file_changed")) &&
+    !ids.has("source_wording_change")
   ) {
     return "security_review";
   }
@@ -45,6 +46,10 @@ export function chooseRecommendedAction(
     ids.has("dependency_change_without_code") ||
     ids.has("container_image_update")
   ) {
+    if (ids.has("source_wording_change")) {
+      return "normal_review";
+    }
+
     return "dependency_review";
   }
 

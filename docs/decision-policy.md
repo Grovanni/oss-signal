@@ -5,11 +5,11 @@ OSS Signal recommends the first review action from deterministic signals. The ac
 The current priority order is:
 
 1. `migration_review` for dominant database/schema/migration changes when there is no direct auth-sensitive evidence.
-2. `security_review` for direct auth, session, token, secret, credential, crypto, permission or security paths.
+2. `security_review` for direct auth, session, token, secret, credential, signing, crypto, permission or security paths, except tiny wording-only edits.
 3. `wait_for_ci` when GitHub reports actionable failed/pending checks, or when CI files changed but CI status is unavailable.
 4. `request_split` for large PRs or genuinely mixed independent concerns.
 5. `ask_for_clarification` when the description is empty and the change touches automation-sensitive files without dependency manifest or lockfile evidence.
-6. `ask_for_tests` when code changed and no tests were detected, except for small source wording/comment/docstring/release-note changes.
+6. `ask_for_tests` when code changed and no tests were detected, except for small source wording/comment/docstring/release-note/help/type metadata changes.
 7. `dependency_review` when dependency manifests, lockfiles, dependency-only files or container/deployment image updates changed.
 8. `migration_review` for other migration, schema or database paths.
 9. `ask_for_clarification` for missing or very short descriptions in other relevant cases.
@@ -35,7 +35,7 @@ This protects cases such as foreign-key fixtures, Rails database rake tasks and 
 
 When the PR title/body and file mix look like a coherent release or version bump, OSS Signal can emit `release_version_update`. This suppresses generic `code_without_tests` and `mixed_concerns` noise for small release/version touch points while still preserving dependency signals such as `dependency_manifest_changed`.
 
-Small source edits whose title clearly points to docs, comments, docstrings, typo fixes, wording, changelog or release-note text can emit `source_wording_change`. That signal suppresses generic `ask_for_tests` routing for the small text-only case while keeping the review action normal unless another stronger signal applies.
+Small source edits whose title clearly points to docs, comments, docstrings, typo fixes, wording, help text, type/extension metadata, changelog or release-note text can emit `source_wording_change`. That signal suppresses generic `ask_for_tests` routing for the small low-risk case while keeping the review action normal unless another stronger signal applies.
 
 ## Empty descriptions
 
@@ -50,6 +50,8 @@ It can still recommend clarification when the missing context affects orientatio
 Workflow and GitHub Action files use `automation_sensitive_file_changed`. They can affect CI, releases, permissions and supply chain behavior, but OSS Signal avoids presenting workflow-only PRs as generic security-sensitive changes.
 
 Dockerfile changes also use automation/build attention rather than app security-sensitive wording by default. They can affect runtime image and supply chain behavior, but should not trigger `security_review` unless the path also directly references auth, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
+
+Generic `env` path terms, env sample files, fixture/example data, third-party license files, protocol/compiler/session test paths, and dependency manifests under a package named `security` are not enough by themselves to recommend `security_review`.
 
 CI-green workflow-only PRs can still proceed to `normal_review`.
 

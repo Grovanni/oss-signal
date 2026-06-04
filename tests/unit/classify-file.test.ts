@@ -60,6 +60,7 @@ describe("classifyChangedFile", () => {
     ).toEqual(["migrations", "code"]);
     expect(classifyChangedFile(file("db/schema.rb")).categories).toEqual(["migrations", "code"]);
     expect(classifyChangedFile(file("db/fixtures/users.yml")).categories).toEqual([
+      "tests",
       "configuration",
       "migrations"
     ]);
@@ -69,6 +70,19 @@ describe("classifyChangedFile", () => {
     expect(classifyChangedFile(file("src/examples-smoke.e2e.ts")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("pkg/http/client_test.go")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("src/App.Tests.cs")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("server/src/test/java/org/example/FooIT.java")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("qa/rolling-upgrade/src/test/java/FooITCase.java")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("muted-tests/FooTestCase.java")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("src/internalClusterTest/java/FooTests.java")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("testfixtures/Foo.java")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("integration/test_project/Program.cs")).categories).toEqual([
       "tests"
     ]);
@@ -127,14 +141,38 @@ describe("classifyChangedFile", () => {
       "documentation",
       "configuration"
     ]);
+    expect(classifyChangedFile(file("LICENSE-THIRD-PARTY")).categories).toEqual([
+      "documentation"
+    ]);
+    expect(classifyChangedFile(file("setup_env.sh")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("src/vite-env.d.ts")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file(".env.example")).categories).toEqual(["configuration"]);
+    expect(classifyChangedFile(file(".env.sample")).categories).toEqual(["configuration"]);
+    expect(classifyChangedFile(file(".env")).categories).toEqual(["security"]);
+    expect(classifyChangedFile(file("tests/fixtures/.env")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("tests/fixtures/secret.json")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("packages/security/package.json")).categories).toEqual([
+      "dependencies",
+      "release"
+    ]);
     expect(classifyChangedFile(file("testing/test_session.py")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("test/protocol/session.spec.ts")).categories).toEqual([
       "tests"
     ]);
     expect(classifyChangedFile(file("src/compiler/session.ts")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("x-pack/plugin/esql/session/Session.java")).categories).toEqual([
+      "code"
+    ]);
+    expect(classifyChangedFile(file("src/protocol/quic/session.ts")).categories).toEqual([
+      "code"
+    ]);
     expect(classifyChangedFile(file("src/auth/hashers.py")).categories).toEqual([
       "security",
       "code"
+    ]);
+    expect(classifyChangedFile(file("config/credentials.yml")).categories).toEqual([
+      "configuration",
+      "security"
     ]);
     expect(classifyChangedFile(file("src/policies/permissions.ts")).categories).toEqual([
       "security",

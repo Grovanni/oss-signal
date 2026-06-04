@@ -84,6 +84,14 @@ export function detectSignals(input: SignalInput): Signal[] {
     titleAndBody,
     fileCount,
     linesChanged
+  ) || isVerySmallLowRiskUntestedChange(
+    input.files,
+    codeFiles,
+    testFiles,
+    titleAndBody,
+    fileCount,
+    linesChanged,
+    input.data.ci.state
   );
   const containerImageUpdate = isContainerImageUpdate(input.files, titleAndBody);
   const reportsPersistenceDataFormat = shouldReportPersistenceDataFormatChange(
@@ -183,9 +191,9 @@ export function detectSignals(input: SignalInput): Signal[] {
       signal(
         "source_wording_change",
         "info",
-        "Source wording/comment change",
-        "The title and file mix look like a small documentation, comment, docstring or wording-only source change.",
-        fileEvidence(codeFiles, "small source wording/comment evidence")
+        "Small source wording/metadata change",
+        "The title and file mix look like a small documentation, comment, docstring, help text, type metadata or wording-only source change.",
+        fileEvidence(codeFiles, "small source wording/metadata evidence")
       )
     );
   }
@@ -809,8 +817,67 @@ function isLikelySourceWordingChange(
 }
 
 function mentionsSourceWordingOnlyChange(text: string): boolean {
-  return /\b(doc|docs|documentation|docstring|comment|comments|typo|wording|spelling|grammar|changelog|readme|release notes?|error message|message text|copy)\b/.test(
+  return /\b(doc|docs|documentation|docstring|comment|comments|typo|wording|spelling|grammar|changelog|readme|release notes?|error message|message text|help text|help output|usage text|copy)\b/.test(
     text
+  );
+}
+
+function isVerySmallLowRiskUntestedChange(
+  files: ClassifiedFile[],
+  codeFiles: ClassifiedFile[],
+  testFiles: ClassifiedFile[],
+  titleAndBody: string,
+  fileCount: number,
+  linesChanged: number,
+  ciState: string
+): boolean {
+  if (
+    ciState !== "success" ||
+    codeFiles.length === 0 ||
+    testFiles.length > 0 ||
+    fileCount > 2 ||
+    linesChanged > 30 ||
+    files.some(
+      (file) =>
+        hasCategory(file, "security") ||
+        hasCategory(file, "migrations") ||
+        hasCategory(file, "ci") ||
+        hasCategory(file, "automation")
+    )
+  ) {
+    return false;
+  }
+
+  if (!mentionsLowRiskUntestedChange(titleAndBody) && !codeFiles.every(isLowRiskCodePath)) {
+    return false;
+  }
+
+  return files.every(
+    (file) =>
+      hasCategory(file, "code") ||
+      hasCategory(file, "documentation") ||
+      hasCategory(file, "release") ||
+      hasCategory(file, "dependencies") ||
+      hasCategory(file, "generated")
+  );
+}
+
+function mentionsLowRiskUntestedChange(text: string): boolean {
+  return /\b(type table|types table|type metadata|extension table|extensions table|file extension|file extensions|mime type|mime types|help text|help output|usage text|spelling|typo|comment|comments|docstring|wording|generated requirements|requirements generator|requirements generation)\b/.test(
+    text
+  );
+}
+
+function isLowRiskCodePath(file: ClassifiedFile): boolean {
+  const normalized = file.path.replace(/\\/g, "/").toLowerCase();
+  const name = normalized.split("/").at(-1) ?? normalized;
+
+  return (
+    name.endsWith(".d.ts") ||
+    normalized.includes("/types/") ||
+    normalized.includes("/help/") ||
+    normalized.includes("requirements") ||
+    normalized.includes("extension")
   );
 }
 

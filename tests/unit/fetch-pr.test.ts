@@ -205,6 +205,31 @@ describe("fetchGitHubPullRequest", () => {
     expect(data.limitations).toContain("GitHub pull request diff unavailable: diff_unavailable.");
   });
 
+  it("keeps PR data usable when GitHub changed files response is unexpected", async () => {
+    const fetchImpl = createFetchMock({
+      "application/vnd.github+json https://api.github.com/repos/org/repo/pulls/123":
+        jsonResponse(pullRequestPayload),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/pulls/123/files?per_page=100&page=1":
+        jsonResponse({ message: "unexpected shape" }),
+      "application/vnd.github.v3.diff https://api.github.com/repos/org/repo/pulls/123":
+        textResponse(diffText),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/status":
+        jsonResponse(commitStatusPayload),
+      "application/vnd.github+json https://api.github.com/repos/org/repo/commits/1111111111111111111111111111111111111111/check-runs?per_page=100":
+        jsonResponse(checkRunsPayload)
+    });
+
+    const data = await fetchGitHubPullRequest(
+      parseGitHubPullRequestUrl("https://github.com/org/repo/pull/123"),
+      { fetchImpl }
+    );
+
+    expect(data.files).toHaveLength(0);
+    expect(data.pull_request.changed_files).toBe(2);
+    expect(data.diff.bytes).toBeGreaterThan(0);
+    expect(data.limitations).toContain("GitHub changed files unavailable: unexpected_response.");
+  });
+
   it("maps GitHub rate limit responses to a readable error", async () => {
     const fetchImpl = createFetchMock({
       "application/vnd.github+json https://api.github.com/repos/org/repo/pulls/123": new Response(

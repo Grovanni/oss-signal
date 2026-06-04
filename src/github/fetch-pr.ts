@@ -280,12 +280,22 @@ async function fetchChangedFiles(
 
   for (let page = 1; page <= maxFilePages; page += 1) {
     const pageUrl = buildChangedFilesApiUrl(parsedUrl, page);
-    const pageFiles = await fetchJson(
-      pageUrl,
-      githubChangedFilesApiSchema,
-      "changed files",
-      options
-    );
+    let pageFiles: GitHubChangedFileApiResponse[];
+
+    try {
+      pageFiles = await fetchJson(pageUrl, githubChangedFilesApiSchema, "changed files", options);
+    } catch (error) {
+      if (!(error instanceof GitHubFetchError)) {
+        throw error;
+      }
+
+      limitations.push(
+        files.length > 0
+          ? `GitHub changed files partially unavailable after page ${page}: ${error.code}.`
+          : `GitHub changed files unavailable: ${error.code}.`
+      );
+      return { files, limitations };
+    }
 
     files.push(...pageFiles);
 

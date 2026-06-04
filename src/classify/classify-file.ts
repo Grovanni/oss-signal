@@ -109,8 +109,7 @@ const secretPathTerms = new Set([
   "secret",
   "secrets",
   "credential",
-  "credentials",
-  "env"
+  "credentials"
 ]);
 
 const securityPathTerms = new Set([
@@ -359,8 +358,7 @@ export function hasSecretSensitivePathTerm(path: string): boolean {
   const tokens = pathTokens(normalized);
 
   return (
-    name === ".env" ||
-    name.startsWith(".env.") ||
+    isRealEnvFileName(name) ||
     hasAnyToken(tokens, secretPathTerms) ||
     hasContextualKeyToken(tokens)
   );
@@ -410,7 +408,9 @@ function hasContextualKeyToken(tokens: string[]): boolean {
 function isDocumentationPath(path: string, name: string): boolean {
   return (
     path.startsWith("docs/") ||
-    ["readme", "changelog", "contributing", "authors"].some((prefix) => name.startsWith(prefix)) ||
+    ["readme", "changelog", "contributing", "authors", "license", "licence", "notice"].some(
+      (prefix) => name.startsWith(prefix)
+    ) ||
     [".md", ".rst", ".adoc"].includes(extension(name))
   );
 }
@@ -435,6 +435,8 @@ function isTestPath(path: string, name: string): boolean {
     path.startsWith("test_project/") ||
     path.startsWith("test-project/") ||
     path.startsWith("testsuite/") ||
+    path.startsWith("qa/") ||
+    path.startsWith("src/test/") ||
     path.startsWith("spec/") ||
     path.startsWith("e2e/") ||
     path.includes("/test/") ||
@@ -443,6 +445,13 @@ function isTestPath(path: string, name: string): boolean {
     path.includes("/test_project/") ||
     path.includes("/test-project/") ||
     path.includes("/testsuite/") ||
+    path.includes("/qa/") ||
+    path.includes("/src/test/") ||
+    path.includes("internalclustertest") ||
+    path.includes("muted-tests") ||
+    path.includes("testfixtures") ||
+    path.includes("test-fixtures") ||
+    path.includes("/fixtures/") ||
     path.includes("/spec/") ||
     path.includes("/e2e/") ||
     path.includes("__tests__") ||
@@ -454,6 +463,9 @@ function isTestPath(path: string, name: string): boolean {
     name.endsWith("_test.py") ||
     name.endsWith("test.java") ||
     name.endsWith("tests.java") ||
+    name.endsWith("testcase.java") ||
+    name.endsWith("it.java") ||
+    name.endsWith("itcase.java") ||
     name.endsWith("test.kt") ||
     name.endsWith("tests.kt") ||
     name.endsWith("test.cs") ||
@@ -482,6 +494,8 @@ function isCiPath(path: string, name: string): boolean {
 function isConfigurationPath(path: string, name: string): boolean {
   return (
     name === ".env.example" ||
+    name === ".env.sample" ||
+    name === ".env.template" ||
     name === ".pre-commit-config.yaml" ||
     name === ".pre-commit-config.yml" ||
     name === "renovate.json" ||
@@ -510,19 +524,23 @@ function isSecuritySensitivePath(path: string, name: string): boolean {
     return false;
   }
 
-  if (isDependencyPolicyPath(name)) {
+  if (isDependencyPolicyPath(name) || isDependencyManifestName(name) || isDependencyLockfileName(name)) {
     return false;
   }
 
-  if (name === ".env" || name.startsWith(".env.")) {
+  if (isExampleEnvFileName(name)) {
+    return false;
+  }
+
+  if (isNonProductionSecurityContext(path, name)) {
+    return false;
+  }
+
+  if (isRealEnvFileName(name)) {
     return true;
   }
 
-  if (isNonProductionSecurityContext(path, name) && !hasDirectSensitivePathTerm(path)) {
-    return false;
-  }
-
-  return hasSecuritySensitivePathTerm(path) || name === ".env.example";
+  return hasSecuritySensitivePathTerm(path);
 }
 
 function isAutomationSensitivePath(path: string, name: string): boolean {
@@ -638,13 +656,44 @@ function isDependencyPolicyPath(name: string): boolean {
   return name === "dependency-policy.json" || name === "dependency_policy.json";
 }
 
+function isRealEnvFileName(name: string): boolean {
+  return name === ".env" || (name.startsWith(".env.") && !isExampleEnvFileName(name));
+}
+
+function isExampleEnvFileName(name: string): boolean {
+  return (
+    name === ".env.example" ||
+    name === ".env.sample" ||
+    name === ".env.template" ||
+    name.endsWith(".env.example") ||
+    name.endsWith(".env.sample") ||
+    name.endsWith(".env.template")
+  );
+}
+
 function isNonProductionSecurityContext(path: string, name: string): boolean {
   const tokens = pathTokens(path);
 
   return (
     isTestPath(path, name) ||
     isNonRuntimeFixturePath(path) ||
-    hasAnyToken(tokens, new Set(["example", "examples", "sample", "samples", "compiler", "protocol"]))
+    hasAnyToken(
+      tokens,
+      new Set([
+        "example",
+        "examples",
+        "sample",
+        "samples",
+        "data",
+        "testdata",
+        "compiler",
+        "protocol",
+        "quic",
+        "http2",
+        "http",
+        "esql"
+      ])
+    )
   );
 }
 
@@ -656,37 +705,6 @@ function isNonRuntimeFixturePath(path: string): boolean {
 
 function isGeneratedFixturePath(path: string, name: string): boolean {
   return isGeneratedPath(path, name) && isNonRuntimeFixturePath(path);
-}
-
-function hasDirectSensitivePathTerm(path: string): boolean {
-  const tokens = pathTokens(path);
-
-  return hasAnyToken(
-    tokens,
-    new Set([
-      "password",
-      "passwords",
-      "passwd",
-      "secret",
-      "secrets",
-      "credential",
-      "credentials",
-      "crypto",
-      "cryptography",
-      "encrypt",
-      "encrypted",
-      "encryption",
-      "decrypt",
-      "decrypted",
-      "decryption",
-      "permission",
-      "permissions",
-      "policy",
-      "policies",
-      "rbac",
-      "acl"
-    ])
-  );
 }
 
 function hasMigrationTerm(tokens: string[]): boolean {

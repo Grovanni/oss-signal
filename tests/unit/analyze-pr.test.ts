@@ -326,6 +326,82 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("normal_review");
   });
 
+  it("does not route env names samples fixtures or third party licenses to security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update env examples and fixture data",
+        body: "Refresh examples and test data.",
+        files: [
+          changedFile("setup_env.sh", 1),
+          changedFile("src/vite-env.d.ts", 1),
+          changedFile(".env.sample", 1),
+          changedFile("tests/fixtures/secret.json", 4),
+          changedFile("LICENSE-THIRD-PARTY", 2)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
+    expect(analysis.recommended_action).not.toBe("security_review");
+  });
+
+  it("keeps real env and credential configuration security-sensitive", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update credential configuration",
+        body: "Update credential loading.",
+        files: [changedFile(".env", 2), changedFile("config/credentials.yml", 2)]
+      })
+    );
+
+    expect(analysis.categories.security).toBe(2);
+    expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).toContain("secret_related_change");
+    expect(analysis.recommended_action).toBe("security_review");
+  });
+
+  it("does not let security-named dependency manifests dominate dependency updates", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update security package dependencies",
+        body: "Bump vendored dependency metadata.",
+        files: [
+          changedFile("staging/src/k8s.io/pod-security-admission/go.mod", 5),
+          changedFile("staging/src/k8s.io/pod-security-admission/go.sum", 20)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("treats Java QA and integration conventions as tests", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update QA integration tests",
+        body: "Refresh muted integration test coverage.",
+        files: [
+          changedFile("server/src/test/java/org/example/FooIT.java", 12),
+          changedFile("qa/rolling-upgrade/src/test/java/FooITCase.java", 10),
+          changedFile("muted-tests/FooTestCase.java", 4),
+          changedFile("src/internalClusterTest/java/FooTests.java", 8)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.tests).toBe(4);
+    expect(signalIds(analysis.signals)).toContain("tests_only");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
   it("keeps direct permission and policy code on security review", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -338,6 +414,21 @@ describe("analyzePullRequestData", () => {
     expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
     expect(analysis.attention).toBe("high");
     expect(analysis.recommended_action).toBe("security_review");
+  });
+
+  it("does not route tiny comment-only auth edits to security review when CI is green", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Fix auth hasher comment wording",
+        body: "Comment wording only.",
+        files: [changedFile("src/auth/hashers.py", 1)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).toContain("source_wording_change");
+    expect(analysis.recommended_action).toBe("normal_review");
   });
 
   it("keeps large localization catalog refreshes low attention when CI passed", () => {
@@ -565,6 +656,40 @@ describe("analyzePullRequestData", () => {
 
     expect(signalIds(analysis.signals)).toContain("dependency_manifest_changed");
     expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("does not ask for tests on very small low-risk source metadata changes with green CI", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Add file extension to type table",
+        body: "Update the file extension table.",
+        files: [changedFile("src/filetypes/extensions.py", 4)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("source_wording_change");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not ask for tests on incidental generated requirements updates with green CI", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Fix spelling in requirements generator",
+        body: "Spelling-only generator update.",
+        files: [
+          changedFile("scripts/generate_requirements.py", 2),
+          changedFile("requirements-dev.txt", 1)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("source_wording_change");
+    expect(signalIds(analysis.signals)).toContain("dependency_manifest_changed");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(analysis.recommended_action).toBe("normal_review");
   });
 
   it("routes container image and HelmRelease updates away from unknown normal review", () => {

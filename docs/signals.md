@@ -58,9 +58,11 @@ Database/schema paths include common migration directories, `db/schema.rb`, `str
 
 Security-sensitive matching is token-based, not substring-based. For example, `AUTHORS` is documentation, not auth. `key` only contributes to secret-sensitive routing with strong surrounding context such as secret, credential, token, env, API, private/public key, crypto or security.
 
-Security-sensitive routing is also context-aware. Test, fixture, documentation, example, compiler or protocol paths that only mention generic auth/session/token/security words do not automatically route to security review. Product code or sensitive configuration paths for auth, sessions, tokens, secrets, credentials, crypto, permissions or policy remain security-sensitive.
+Security-sensitive routing is also context-aware. Test, fixture, documentation, example, data, compiler, protocol, QUIC, HTTP/2 or query-language paths that only mention generic auth/session/token/security words do not automatically route to security review. Product code or sensitive configuration paths for auth, sessions, tokens, real env files, secrets, credentials, signing, crypto, permissions or policy remain security-sensitive.
 
-Common test conventions include `tests/`, `testing/`, `test_project/`, `testsuite/`, `__tests__`, `.test.*`, `.spec.*`, `.e2e.*`, Go `_test.go`, and common Java/Kotlin/C#/F# `*Test` or `*Tests` filenames. CI workflow names such as `.github/workflows/test.yml` remain CI/automation files, not test files.
+Example env files such as `.env.example`, `.env.sample`, test fixture env files, third-party license files and dependency manifests under packages named `security` are not treated as direct security-review evidence by default.
+
+Common test conventions include `tests/`, `testing/`, `test_project/`, `testsuite/`, `qa/`, `src/test/`, `internalClusterTest`, `muted-tests`, `testfixtures`, `test-fixtures`, `fixtures`, `__tests__`, `.test.*`, `.spec.*`, `.e2e.*`, Go `_test.go`, and common Java/Kotlin/C#/F# `*Test` or `*Tests` filenames. Java integration forms such as `*IT.java`, `*ITCase.java` and `*TestCase.java` are also treated as tests. CI workflow names such as `.github/workflows/test.yml` remain CI/automation files, not test files.
 
 Container and deployment image updates can emit `container_image_update` when paths or PR text reference Docker/container image tags, HelmRelease, Helm charts, Kustomize or similar deployment image version changes. This orients review toward dependency/build/deployment context without treating the PR as an app security change.
 
@@ -132,7 +134,7 @@ Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_ch
 
 Coherent release/version bumps can emit `release_version_update`. That signal is informational and can suppress generic missing-test or mixed-concern noise when the title and file mix indicate a version update rather than feature code.
 
-Small source changes whose title clearly points to docs, comments, docstrings, typos, wording, changelog or release-note text can emit `source_wording_change`. This suppresses generic `code_without_tests` routing for small text-only source touch points, but it does not try to infer behavior from the diff.
+Small source changes whose title clearly points to docs, comments, docstrings, typos, wording, help text, type/extension metadata, changelog or release-note text can emit `source_wording_change`. This suppresses generic `code_without_tests` routing for small low-risk source touch points, especially when CI is green, but it does not try to infer behavior from the diff.
 
 `persistence_data_format_change` is a cautious medium signal for paths or PR text that mention persisted data, serialization, storage metadata, JSON schemas or file formats. It is intended to focus review attention on compatibility questions, not to imply a bug or security issue.
 
