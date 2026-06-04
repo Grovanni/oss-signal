@@ -12,6 +12,7 @@ Examples:
 - `ci_checks_failed`
 - `ci_checks_pending`
 - `ci_status_unavailable`
+- `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
 - `mixed_concerns`
 - `short_description_for_large_pr`
@@ -26,6 +27,7 @@ Changed files can be classified into these categories:
 - `tests`
 - `documentation`
 - `ci`
+- `automation`
 - `dependencies`
 - `configuration`
 - `security`
@@ -35,7 +37,7 @@ Changed files can be classified into these categories:
 - `generated`
 - `unknown`
 
-Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `configuration` and `security` because workflow changes can affect execution permissions and secrets. Workflow-only changes are treated as CI attention first; they do not automatically become a `security_review` action.
+Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `automation` and `configuration` because workflow changes can affect CI, release automation, permissions and supply chain behavior. Workflow-only changes are treated as CI/automation attention first; they do not automatically become a `security_review` action.
 
 ## Current signal set
 
@@ -58,6 +60,7 @@ The Phase 3 implementation can emit these deterministic signals:
 - `ci_checks_failed`
 - `ci_checks_pending`
 - `ci_status_unavailable`
+- `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
 - `auth_related_change`
 - `secret_related_change`
@@ -88,6 +91,8 @@ Recommended actions are non-authoritative:
 Questions are limited to five and are only generated from detected signals.
 
 GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Passing CI is shown in the output summary but does not emit a signal by itself.
+
+Workflow and GitHub Action files use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, sessions, tokens, secrets, credentials, crypto, permissions or security.
 
 Bad:
 

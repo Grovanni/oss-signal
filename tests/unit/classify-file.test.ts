@@ -19,11 +19,11 @@ describe("classifyChangedFile", () => {
     expect(classifyChangedFile(file("package-lock.json")).categories).toEqual(["dependencies"]);
   });
 
-  it("classifies CI workflow files as CI, configuration and security-sensitive", () => {
+  it("classifies CI workflow files as CI, configuration and automation-sensitive", () => {
     expect(classifyChangedFile(file(".github/workflows/ci.yml")).categories).toEqual([
       "ci",
+      "automation",
       "configuration",
-      "security"
     ]);
   });
 

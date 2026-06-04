@@ -110,8 +110,11 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toEqual(
-      expect.arrayContaining(["ci_changed", "security_sensitive_file_changed", "ci_status_unavailable"])
+      expect.arrayContaining(["ci_changed", "automation_sensitive_file_changed", "ci_status_unavailable"])
     );
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(analysis.categories.security).toBe(0);
+    expect(analysis.categories.automation).toBe(1);
     expect(analysis.attention).toBe("medium");
     expect(analysis.recommended_action).toBe("wait_for_ci");
   });
@@ -126,6 +129,8 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toContain("ci_changed");
+    expect(signalIds(analysis.signals)).toContain("automation_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
     expect(signalIds(analysis.signals)).not.toContain("ci_status_unavailable");
     expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
     expect(analysis.recommended_action).toBe("normal_review");

@@ -119,6 +119,10 @@ export function classifyChangedFile(file: GitHubChangedFileSummary): ClassifiedF
     add("ci", "CI workflow or pipeline path");
   }
 
+  if (isAutomationSensitivePath(path, name)) {
+    add("automation", "automation path can affect CI, releases, permissions or supply chain behavior");
+  }
+
   if (isDependencyManifestName(name) || isDependencyLockfileName(name)) {
     add("dependencies", "dependency manifest or lockfile");
   }
@@ -265,8 +269,16 @@ function isSecuritySensitivePath(path: string, name: string): boolean {
     sensitiveTerms.some((term) => path.includes(term)) ||
     name === ".env" ||
     name === ".env.example" ||
-    name === "dockerfile" ||
-    path.startsWith(".github/workflows/")
+    name === "dockerfile"
+  );
+}
+
+function isAutomationSensitivePath(path: string, name: string): boolean {
+  return (
+    path.startsWith(".github/workflows/") ||
+    path.startsWith(".github/actions/") ||
+    name === "action.yml" ||
+    name === "action.yaml"
   );
 }
 

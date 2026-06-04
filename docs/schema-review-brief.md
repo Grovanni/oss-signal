@@ -66,9 +66,11 @@ Required top-level fields:
 
 ## Compatibility rule
 
-Do not remove or rename fields inside the same `schema_version`.
+`review-brief.v1` allows additive, non-breaking fields. Consumers should ignore unknown fields they do not understand.
 
-If a breaking change is needed, increment `schema_version`.
+Do not remove fields, rename fields or change field types inside the same `schema_version`.
+
+If a breaking change is needed, use a new major schema version such as `review-brief.v2`.
 
 ## Analysis fields
 

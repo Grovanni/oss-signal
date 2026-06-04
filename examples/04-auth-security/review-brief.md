@@ -25,7 +25,7 @@ Route attention to a security-sensitive review path first.
   - Evidence: HISTORY.md (documentation changed)
   - Evidence: README.md (documentation changed)
 - Security-sensitive path changed: This does not mean a vulnerability exists. It only indicates that extra attention may be useful.
-  - Evidence: test/session.js (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
+  - Evidence: test/session.js (path contains auth, session, token, secret, credential, crypto, permission or security)
 - Authentication-related path changed: A path references authentication, sessions or tokens.
   - Evidence: test/session.js (path contains auth/login/session/token/jwt/oauth)
 

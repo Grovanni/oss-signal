@@ -6,6 +6,9 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Clarified workflow sensitivity wording: GitHub workflow files are now automation-sensitive instead of generic security-sensitive.
+- Documented `review-brief.v1` compatibility rules for additive fields and future breaking schema changes.
+
 ## 0.1.1 - 2026-06-04
 
 - Added GitHub CI status/check fetching and compact CI summaries in terminal, Markdown, JSON and agent context outputs.

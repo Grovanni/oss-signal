@@ -28,7 +28,8 @@ It does not decide whether a PR is good or bad. It highlights observable facts:
 - dependency changes;
 - CI changes;
 - GitHub CI status/check results;
-- sensitive paths;
+- automation-sensitive workflow paths;
+- security-sensitive auth, session, token, secret, crypto and permission paths;
 - migrations;
 - mixed concerns;
 - suggested next review action.

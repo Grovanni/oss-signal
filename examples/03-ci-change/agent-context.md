@@ -23,7 +23,7 @@ Use this context to decide where human review attention should go first. Do not 
 ## Signals
 - medium_pr (info): Medium pull request
 - ci_changed (medium): CI changed
-- security_sensitive_file_changed (medium): Security-sensitive path changed
+- automation_sensitive_file_changed (medium): Automation-sensitive workflow changed
 - configuration_changed (info): Configuration changed
 
 ## Suggested Questions

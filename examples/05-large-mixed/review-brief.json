@@ -224,9 +224,10 @@
     "tests": 0,
     "documentation": 1,
     "ci": 5,
+    "automation": 5,
     "dependencies": 27,
     "configuration": 6,
-    "security": 5,
+    "security": 0,
     "migrations": 0,
     "release": 26,
     "build": 0,
@@ -442,35 +443,35 @@
       ]
     },
     {
-      "id": "security_sensitive_file_changed",
+      "id": "automation_sensitive_file_changed",
       "level": "medium",
-      "title": "Security-sensitive path changed",
-      "message": "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
+      "title": "Automation-sensitive workflow changed",
+      "message": "Automation files can affect CI, releases, permissions or supply chain behavior.",
       "evidence": [
         {
           "kind": "file",
           "value": ".github/workflows/ci.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/copilot-setup-steps.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/preview-release.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/publish.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/zizmor.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         }
       ]
     },
@@ -515,7 +516,7 @@
       "evidence": [
         {
           "kind": "metadata",
-          "value": "documentation, ci, dependencies, configuration, release",
+          "value": "documentation, ci, automation, dependencies, configuration, release",
           "reason": ">= 4 strong categories touched"
         }
       ]

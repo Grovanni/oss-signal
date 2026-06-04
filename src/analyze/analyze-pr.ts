@@ -82,6 +82,10 @@ function scoreFile(file: ClassifiedFile): number {
     score += 50;
   }
 
+  if (hasCategory(file, "automation") && !hasCategory(file, "ci")) {
+    score += 45;
+  }
+
   if (hasCategory(file, "code")) {
     score += 40;
   }
@@ -116,6 +120,10 @@ function priorityReason(file: ClassifiedFile): string {
 
   if (hasCategory(file, "ci")) {
     return "CI workflow or pipeline";
+  }
+
+  if (hasCategory(file, "automation")) {
+    return "automation-sensitive path";
   }
 
   if (hasCategory(file, "code")) {

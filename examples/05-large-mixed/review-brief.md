@@ -34,9 +34,9 @@ Wait for CI or inspect CI context before deep review.
 ## Areas Touched
 - documentation: 1
 - ci: 5
+- automation: 5
 - dependencies: 27
 - configuration: 6
-- security: 5
 - release: 26
 
 ## Priority Files

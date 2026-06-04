@@ -41,6 +41,7 @@ export function detectSignals(input: SignalInput): Signal[] {
   const dependencyLockfiles = input.files.filter(isDependencyLockfile);
   const dependencyFiles = input.files.filter((file) => hasCategory(file, "dependencies"));
   const ciFiles = input.files.filter((file) => hasCategory(file, "ci"));
+  const automationFiles = input.files.filter((file) => hasCategory(file, "automation"));
   const securityFiles = input.files.filter((file) => hasCategory(file, "security"));
   const authFiles = input.files.filter((file) => normalizedPathIncludes(file.path, authTerms));
   const secretFiles = input.files.filter((file) => isSecretRelatedPath(file.path));
@@ -176,6 +177,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (automationFiles.length > 0) {
+    signals.push(
+      signal(
+        "automation_sensitive_file_changed",
+        "medium",
+        "Automation-sensitive workflow changed",
+        "Automation files can affect CI, releases, permissions or supply chain behavior.",
+        fileEvidence(automationFiles, "automation path")
+      )
+    );
+  }
+
   if (securityFiles.length > 0) {
     const securityLevel = authFiles.length > 0 || secretFiles.length > 0 ? "high" : "medium";
     signals.push(
@@ -184,7 +197,7 @@ export function detectSignals(input: SignalInput): Signal[] {
         securityLevel,
         "Security-sensitive path changed",
         "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
-        fileEvidence(securityFiles, "path contains auth, secrets, credentials, policy, Dockerfile, or CI")
+        fileEvidence(securityFiles, "path contains auth, session, token, secret, credential, crypto, permission or security")
       )
     );
   }
@@ -319,6 +332,10 @@ function mixedConcernCategories(files: ClassifiedFile[]): FileCategory[] {
 
     if (hasCategory(file, "ci")) {
       categories.add("ci");
+    }
+
+    if (hasCategory(file, "automation")) {
+      categories.add("automation");
     }
 
     if (hasCategory(file, "configuration") && !hasCategory(file, "ci")) {

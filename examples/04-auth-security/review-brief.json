@@ -288,6 +288,7 @@
     "tests": 1,
     "documentation": 2,
     "ci": 0,
+    "automation": 0,
     "dependencies": 0,
     "configuration": 0,
     "security": 1,
@@ -351,7 +352,7 @@
         {
           "kind": "file",
           "value": "test/session.js",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "path contains auth, session, token, secret, credential, crypto, permission or security"
         }
       ]
     },

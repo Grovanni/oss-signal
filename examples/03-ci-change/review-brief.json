@@ -128,9 +128,10 @@
     "tests": 0,
     "documentation": 0,
     "ci": 7,
+    "automation": 7,
     "dependencies": 0,
     "configuration": 7,
-    "security": 7,
+    "security": 0,
     "migrations": 0,
     "release": 0,
     "build": 0,
@@ -185,35 +186,35 @@
       ]
     },
     {
-      "id": "security_sensitive_file_changed",
+      "id": "automation_sensitive_file_changed",
       "level": "medium",
-      "title": "Security-sensitive path changed",
-      "message": "This does not mean a vulnerability exists. It only indicates that extra attention may be useful.",
+      "title": "Automation-sensitive workflow changed",
+      "message": "Automation files can affect CI, releases, permissions or supply chain behavior.",
       "evidence": [
         {
           "kind": "file",
           "value": ".github/workflows/bump-go.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/codeql.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/deployment.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/detect-spam.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         },
         {
           "kind": "file",
           "value": ".github/workflows/go.yml",
-          "reason": "path contains auth, secrets, credentials, policy, Dockerfile, or CI"
+          "reason": "automation path"
         }
       ]
     },
@@ -258,8 +259,8 @@
       "path": ".github/workflows/deployment.yml",
       "categories": [
         "ci",
-        "configuration",
-        "security"
+        "automation",
+        "configuration"
       ],
       "changes": 24,
       "reason": "CI workflow or pipeline"
@@ -268,8 +269,8 @@
       "path": ".github/workflows/codeql.yml",
       "categories": [
         "ci",
-        "configuration",
-        "security"
+        "automation",
+        "configuration"
       ],
       "changes": 10,
       "reason": "CI workflow or pipeline"
@@ -278,8 +279,8 @@
       "path": ".github/workflows/go.yml",
       "categories": [
         "ci",
-        "configuration",
-        "security"
+        "automation",
+        "configuration"
       ],
       "changes": 8,
       "reason": "CI workflow or pipeline"
@@ -288,8 +289,8 @@
       "path": ".github/workflows/lint.yml",
       "categories": [
         "ci",
-        "configuration",
-        "security"
+        "automation",
+        "configuration"
       ],
       "changes": 8,
       "reason": "CI workflow or pipeline"
@@ -298,8 +299,8 @@
       "path": ".github/workflows/govulncheck.yml",
       "categories": [
         "ci",
-        "configuration",
-        "security"
+        "automation",
+        "configuration"
       ],
       "changes": 6,
       "reason": "CI workflow or pipeline"

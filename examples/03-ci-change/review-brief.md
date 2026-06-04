@@ -23,10 +23,10 @@ Proceed with normal review.
   - Evidence: .github/workflows/bump-go.yml (CI path)
   - Evidence: .github/workflows/codeql.yml (CI path)
   - Evidence: .github/workflows/deployment.yml (CI path)
-- Security-sensitive path changed: This does not mean a vulnerability exists. It only indicates that extra attention may be useful.
-  - Evidence: .github/workflows/bump-go.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
-  - Evidence: .github/workflows/codeql.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
-  - Evidence: .github/workflows/deployment.yml (path contains auth, secrets, credentials, policy, Dockerfile, or CI)
+- Automation-sensitive workflow changed: Automation files can affect CI, releases, permissions or supply chain behavior.
+  - Evidence: .github/workflows/bump-go.yml (automation path)
+  - Evidence: .github/workflows/codeql.yml (automation path)
+  - Evidence: .github/workflows/deployment.yml (automation path)
 - Configuration changed: A configuration file changed.
   - Evidence: .github/workflows/bump-go.yml (configuration file or directory)
   - Evidence: .github/workflows/codeql.yml (configuration file or directory)
@@ -34,8 +34,8 @@ Proceed with normal review.
 
 ## Areas Touched
 - ci: 7
+- automation: 7
 - configuration: 7
-- security: 7
 
 ## Priority Files
 1. .github/workflows/deployment.yml - CI workflow or pipeline
