@@ -33,10 +33,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: Grovanni/oss-signal@v0.2.0
+      - uses: Grovanni/oss-signal@<tag-or-commit>
         with:
           github-token: ${{ github.token }}
 ```
+
+Replace `<tag-or-commit>` with the release tag, commit SHA or branch you intentionally want to run.
 
 ## Inputs
 

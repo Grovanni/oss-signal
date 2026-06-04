@@ -6,6 +6,8 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Documented the validated release-candidate status, public evaluation methodology and main 1,000 PR GO metrics.
+- Refreshed the README to describe OSS Signal as a deterministic, no-AI-runtime PR intake brief and clarify current local CLI/GitHub Action usage.
 - Kept PR brief generation usable when GitHub changed-files responses are unavailable or unexpectedly shaped.
 - Reduced remaining security false positives for generic `env` filenames, env samples, fixtures/examples, protocol/compiler session paths, third-party licenses and dependency manifests under `security` package paths.
 - Expanded Java and QA test detection for `*IT.java`, `*ITCase.java`, `*TestCase.java`, `qa/`, `src/test/`, `internalClusterTest`, `muted-tests`, `testfixtures`, `test-fixtures` and `fixtures`.

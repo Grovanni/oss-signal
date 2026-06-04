@@ -30,6 +30,18 @@ Container image/deployment detection is orientation only. OSS Signal can flag im
 
 OSS Signal does not currently emit dedicated backport, public API or workflow-hardening signals. Those may be added later when they can be detected precisely without increasing generic noise.
 
+## Known Residual Limits From Validation
+
+The public validation runs showed strong aggregate usefulness, but a few families remain imperfect:
+
+- auth/security changes can be under-prioritized when the sensitive behavior is visible only from project-specific semantics rather than paths or titles;
+- migration, schema and persistence changes can be under-prioritized or over-prioritized when repository naming does not distinguish database schema from data-format schema;
+- token, policy, session or credential terms can still be noisy in unusual non-security contexts;
+- dependency, vendor and fixture-heavy PRs can sometimes be routed to dependency or normal review when a human would prefer a more specific first pass;
+- generated files and large test fixtures can make priority-file ordering less precise.
+
+These are limitations of deterministic intake signals. They should be handled by human review, project configuration, or future narrowly scoped signals rather than broad overfitting.
+
 It can:
 
 - classify changed files;
