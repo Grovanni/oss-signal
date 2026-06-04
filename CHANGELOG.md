@@ -6,6 +6,13 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Reduced `ask_for_tests` routing for small source wording, comment, docstring, typo, changelog and release-note changes.
+- Expanded test path detection for `.e2e.*`, Go `_test.go`, common Java/Kotlin/C#/F# `*Test`/`*Tests` names, `test_project/` and `testsuite/`.
+- Made empty descriptions less dominant for small docs/tests/changelog/release-note/source-wording PRs while keeping clarification for automation/build/config cases.
+- Narrowed security routing for generic auth/session/token/security terms in tests, docs, fixtures, examples, compiler internals and protocol paths.
+- Narrowed migration routing so tests-only migration folders, generated fixtures and JSON/data-format schemas do not become database migration review by default.
+- Added container/deployment image update orientation for Docker image, HelmRelease, Helm chart and related image version changes.
+- Recognized pre-commit, Renovate and dependency-policy config files as dependency/configuration context.
 - Classified `Dockerfile` as automation/build attention instead of app security-sensitive.
 - Reduced noisy security routing for localization catalogs under auth/session paths and narrowed `acl` matching.
 - Treated documentation migration guides as documentation instead of database migration changes.

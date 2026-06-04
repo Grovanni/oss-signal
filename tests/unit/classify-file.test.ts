@@ -41,7 +41,7 @@ describe("classifyChangedFile", () => {
     expect(
       classifyChangedFile(file("packages/vite/src/node/__tests_dts__/importGlob.ts")).categories
     ).toEqual(["tests"]);
-    expect(classifyChangedFile(file("test/session.js")).categories).toEqual(["tests", "security"]);
+    expect(classifyChangedFile(file("test/session.js")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("docs/guide/migration.md")).categories).toEqual([
       "documentation"
     ]);
@@ -65,6 +65,44 @@ describe("classifyChangedFile", () => {
     ]);
   });
 
+  it("recognizes common test naming conventions across ecosystems", () => {
+    expect(classifyChangedFile(file("src/examples-smoke.e2e.ts")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("pkg/http/client_test.go")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("src/App.Tests.cs")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("integration/test_project/Program.cs")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("testsuite/parser/ParserSpec.java")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file(".github/workflows/test-redistribute.yml")).categories).toEqual([
+      "ci",
+      "automation",
+      "configuration"
+    ]);
+  });
+
+  it("classifies container and tooling update files as build/dependency context", () => {
+    expect(classifyChangedFile(file("Dockerfile.windows")).categories).toEqual([
+      "automation",
+      "build"
+    ]);
+    expect(classifyChangedFile(file("configure.py")).categories).toEqual(["build", "code"]);
+    expect(classifyChangedFile(file("node.gyp")).categories).toEqual(["configuration", "build"]);
+    expect(classifyChangedFile(file(".pre-commit-config.yaml")).categories).toEqual([
+      "dependencies",
+      "configuration"
+    ]);
+    expect(classifyChangedFile(file("renovate.json")).categories).toEqual([
+      "dependencies",
+      "configuration"
+    ]);
+    expect(classifyChangedFile(file("dependency-policy.json")).categories).toEqual([
+      "dependencies",
+      "configuration"
+    ]);
+  });
+
   it("does not classify localization catalogs under auth as app security-sensitive", () => {
     expect(
       classifyChangedFile(file("django/contrib/auth/locale/en/LC_MESSAGES/django.po")).categories
@@ -81,6 +119,38 @@ describe("classifyChangedFile", () => {
     expect(classifyChangedFile(file("src/policies/acl.ts")).categories).toEqual([
       "security",
       "code"
+    ]);
+  });
+
+  it("keeps docs tests fixtures and protocol sessions out of automatic security routing", () => {
+    expect(classifyChangedFile(file("docs/en/mkdocs.env.yml")).categories).toEqual([
+      "documentation",
+      "configuration"
+    ]);
+    expect(classifyChangedFile(file("testing/test_session.py")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("test/protocol/session.spec.ts")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("src/compiler/session.ts")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("src/auth/hashers.py")).categories).toEqual([
+      "security",
+      "code"
+    ]);
+    expect(classifyChangedFile(file("src/policies/permissions.ts")).categories).toEqual([
+      "security",
+      "code"
+    ]);
+  });
+
+  it("does not treat non database schemas as migrations", () => {
+    expect(classifyChangedFile(file("schemas/user.schema.json")).categories).toEqual(["unknown"]);
+    expect(classifyChangedFile(file("src/types/schema.ts")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("tests/migrations/test_runner.py")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("tests/fixtures/generated/schema.prisma")).categories).toEqual([
+      "generated",
+      "tests"
     ]);
   });
 

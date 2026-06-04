@@ -57,7 +57,17 @@ const dependencyManifests = new Set([
   "gemfile",
   "composer.json",
   "pom.xml",
-  "build.gradle"
+  "build.gradle",
+  ".pre-commit-config.yaml",
+  ".pre-commit-config.yml",
+  "renovate.json",
+  "renovate.json5",
+  ".renovaterc",
+  ".renovaterc.json",
+  ".renovaterc.yaml",
+  ".renovaterc.yml",
+  "dependency-policy.json",
+  "dependency_policy.json"
 ]);
 
 const dependencyLockfiles = new Set([
@@ -414,19 +424,44 @@ function isCompiledLocalizationCatalog(name: string): boolean {
 }
 
 function isTestPath(path: string, name: string): boolean {
+  if (isCiPath(path, name)) {
+    return false;
+  }
+
   return (
     path.startsWith("test/") ||
     path.startsWith("tests/") ||
     path.startsWith("testing/") ||
+    path.startsWith("test_project/") ||
+    path.startsWith("test-project/") ||
+    path.startsWith("testsuite/") ||
     path.startsWith("spec/") ||
+    path.startsWith("e2e/") ||
     path.includes("/test/") ||
     path.includes("/tests/") ||
     path.includes("/testing/") ||
+    path.includes("/test_project/") ||
+    path.includes("/test-project/") ||
+    path.includes("/testsuite/") ||
     path.includes("/spec/") ||
+    path.includes("/e2e/") ||
     path.includes("__tests__") ||
     path.includes("__tests_dts__") ||
     name.includes(".test.") ||
     name.includes(".spec.") ||
+    name.includes(".e2e.") ||
+    name.endsWith("_test.go") ||
+    name.endsWith("_test.py") ||
+    name.endsWith("test.java") ||
+    name.endsWith("tests.java") ||
+    name.endsWith("test.kt") ||
+    name.endsWith("tests.kt") ||
+    name.endsWith("test.cs") ||
+    name.endsWith("tests.cs") ||
+    name.endsWith("test.fs") ||
+    name.endsWith("tests.fs") ||
+    name.endsWith("test.fsx") ||
+    name.endsWith("tests.fsx") ||
     name.startsWith("test-") ||
     name.startsWith("spec-")
   );
@@ -447,6 +482,15 @@ function isCiPath(path: string, name: string): boolean {
 function isConfigurationPath(path: string, name: string): boolean {
   return (
     name === ".env.example" ||
+    name === ".pre-commit-config.yaml" ||
+    name === ".pre-commit-config.yml" ||
+    name === "renovate.json" ||
+    name === "renovate.json5" ||
+    name.startsWith(".renovaterc") ||
+    name === "dependency-policy.json" ||
+    name === "dependency_policy.json" ||
+    name === "node.gyp" ||
+    name.endsWith(".gyp") ||
     path.startsWith("config/") ||
     name.endsWith(".config.js") ||
     name.endsWith(".config.ts") ||
@@ -462,7 +506,19 @@ function isConfigurationPath(path: string, name: string): boolean {
 }
 
 function isSecuritySensitivePath(path: string, name: string): boolean {
-  if (isLocalizationCatalogPath(path, name)) {
+  if (isLocalizationCatalogPath(path, name) || isDocumentationPath(path, name)) {
+    return false;
+  }
+
+  if (isDependencyPolicyPath(name)) {
+    return false;
+  }
+
+  if (name === ".env" || name.startsWith(".env.")) {
+    return true;
+  }
+
+  if (isNonProductionSecurityContext(path, name) && !hasDirectSensitivePathTerm(path)) {
     return false;
   }
 
@@ -474,27 +530,34 @@ function isAutomationSensitivePath(path: string, name: string): boolean {
     path.startsWith(".github/workflows/") ||
     path.startsWith(".github/actions/") ||
     name === "dockerfile" ||
+    name.startsWith("dockerfile.") ||
     name === "action.yml" ||
     name === "action.yaml"
   );
 }
 
 function isMigrationPath(path: string, name: string): boolean {
-  if (isDocumentationPath(path, name) || isLocalizationCatalogPath(path, name)) {
+  if (
+    isDocumentationPath(path, name) ||
+    isLocalizationCatalogPath(path, name) ||
+    isGeneratedFixturePath(path, name)
+  ) {
+    return false;
+  }
+
+  const tokens = pathTokens(path);
+
+  if (isTestPath(path, name) && hasMigrationTerm(tokens) && !hasDatabaseFixtureEvidence(path)) {
     return false;
   }
 
   return (
-    path.includes("migration") ||
-    path.includes("migrations") ||
-    path.includes("schema") ||
-    path.includes("database") ||
-    path.includes("databases") ||
     path.includes("db/migrate") ||
     path.startsWith("db/") ||
     path.includes("/db/fixtures/") ||
     path.includes("prisma/migrations") ||
     path.includes("alembic") ||
+    hasRuntimeMigrationToolingTerm(tokens) ||
     isDatabaseSchemaPath(path, name)
   );
 }
@@ -505,7 +568,7 @@ function isDatabaseSchemaPath(path: string, name: string): boolean {
   return (
     name === "schema.rb" ||
     name === "structure.sql" ||
-    name.endsWith(".prisma") ||
+    (name.endsWith(".prisma") && !isNonRuntimeFixturePath(path)) ||
     tokens.includes("datasource") ||
     tokens.includes("datasources") ||
     (tokens.includes("foreign") && (tokens.includes("key") || tokens.includes("keys"))) ||
@@ -518,11 +581,16 @@ function isDatabaseSchemaPath(path: string, name: string): boolean {
 }
 
 function isReleasePath(path: string, name: string): boolean {
+  const tokens = pathTokens(path);
+
   return (
     name.startsWith("changelog") ||
     name.startsWith("release") ||
     path.startsWith(".changeset/") ||
-    path.includes("version") ||
+    tokens.includes("version") ||
+    tokens.includes("versions") ||
+    tokens.includes("release") ||
+    tokens.includes("releases") ||
     ["package.json", "cargo.toml", "pyproject.toml"].includes(name)
   );
 }
@@ -532,7 +600,11 @@ function isBuildPath(path: string, name: string): boolean {
     path.startsWith("dist/") ||
     path.startsWith("build/") ||
     name === "dockerfile" ||
+    name.startsWith("dockerfile.") ||
     name === "makefile" ||
+    name === "node.gyp" ||
+    name.endsWith(".gyp") ||
+    name === "configure.py" ||
     name === "webpack.config.js" ||
     name === "vite.config.ts" ||
     name === "rollup.config.js"
@@ -560,4 +632,82 @@ function isDependencyManifestName(name: string): boolean {
 
 function isDependencyLockfileName(name: string): boolean {
   return dependencyLockfiles.has(name);
+}
+
+function isDependencyPolicyPath(name: string): boolean {
+  return name === "dependency-policy.json" || name === "dependency_policy.json";
+}
+
+function isNonProductionSecurityContext(path: string, name: string): boolean {
+  const tokens = pathTokens(path);
+
+  return (
+    isTestPath(path, name) ||
+    isNonRuntimeFixturePath(path) ||
+    hasAnyToken(tokens, new Set(["example", "examples", "sample", "samples", "compiler", "protocol"]))
+  );
+}
+
+function isNonRuntimeFixturePath(path: string): boolean {
+  const tokens = pathTokens(path);
+
+  return hasAnyToken(tokens, new Set(["fixture", "fixtures", "generated", "example", "examples"]));
+}
+
+function isGeneratedFixturePath(path: string, name: string): boolean {
+  return isGeneratedPath(path, name) && isNonRuntimeFixturePath(path);
+}
+
+function hasDirectSensitivePathTerm(path: string): boolean {
+  const tokens = pathTokens(path);
+
+  return hasAnyToken(
+    tokens,
+    new Set([
+      "password",
+      "passwords",
+      "passwd",
+      "secret",
+      "secrets",
+      "credential",
+      "credentials",
+      "crypto",
+      "cryptography",
+      "encrypt",
+      "encrypted",
+      "encryption",
+      "decrypt",
+      "decrypted",
+      "decryption",
+      "permission",
+      "permissions",
+      "policy",
+      "policies",
+      "rbac",
+      "acl"
+    ])
+  );
+}
+
+function hasMigrationTerm(tokens: string[]): boolean {
+  return hasAnyToken(tokens, new Set(["migrate", "migration", "migrations"]));
+}
+
+function hasDatabaseFixtureEvidence(path: string): boolean {
+  const tokens = pathTokens(path);
+
+  return (
+    path.startsWith("db/") ||
+    path.includes("/db/fixtures/") ||
+    (hasAnyToken(tokens, new Set(["db", "database", "databases"])) &&
+      hasAnyToken(tokens, new Set(["fixture", "fixtures", "schema", "schemas"]))) ||
+    (tokens.includes("foreign") && (tokens.includes("key") || tokens.includes("keys")))
+  );
+}
+
+function hasRuntimeMigrationToolingTerm(tokens: string[]): boolean {
+  return (
+    hasAnyToken(tokens, new Set(["migrate", "migration", "migrations"])) &&
+    !hasAnyToken(tokens, new Set(["test", "tests", "testing", "testsuite", "fixture", "fixtures"]))
+  );
 }

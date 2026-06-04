@@ -53,8 +53,9 @@ export function detectSignals(input: SignalInput): Signal[] {
   const ciFiles = input.files.filter((file) => hasCategory(file, "ci"));
   const automationFiles = input.files.filter((file) => hasCategory(file, "automation"));
   const securityFiles = input.files.filter((file) => hasCategory(file, "security"));
-  const authFiles = input.files.filter((file) => isAuthRelatedPath(file.path));
-  const secretFiles = input.files.filter((file) => isSecretRelatedPath(file.path));
+  const authFiles = securityFiles.filter((file) => isAuthRelatedPath(file.path));
+  const secretFiles = securityFiles.filter((file) => isSecretRelatedPath(file.path));
+  const directSecurityFiles = securityFiles.filter((file) => isDirectSecurityReviewPath(file.path));
   const migrationFiles = input.files.filter((file) => hasCategory(file, "migrations"));
   const configurationFiles = input.files.filter((file) => hasCategory(file, "configuration"));
   const documentationFiles = input.files.filter((file) => hasCategory(file, "documentation"));
@@ -76,6 +77,15 @@ export function detectSignals(input: SignalInput): Signal[] {
     releaseFiles,
     titleAndBody
   );
+  const sourceWordingChange = isLikelySourceWordingChange(
+    input.files,
+    codeFiles,
+    testFiles,
+    titleAndBody,
+    fileCount,
+    linesChanged
+  );
+  const containerImageUpdate = isContainerImageUpdate(input.files, titleAndBody);
   const reportsPersistenceDataFormat = shouldReportPersistenceDataFormatChange(
     codeFiles,
     persistenceFiles,
@@ -168,7 +178,24 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (codeFiles.length > 0 && testFiles.length === 0 && !releaseVersionUpdate) {
+  if (sourceWordingChange) {
+    signals.push(
+      signal(
+        "source_wording_change",
+        "info",
+        "Source wording/comment change",
+        "The title and file mix look like a small documentation, comment, docstring or wording-only source change.",
+        fileEvidence(codeFiles, "small source wording/comment evidence")
+      )
+    );
+  }
+
+  if (
+    codeFiles.length > 0 &&
+    testFiles.length === 0 &&
+    !releaseVersionUpdate &&
+    !sourceWordingChange
+  ) {
     signals.push(
       signal(
         "code_without_tests",
@@ -262,6 +289,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (containerImageUpdate) {
+    signals.push(
+      signal(
+        "container_image_update",
+        "medium",
+        "Container/deployment image update",
+        "Changed files or PR text point to a container image, HelmRelease or deployment image version update.",
+        containerImageEvidence(input.files)
+      )
+    );
+  }
+
   if (ciFiles.length > 0) {
     signals.push(
       signal(
@@ -351,7 +390,10 @@ export function detectSignals(input: SignalInput): Signal[] {
   }
 
   if (securityFiles.length > 0) {
-    const securityLevel = authFiles.length > 0 || secretFiles.length > 0 ? "high" : "medium";
+    const securityLevel =
+      authFiles.length > 0 || secretFiles.length > 0 || directSecurityFiles.length > 0
+        ? "high"
+        : "medium";
     signals.push(
       signal(
         "security_sensitive_file_changed",
@@ -642,7 +684,7 @@ function isReleaseVersionUpdate(
   releaseFiles: ClassifiedFile[],
   titleAndBody: string
 ): boolean {
-  if (files.length === 0 || dependencyFiles.length === 0 || releaseFiles.length === 0) {
+  if (files.length === 0 || releaseFiles.length === 0) {
     return false;
   }
 
@@ -659,7 +701,15 @@ function isReleaseVersionUpdate(
       !hasCategory(file, "generated")
   );
 
-  return codeFiles.length <= 3 && unrelatedFiles.length <= 3;
+  const nonReleaseCodeFiles = codeFiles.filter(
+    (file) => !hasCategory(file, "release") && !hasCategory(file, "dependencies")
+  );
+
+  return (
+    nonReleaseCodeFiles.length <= 3 &&
+    unrelatedFiles.length <= 3 &&
+    (dependencyFiles.length > 0 || releaseFiles.length / files.length >= 0.5)
+  );
 }
 
 function mentionsReleaseOrVersion(text: string): boolean {
@@ -690,7 +740,14 @@ function shouldReportPersistenceDataFormatChange(
 
 function isPersistenceDataFormatPath(path: string): boolean {
   const normalized = path.replace(/\\/g, "/").toLowerCase();
-  return mentionsPersistenceDataFormat(normalized);
+  const name = normalized.split("/").at(-1) ?? normalized;
+
+  return (
+    mentionsPersistenceDataFormat(normalized) ||
+    name.endsWith(".schema.json") ||
+    normalized.includes("json-schema") ||
+    normalized.includes("table-schema")
+  );
 }
 
 function mentionsPersistenceDataFormat(text: string): boolean {
@@ -715,8 +772,87 @@ function mentionsPersistenceDataFormat(text: string): boolean {
     "data_format",
     "file format",
     "file-format",
-    "file_format"
+    "file_format",
+    "json schema",
+    "json-schema",
+    "table schema",
+    "table-schema",
+    "storage metadata",
+    "format metadata"
   ].some((term) => text.includes(term));
+}
+
+function isLikelySourceWordingChange(
+  files: ClassifiedFile[],
+  codeFiles: ClassifiedFile[],
+  testFiles: ClassifiedFile[],
+  titleAndBody: string,
+  fileCount: number,
+  linesChanged: number
+): boolean {
+  if (
+    codeFiles.length === 0 ||
+    testFiles.length > 0 ||
+    fileCount > 3 ||
+    linesChanged > 120 ||
+    !mentionsSourceWordingOnlyChange(titleAndBody)
+  ) {
+    return false;
+  }
+
+  return files.every(
+    (file) =>
+      hasCategory(file, "code") ||
+      hasCategory(file, "documentation") ||
+      hasCategory(file, "release")
+  );
+}
+
+function mentionsSourceWordingOnlyChange(text: string): boolean {
+  return /\b(doc|docs|documentation|docstring|comment|comments|typo|wording|spelling|grammar|changelog|readme|release notes?|error message|message text|copy)\b/.test(
+    text
+  );
+}
+
+function isContainerImageUpdate(files: ClassifiedFile[], titleAndBody: string): boolean {
+  if (files.length === 0) {
+    return false;
+  }
+
+  const pathText = files.map((file) => file.path.replace(/\\/g, "/").toLowerCase()).join(" ");
+  const hasRelevantFile = files.some(
+    (file) =>
+      hasCategory(file, "automation") ||
+      hasCategory(file, "build") ||
+      hasCategory(file, "configuration") ||
+      hasCategory(file, "dependencies")
+  );
+
+  return hasRelevantFile && mentionsContainerImageUpdate(`${titleAndBody} ${pathText}`);
+}
+
+function mentionsContainerImageUpdate(text: string): boolean {
+  return /\b(container image|docker image|image tag|image version|base image|runtime image|helmrelease|helm release|helm chart|kustomize|containerd)\b/.test(
+    text
+  );
+}
+
+function containerImageEvidence(files: ClassifiedFile[]): Evidence[] {
+  const evidence = fileEvidence(
+    files.filter(
+      (file) =>
+        hasCategory(file, "automation") ||
+        hasCategory(file, "build") ||
+        hasCategory(file, "configuration") ||
+        hasCategory(file, "dependencies")
+    ),
+    "container/deployment image evidence",
+    5
+  );
+
+  return evidence.length > 0
+    ? evidence
+    : [metadataEvidence("PR title/body", "mentions container or deployment image update")];
 }
 
 function isActionableCiFailure(item: { conclusion: string | null }): boolean {
@@ -810,7 +946,7 @@ function hasCoreReviewConcern(categories: FileCategory[]): boolean {
 }
 
 function isSecurityConcernPath(path: string): boolean {
-  return isAuthRelatedPath(path) || isSecretRelatedPath(path);
+  return isAuthRelatedPath(path) || isSecretRelatedPath(path) || isDirectSecurityReviewPath(path);
 }
 
 function isAuthRelatedPath(path: string): boolean {
@@ -819,4 +955,12 @@ function isAuthRelatedPath(path: string): boolean {
 
 function isSecretRelatedPath(path: string): boolean {
   return !isLocalizationCatalogPath(path) && hasSecretSensitivePathTerm(path);
+}
+
+function isDirectSecurityReviewPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+
+  return /(^|[^a-z0-9])(crypto|cryptography|encrypt|encrypted|encryption|decrypt|decrypted|decryption|permission|permissions|policy|policies|rbac|acl|security|secure)([^a-z0-9]|$)/.test(
+    normalized
+  );
 }

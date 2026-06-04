@@ -193,8 +193,9 @@ describe("analyzePullRequestData", () => {
     expect(analysis.categories.build).toBe(1);
     expect(analysis.categories.security).toBe(0);
     expect(signalIds(analysis.signals)).toContain("automation_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).toContain("container_image_update");
     expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
-    expect(analysis.recommended_action).toBe("normal_review");
+    expect(analysis.recommended_action).toBe("dependency_review");
   });
 
   it("does not treat environment as an env secret path", () => {
@@ -227,6 +228,67 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("dependency_review");
   });
 
+  it("does not ask for tests on small source wording or docstring-only changes", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "DOC: align docstring wording",
+        body: "Docstring wording only.",
+        files: [changedFile("pandas/core/frame.py", 18)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("source_wording_change");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(analysis.attention).toBe("low");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not let an empty description dominate small docs tests or changelog changes", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Fix typo in changelog",
+        body: "",
+        files: [changedFile("CHANGELOG.md", 2)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("empty_description");
+    expect(signalIds(analysis.signals)).toContain("docs_only");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("still asks for clarification on empty substantial build or automation changes", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update runtime image",
+        body: "",
+        files: [changedFile("Dockerfile", 18)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("automation_sensitive_file_changed");
+    expect(analysis.recommended_action).toBe("ask_for_clarification");
+  });
+
+  it("recognizes e2e test files and avoids code-without-tests routing", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Add smoke e2e coverage",
+        body: "",
+        files: [changedFile("src/examples-smoke.e2e.ts", 24)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.tests).toBe(1);
+    expect(signalIds(analysis.signals)).toContain("tests_only");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
   it("does not route localization catalogs under auth to security review", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -242,6 +304,40 @@ describe("analyzePullRequestData", () => {
     expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
     expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
     expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not route non-auth session tests or docs paths to security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Refine session tests",
+        body: "Update protocol session coverage.",
+        files: [
+          changedFile("testing/test_session.py", 12),
+          changedFile("docs/en/mkdocs.env.yml", 2)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
+    expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("keeps direct permission and policy code on security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Tighten permission policy",
+        body: "Update permission policy.",
+        files: [changedFile("src/policies/permissions.ts", 22)]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
+    expect(analysis.attention).toBe("high");
+    expect(analysis.recommended_action).toBe("security_review");
   });
 
   it("keeps large localization catalog refreshes low attention when CI passed", () => {
@@ -276,6 +372,35 @@ describe("analyzePullRequestData", () => {
     expect(analysis.categories.migrations).toBe(0);
     expect(signalIds(analysis.signals)).not.toContain("migration_changed");
     expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not route tests-only migration folders or JSON schemas to migration review", () => {
+    const testsOnly = analyzePullRequestData(
+      dataWith({
+        title: "Update migration test coverage",
+        body: "Refine migration tests.",
+        files: [changedFile("tests/migrations/test_runner.py", 12)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(testsOnly.categories.migrations).toBe(0);
+    expect(signalIds(testsOnly.signals)).not.toContain("migration_changed");
+    expect(testsOnly.recommended_action).toBe("normal_review");
+
+    const jsonSchema = analyzePullRequestData(
+      dataWith({
+        title: "Update JSON schema metadata",
+        body: "Adjust table schema metadata.",
+        files: [changedFile("schemas/user.schema.json", 12)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(jsonSchema.categories.migrations).toBe(0);
+    expect(signalIds(jsonSchema.signals)).toContain("persistence_data_format_change");
+    expect(signalIds(jsonSchema.signals)).not.toContain("migration_changed");
+    expect(jsonSchema.recommended_action).toBe("normal_review");
   });
 
   it("routes Rails database rake tasks to migration review", () => {
@@ -426,6 +551,53 @@ describe("analyzePullRequestData", () => {
     expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
     expect(analysis.attention).toBe("medium");
     expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("routes pre-commit pin updates through dependency review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Bump pre-commit hook versions",
+        body: "",
+        files: [changedFile(".pre-commit-config.yaml", 6)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("dependency_manifest_changed");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("routes container image and HelmRelease updates away from unknown normal review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update container image tag",
+        body: "Bump the runtime image.",
+        files: [changedFile("deploy/prod/helmrelease.yaml", 6)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("container_image_update");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("does not request split for coherent release note only updates", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Version 2.4.1 release notes",
+        body: "",
+        files: [
+          changedFile(".changeset/fix-one.md", 2),
+          changedFile(".changeset/fix-two.md", 2),
+          changedFile("CHANGELOG.md", 4)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("release_version_update");
+    expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
+    expect(analysis.recommended_action).toBe("normal_review");
   });
 
   it("prioritizes dependency files before CI workflows in dependency-heavy PRs", () => {
