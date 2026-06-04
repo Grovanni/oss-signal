@@ -186,6 +186,124 @@ describe("analyzePullRequestData", () => {
     expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
   });
 
+  it("does not ask for generic tests on coherent release version bumps", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Version 19.2.7",
+        body: "Release version 19.2.7.",
+        files: [
+          changedFile("package.json", 8),
+          changedFile("packages/react/package.json", 8),
+          changedFile("packages/react/src/ReactVersion.js", 3)
+        ]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("release_version_update");
+    expect(signalIds(analysis.signals)).not.toContain("code_without_tests");
+    expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("does not route localization catalogs under auth to security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update translations.",
+        files: [
+          changedFile("django/contrib/auth/locale/fr/LC_MESSAGES/django.po", 12),
+          changedFile("django/contrib/auth/locale/fr/LC_MESSAGES/django.mo", 12)
+        ]
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not treat documentation migration guides as database migrations", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update migration guide.",
+        files: [changedFile("docs/guide/migration.md", 10)]
+      })
+    );
+
+    expect(analysis.categories.migrations).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("migration_changed");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("does not wait for only cancelled or skipped CI items", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update tests.",
+        files: [changedFile("pandas/tests/io/pytables/test_append.py", 10)],
+        ci: ciWithItems("failure", [
+          {
+            kind: "check_run",
+            name: "publish",
+            state: "failure",
+            status: "completed",
+            conclusion: "cancelled",
+            url: null
+          },
+          {
+            kind: "check_run",
+            name: "Upload nightly packages to Anaconda",
+            state: "failure",
+            status: "completed",
+            conclusion: "cancelled",
+            url: null
+          }
+        ])
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("ci_checks_noncritical");
+    expect(signalIds(analysis.signals)).not.toContain("ci_checks_failed");
+    expect(analysis.attention).toBe("low");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("adds a cautious persistence/data-format signal without changing review action", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "BUG: HDF5 pandas_version attr should be updated",
+        body: "Fix PyTables persisted format metadata.",
+        files: [
+          changedFile("pandas/io/pytables.py", 20),
+          changedFile("pandas/tests/io/pytables/test_store.py", 10),
+          changedFile("doc/source/whatsnew/v3.0.0.rst", 4)
+        ]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("persistence_data_format_change");
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("keeps cohesive test dependency and green CI updates out of request_split", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update dependency test workflow.",
+        files: [
+          changedFile("pyproject.toml", 6),
+          changedFile(".github/workflows/test.yml", 12),
+          changedFile(".github/workflows/publish.yml", 12),
+          changedFile("tests/test_fastapi_cli.py", 8)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
   it("prioritizes dependency files before CI workflows in dependency-heavy PRs", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -316,6 +434,7 @@ function signalIds(signals: Array<{ id: string }>): string[] {
 }
 
 function dataWith(options: {
+  title?: string;
   body: string;
   files: GitHubChangedFileSummary[];
   additions?: number;
@@ -338,7 +457,7 @@ function dataWith(options: {
     },
     pull_request: {
       number: 123,
-      title: "Synthetic PR",
+      title: options.title ?? "Synthetic PR",
       body: options.body,
       author: "contributor",
       html_url: "https://github.com/org/repo/pull/123",
@@ -371,6 +490,22 @@ function dataWith(options: {
     },
     ci: options.ci ?? ciWith("unknown"),
     limitations: []
+  };
+}
+
+function ciWithItems(
+  state: GitHubCiSummary["state"],
+  items: GitHubCiSummary["items"]
+): GitHubCiSummary {
+  return {
+    head_sha: "1111111111111111111111111111111111111111",
+    state,
+    total: items.length,
+    successful: items.filter((item) => item.state === "success").length,
+    failed: items.filter((item) => item.state === "failure").length,
+    pending: items.filter((item) => item.state === "pending").length,
+    skipped: items.filter((item) => item.conclusion === "skipped").length,
+    items
   };
 }
 

@@ -111,21 +111,33 @@ export function classifyChangedFile(
     }
   };
 
-  if (isGeneratedPath(path, name) || matchesConfiguredPath(config, "generated", path)) {
+  if (
+    isGeneratedPath(path, name) ||
+    isCompiledLocalizationCatalog(name) ||
+    matchesConfiguredPath(config, "generated", path)
+  ) {
     add(
       "generated",
       isGeneratedPath(path, name)
         ? "path or filename indicates generated output"
-        : "configured generated path"
+        : isCompiledLocalizationCatalog(name)
+          ? "compiled localization catalog"
+          : "configured generated path"
     );
   }
 
-  if (isDocumentationPath(path, name) || matchesConfiguredPath(config, "documentation", path)) {
+  if (
+    isDocumentationPath(path, name) ||
+    isTextLocalizationCatalog(path, name) ||
+    matchesConfiguredPath(config, "documentation", path)
+  ) {
     add(
       "documentation",
       isDocumentationPath(path, name)
         ? "documentation path, filename or extension"
-        : "configured documentation path"
+        : isTextLocalizationCatalog(path, name)
+          ? "localization catalog"
+          : "configured documentation path"
     );
   }
 
@@ -177,10 +189,12 @@ export function classifyChangedFile(
     );
   }
 
-  if (isMigrationPath(path) || matchesConfiguredPath(config, "migrations", path)) {
+  if (isMigrationPath(path, name) || matchesConfiguredPath(config, "migrations", path)) {
     add(
       "migrations",
-      isMigrationPath(path) ? "migration, schema or database path" : "configured migration path"
+      isMigrationPath(path, name)
+        ? "migration, schema or database path"
+        : "configured migration path"
     );
   }
 
@@ -254,6 +268,21 @@ export function normalizedPathIncludes(path: string, terms: string[]): boolean {
   return terms.some((term) => normalized.includes(term));
 }
 
+export function isLocalizationCatalogPath(
+  path: string,
+  name = basename(normalizePath(path))
+): boolean {
+  const normalizedPath = normalizePath(path);
+  const normalizedName = normalizePath(name);
+
+  return (
+    normalizedPath.includes("/locale/") ||
+    normalizedPath.includes("/locales/") ||
+    normalizedPath.includes("/lc_messages/") ||
+    [".po", ".pot", ".mo"].includes(extension(normalizedName))
+  );
+}
+
 function normalizePath(path: string): string {
   return path.replace(/\\/g, "/").toLowerCase();
 }
@@ -275,15 +304,26 @@ function isDocumentationPath(path: string, name: string): boolean {
   );
 }
 
+function isTextLocalizationCatalog(path: string, name: string): boolean {
+  return isLocalizationCatalogPath(path, name) && [".po", ".pot"].includes(extension(name));
+}
+
+function isCompiledLocalizationCatalog(name: string): boolean {
+  return extension(name) === ".mo";
+}
+
 function isTestPath(path: string, name: string): boolean {
   return (
     path.startsWith("test/") ||
     path.startsWith("tests/") ||
+    path.startsWith("testing/") ||
     path.startsWith("spec/") ||
     path.includes("/test/") ||
     path.includes("/tests/") ||
+    path.includes("/testing/") ||
     path.includes("/spec/") ||
     path.includes("__tests__") ||
+    path.includes("__tests_dts__") ||
     name.includes(".test.") ||
     name.includes(".spec.") ||
     name.startsWith("test-") ||
@@ -321,9 +361,24 @@ function isConfigurationPath(path: string, name: string): boolean {
 }
 
 function isSecuritySensitivePath(path: string, name: string): boolean {
-  return (
-    sensitiveTerms.some((term) => path.includes(term)) || name === ".env" || name === ".env.example"
-  );
+  if (isLocalizationCatalogPath(path, name)) {
+    return false;
+  }
+
+  return hasSensitivePathTerm(path) || name === ".env" || name === ".env.example";
+}
+
+function hasSensitivePathTerm(path: string): boolean {
+  const normalized = normalizePath(path);
+  const segments = normalized.split(/[^a-z0-9]+/).filter(Boolean);
+
+  return sensitiveTerms.some((term) => {
+    if (term === "acl" || term === "key") {
+      return segments.includes(term) || segments.includes(`${term}s`);
+    }
+
+    return normalized.includes(term);
+  });
 }
 
 function isAutomationSensitivePath(path: string, name: string): boolean {
@@ -336,7 +391,11 @@ function isAutomationSensitivePath(path: string, name: string): boolean {
   );
 }
 
-function isMigrationPath(path: string): boolean {
+function isMigrationPath(path: string, name: string): boolean {
+  if (isDocumentationPath(path, name)) {
+    return false;
+  }
+
   return (
     path.includes("migration") ||
     path.includes("migrations") ||

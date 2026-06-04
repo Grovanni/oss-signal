@@ -72,6 +72,8 @@ Required top-level fields:
 
 `review-brief.v1` allows additive, non-breaking fields. Consumers should ignore unknown fields they do not understand.
 
+New signal IDs, optional fields and additional object members are additive in `review-brief.v1` when existing field names and types stay valid. Consumers should route on the signal IDs they understand and ignore the rest.
+
 Do not remove fields, rename fields or change field types inside the same `schema_version`.
 
 If a breaking change is needed, use a new major schema version such as `review-brief.v2`.

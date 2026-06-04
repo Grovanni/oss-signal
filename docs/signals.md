@@ -11,9 +11,12 @@ Examples:
 - `ci_changed`
 - `ci_checks_failed`
 - `ci_checks_pending`
+- `ci_checks_noncritical`
 - `ci_status_unavailable`
 - `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
+- `release_version_update`
+- `persistence_data_format_change`
 - `mixed_concerns`
 - `short_description_for_large_pr`
 
@@ -41,6 +44,10 @@ Files can have more than one category. For example, `.github/workflows/ci.yml` i
 
 `Dockerfile` is classified as `automation` and `build`, not `security`. Container image changes can affect build/runtime and supply-chain review attention, but they are not treated as direct application security paths unless the path also matches auth, session, token, secret, credential, crypto, permission, policy or security terms.
 
+Localization catalogs such as `.po`, `.pot` and `.mo` files are treated as documentation or generated artifacts, even when they live below an `auth` or `session` path. This avoids routing translation-only PRs to application security review.
+
+Documentation pages about migration guides remain documentation. Database/schema migration attention is reserved for code or repository paths that indicate runtime migrations, schemas or database migration tooling.
+
 Repository-specific path patterns can add category matches through `docs/configuration.md`. Built-in rules still apply, and configured `ignore_paths` only remove matching files from classification and signal analysis.
 
 ## Current signal set
@@ -63,6 +70,7 @@ The Phase 3 implementation can emit these deterministic signals:
 - `ci_changed_with_dependency_change`
 - `ci_checks_failed`
 - `ci_checks_pending`
+- `ci_checks_noncritical`
 - `ci_status_unavailable`
 - `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
@@ -71,6 +79,8 @@ The Phase 3 implementation can emit these deterministic signals:
 - `migration_changed`
 - `configuration_changed`
 - `empty_description`
+- `release_version_update`
+- `persistence_data_format_change`
 - `short_description_for_large_pr`
 - `description_missing_ci_context`
 - `description_missing_dependency_context`
@@ -96,9 +106,13 @@ Recommended actions are non-authoritative:
 
 Questions are limited to five and are only generated from detected signals.
 
-GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Passing CI is shown in the output summary but does not emit a signal by itself.
+GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Cancelled, skipped or neutral CI items are reported as `ci_checks_noncritical` when they are the only non-successful items; they do not trigger `wait_for_ci` by themselves. Passing CI is shown in the output summary but does not emit a signal by itself.
 
 Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
+
+Coherent release/version bumps can emit `release_version_update`. That signal is informational and can suppress generic missing-test or mixed-concern noise when the title and file mix indicate a version update rather than feature code.
+
+`persistence_data_format_change` is a cautious medium signal for paths or PR text that mention persisted data, serialization or file formats. It is intended to focus review attention on compatibility questions, not to imply a bug or security issue.
 
 Bad:
 

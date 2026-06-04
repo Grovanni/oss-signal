@@ -34,13 +34,41 @@ describe("classifyChangedFile", () => {
   it("classifies documentation, tests, migrations and generated files", () => {
     expect(classifyChangedFile(file("docs/guide.md")).categories).toEqual(["documentation"]);
     expect(classifyChangedFile(file("tests/unit/parser.test.ts")).categories).toEqual(["tests"]);
+    expect(classifyChangedFile(file("testing/test_assertrewrite.py")).categories).toEqual([
+      "tests"
+    ]);
+    expect(
+      classifyChangedFile(file("packages/vite/src/node/__tests_dts__/importGlob.ts")).categories
+    ).toEqual(["tests"]);
     expect(classifyChangedFile(file("test/session.js")).categories).toEqual(["tests", "security"]);
+    expect(classifyChangedFile(file("docs/guide/migration.md")).categories).toEqual([
+      "documentation"
+    ]);
     expect(classifyChangedFile(file("prisma/migrations/001_init.sql")).categories).toEqual([
       "migrations"
     ]);
     expect(classifyChangedFile(file("dist/generated/client.js")).categories).toEqual([
       "generated",
       "build"
+    ]);
+  });
+
+  it("does not classify localization catalogs under auth as app security-sensitive", () => {
+    expect(
+      classifyChangedFile(file("django/contrib/auth/locale/en/LC_MESSAGES/django.po")).categories
+    ).toEqual(["documentation"]);
+    expect(
+      classifyChangedFile(file("django/contrib/auth/locale/en/LC_MESSAGES/django.mo")).categories
+    ).toEqual(["generated"]);
+  });
+
+  it("matches narrow security terms without treating oracle as acl", () => {
+    expect(classifyChangedFile(file("django/db/backends/oracle/operations.py")).categories).toEqual(
+      ["code"]
+    );
+    expect(classifyChangedFile(file("src/policies/acl.ts")).categories).toEqual([
+      "security",
+      "code"
     ]);
   });
 });

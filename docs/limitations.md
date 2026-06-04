@@ -18,6 +18,8 @@ GitHub CI status/check data may be unavailable when GitHub does not expose check
 
 GitHub diff data may also be unavailable for large PRs or transient GitHub errors. OSS Signal still uses PR metadata and changed-file metadata, records the limitation, and does not fail the whole run solely because the diff body is missing.
 
+Persistence and data-format detection is intentionally conservative. It looks for known path or text indicators such as HDF5, PyTables, serialization and file-format terms, but it cannot prove backward compatibility or find every storage-related change.
+
 It can:
 
 - classify changed files;

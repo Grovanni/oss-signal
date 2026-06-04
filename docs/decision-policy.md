@@ -5,7 +5,7 @@ OSS Signal recommends the first review action from deterministic signals. The ac
 The current priority order is:
 
 1. `security_review` for direct auth, session, token, secret, credential, crypto, permission or security paths.
-2. `wait_for_ci` when GitHub reports failed/pending checks, or when CI files changed but CI status is unavailable.
+2. `wait_for_ci` when GitHub reports actionable failed/pending checks, or when CI files changed but CI status is unavailable.
 3. `request_split` for large PRs or mixed concerns.
 4. `ask_for_tests` when code changed and no tests were detected.
 5. `dependency_review` when dependency manifests, lockfiles or dependency-only files changed.
@@ -18,6 +18,12 @@ The current priority order is:
 A dependency PR with a manifest, lockfile or dependency-only file normally recommends `dependency_review`.
 
 If GitHub reports failed or pending CI for the PR head commit, OSS Signal recommends `wait_for_ci` first. This keeps the brief actionable: the maintainer can inspect CI before spending review attention on dependency details that may already be invalidated by failed checks.
+
+Cancelled, skipped or neutral CI items are reported as `ci_checks_noncritical` when they are the only non-successful items. That signal is informational and does not trigger `wait_for_ci` by itself.
+
+## Release/version updates
+
+When the PR title/body and file mix look like a coherent release or version bump, OSS Signal can emit `release_version_update`. This suppresses generic `code_without_tests` and `mixed_concerns` noise for small release/version touch points while still preserving dependency signals such as `dependency_manifest_changed`.
 
 ## Security and automation wording
 

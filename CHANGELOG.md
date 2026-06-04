@@ -7,6 +7,11 @@ The format should follow clear release notes. The project uses semantic versioni
 ## Unreleased
 
 - Classified `Dockerfile` as automation/build attention instead of app security-sensitive.
+- Reduced noisy security routing for localization catalogs under auth/session paths and narrowed `acl` matching.
+- Treated documentation migration guides as documentation instead of database migration changes.
+- Reported cancelled/skipped/neutral-only CI items as informational instead of routing to `wait_for_ci`.
+- Added informational release/version bump detection and a cautious persistence/data-format signal.
+- Recognized additional test path conventions such as `testing/` and `__tests_dts__`.
 
 ## 0.2.0 - 2026-06-04
 

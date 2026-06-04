@@ -2,6 +2,7 @@ import {
   hasCategory,
   isDependencyLockfile,
   isDependencyManifest,
+  isLocalizationCatalogPath,
   normalizedPathIncludes,
   type ClassifiedFile
 } from "../classify/classify-file.js";
@@ -46,19 +47,37 @@ export function detectSignals(input: SignalInput): Signal[] {
     (fileCount >= thresholds.medium_files_changed ||
       linesChanged >= thresholds.medium_lines_changed);
   const body = input.data.pull_request.body.trim();
+  const titleAndBody = `${input.data.pull_request.title} ${body}`.toLowerCase();
   const dependencyManifestFiles = input.files.filter(isDependencyManifest);
   const dependencyLockfiles = input.files.filter(isDependencyLockfile);
   const dependencyFiles = input.files.filter((file) => hasCategory(file, "dependencies"));
   const ciFiles = input.files.filter((file) => hasCategory(file, "ci"));
   const automationFiles = input.files.filter((file) => hasCategory(file, "automation"));
   const securityFiles = input.files.filter((file) => hasCategory(file, "security"));
-  const authFiles = input.files.filter((file) => normalizedPathIncludes(file.path, authTerms));
+  const authFiles = input.files.filter((file) => isAuthRelatedPath(file.path));
   const secretFiles = input.files.filter((file) => isSecretRelatedPath(file.path));
   const migrationFiles = input.files.filter((file) => hasCategory(file, "migrations"));
   const configurationFiles = input.files.filter((file) => hasCategory(file, "configuration"));
   const documentationFiles = input.files.filter((file) => hasCategory(file, "documentation"));
   const testFiles = input.files.filter((file) => hasCategory(file, "tests"));
   const codeFiles = input.files.filter((file) => hasCategory(file, "code"));
+  const releaseFiles = input.files.filter((file) => hasCategory(file, "release"));
+  const persistenceFiles = input.files.filter((file) => isPersistenceDataFormatPath(file.path));
+  const releaseVersionUpdate = isReleaseVersionUpdate(
+    input.files,
+    codeFiles,
+    dependencyFiles,
+    releaseFiles,
+    titleAndBody
+  );
+  const reportsPersistenceDataFormat = shouldReportPersistenceDataFormatChange(
+    codeFiles,
+    persistenceFiles,
+    titleAndBody
+  );
+  const failedCiItems = input.data.ci.items.filter((item) => item.state === "failure");
+  const actionableFailedCiItems = failedCiItems.filter(isActionableCiFailure);
+  const nonActionableFailedCiItems = failedCiItems.filter((item) => !isActionableCiFailure(item));
   const strongCategoriesTouched = mixedConcernCategories(input.files);
 
   if (largePr) {
@@ -126,7 +145,7 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (codeFiles.length > 0 && testFiles.length === 0) {
+  if (codeFiles.length > 0 && testFiles.length === 0 && !releaseVersionUpdate) {
     signals.push(
       signal(
         "code_without_tests",
@@ -208,6 +227,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (releaseVersionUpdate) {
+    signals.push(
+      signal(
+        "release_version_update",
+        "info",
+        "Release/version update",
+        "The title and changed files look like a coherent version or release update.",
+        releaseEvidence(releaseFiles, dependencyFiles)
+      )
+    );
+  }
+
   if (ciFiles.length > 0) {
     signals.push(
       signal(
@@ -220,17 +251,24 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (input.data.ci.state === "failure") {
+  if (input.data.ci.state === "failure" && actionableFailedCiItems.length > 0) {
     signals.push(
       signal(
         "ci_checks_failed",
         "high",
         "CI checks failed",
         "GitHub reports failing or errored checks for the PR head commit.",
-        ciEvidence(
-          input.data.ci.items.filter((item) => item.state === "failure"),
-          "failing CI item"
-        )
+        ciEvidence(actionableFailedCiItems, "failing CI item")
+      )
+    );
+  } else if (input.data.ci.state === "failure" && nonActionableFailedCiItems.length > 0) {
+    signals.push(
+      signal(
+        "ci_checks_noncritical",
+        "info",
+        "Only non-critical CI items reported",
+        "GitHub only reports cancelled, skipped or neutral CI items for the PR head commit.",
+        ciEvidence(nonActionableFailedCiItems, "non-critical CI item")
       )
     );
   }
@@ -266,7 +304,7 @@ export function detectSignals(input: SignalInput): Signal[] {
     signals.push(
       signal(
         "ci_changed_with_dependency_change",
-        "high",
+        input.data.ci.state === "success" ? "medium" : "high",
         "CI and dependencies changed together",
         "CI and dependency files changed in the same PR.",
         [
@@ -341,6 +379,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (reportsPersistenceDataFormat) {
+    signals.push(
+      signal(
+        "persistence_data_format_change",
+        "medium",
+        "Persistence or data format change",
+        "Paths or PR text reference persisted data, serialization or file-format behavior.",
+        persistenceEvidence(persistenceFiles)
+      )
+    );
+  }
+
   if (configurationFiles.length > 0) {
     signals.push(
       signal(
@@ -391,7 +441,11 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (dependencyFiles.length > 0 && !mentionsAny(body, dependencyDescriptionTerms)) {
+  if (
+    dependencyFiles.length > 0 &&
+    !releaseVersionUpdate &&
+    !mentionsAny(body, dependencyDescriptionTerms)
+  ) {
     signals.push(
       signal(
         "description_missing_dependency_context",
@@ -403,7 +457,11 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (strongCategoriesTouched.length >= 4) {
+  if (
+    strongCategoriesTouched.length >= 4 &&
+    hasCoreReviewConcern(strongCategoriesTouched) &&
+    !releaseVersionUpdate
+  ) {
     signals.push(
       signal(
         "mixed_concerns",
@@ -453,6 +511,28 @@ function ciEvidence(
   }));
 
   return evidence.length > 0 ? evidence : [metadataEvidence("github-ci", "GitHub CI state")];
+}
+
+function releaseEvidence(
+  releaseFiles: ClassifiedFile[],
+  dependencyFiles: ClassifiedFile[]
+): Evidence[] {
+  const evidence = [
+    ...fileEvidence(releaseFiles, "release or version path", 3),
+    ...fileEvidence(dependencyFiles, "dependency manifest or lockfile", 2)
+  ];
+
+  return evidence.length > 0
+    ? evidence
+    : [metadataEvidence("PR title/body", "mentions release or version update")];
+}
+
+function persistenceEvidence(files: ClassifiedFile[]): Evidence[] {
+  const evidence = fileEvidence(files, "persistence/storage/data-format path", 5);
+
+  return evidence.length > 0
+    ? evidence
+    : [metadataEvidence("PR title/body", "mentions persistence/storage/data-format terms")];
 }
 
 function metadataEvidence(value: string, reason: string): Evidence {
@@ -517,8 +597,90 @@ function mentionsAny(text: string, terms: string[]): boolean {
   return terms.some((term) => normalized.includes(term));
 }
 
+function isReleaseVersionUpdate(
+  files: ClassifiedFile[],
+  codeFiles: ClassifiedFile[],
+  dependencyFiles: ClassifiedFile[],
+  releaseFiles: ClassifiedFile[],
+  titleAndBody: string
+): boolean {
+  if (files.length === 0 || dependencyFiles.length === 0 || releaseFiles.length === 0) {
+    return false;
+  }
+
+  if (!mentionsReleaseOrVersion(titleAndBody)) {
+    return false;
+  }
+
+  const unrelatedFiles = files.filter(
+    (file) =>
+      !hasCategory(file, "release") &&
+      !hasCategory(file, "dependencies") &&
+      !hasCategory(file, "documentation") &&
+      !hasCategory(file, "tests") &&
+      !hasCategory(file, "generated")
+  );
+
+  return codeFiles.length <= 3 && unrelatedFiles.length <= 3;
+}
+
+function mentionsReleaseOrVersion(text: string): boolean {
+  return /\b(v?\d+\.\d+(?:\.\d+)?|release|version|bump|changelog)\b/.test(text);
+}
+
+function shouldReportPersistenceDataFormatChange(
+  codeFiles: ClassifiedFile[],
+  persistenceFiles: ClassifiedFile[],
+  titleAndBody: string
+): boolean {
+  return (
+    codeFiles.length > 0 &&
+    (persistenceFiles.length > 0 || mentionsPersistenceDataFormat(titleAndBody))
+  );
+}
+
+function isPersistenceDataFormatPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+  return mentionsPersistenceDataFormat(normalized);
+}
+
+function mentionsPersistenceDataFormat(text: string): boolean {
+  return [
+    "hdf5",
+    "pytables",
+    "parquet",
+    "pickle",
+    "serialization",
+    "deserialization",
+    "persisted",
+    "persistence",
+    "storage",
+    "data format",
+    "data-format",
+    "data_format",
+    "file format",
+    "file-format",
+    "file_format"
+  ].some((term) => text.includes(term));
+}
+
+function isActionableCiFailure(item: { conclusion: string | null }): boolean {
+  const conclusion = item.conclusion?.toLowerCase();
+  return !conclusion || !["cancelled", "skipped", "neutral"].includes(conclusion);
+}
+
+function hasCoreReviewConcern(categories: FileCategory[]): boolean {
+  return categories.some(
+    (category) => category === "code" || category === "migrations" || category === "security"
+  );
+}
+
 function isSecurityConcernPath(path: string): boolean {
-  return normalizedPathIncludes(path, authTerms) || isSecretRelatedPath(path);
+  return isAuthRelatedPath(path) || isSecretRelatedPath(path);
+}
+
+function isAuthRelatedPath(path: string): boolean {
+  return !isLocalizationCatalogPath(path) && normalizedPathIncludes(path, authTerms);
 }
 
 function isSecretRelatedPath(path: string): boolean {
