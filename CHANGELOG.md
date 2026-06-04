@@ -6,7 +6,7 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
-- Nothing yet.
+- Classified `Dockerfile` as automation/build attention instead of app security-sensitive.
 
 ## 0.2.0 - 2026-06-04
 

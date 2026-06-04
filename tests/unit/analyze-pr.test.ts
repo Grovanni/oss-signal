@@ -159,6 +159,22 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("normal_review");
   });
 
+  it("does not treat Dockerfile-only changes as app security-sensitive", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update runtime image.",
+        files: [changedFile("Dockerfile", 12)]
+      })
+    );
+
+    expect(analysis.categories.automation).toBe(1);
+    expect(analysis.categories.build).toBe(1);
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).toContain("automation_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
   it("does not treat environment as an env secret path", () => {
     const analysis = analyzePullRequestData(
       dataWith({

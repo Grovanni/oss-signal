@@ -39,6 +39,8 @@ Changed files can be classified into these categories:
 
 Files can have more than one category. For example, `.github/workflows/ci.yml` is `ci`, `automation` and `configuration` because workflow changes can affect CI, release automation, permissions and supply chain behavior. Workflow-only changes are treated as CI/automation attention first; they do not automatically become a `security_review` action.
 
+`Dockerfile` is classified as `automation` and `build`, not `security`. Container image changes can affect build/runtime and supply-chain review attention, but they are not treated as direct application security paths unless the path also matches auth, session, token, secret, credential, crypto, permission, policy or security terms.
+
 Repository-specific path patterns can add category matches through `docs/configuration.md`. Built-in rules still apply, and configured `ignore_paths` only remove matching files from classification and signal analysis.
 
 ## Current signal set
@@ -96,7 +98,7 @@ Questions are limited to five and are only generated from detected signals.
 
 GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Passing CI is shown in the output summary but does not emit a signal by itself.
 
-Workflow and GitHub Action files use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, sessions, tokens, secrets, credentials, crypto, permissions or security.
+Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
 
 Bad:
 

@@ -23,8 +23,12 @@ describe("classifyChangedFile", () => {
     expect(classifyChangedFile(file(".github/workflows/ci.yml")).categories).toEqual([
       "ci",
       "automation",
-      "configuration",
+      "configuration"
     ]);
+  });
+
+  it("classifies Dockerfile as automation-sensitive build context, not app security", () => {
+    expect(classifyChangedFile(file("Dockerfile")).categories).toEqual(["automation", "build"]);
   });
 
   it("classifies documentation, tests, migrations and generated files", () => {

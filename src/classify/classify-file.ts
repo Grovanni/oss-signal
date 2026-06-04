@@ -322,10 +322,7 @@ function isConfigurationPath(path: string, name: string): boolean {
 
 function isSecuritySensitivePath(path: string, name: string): boolean {
   return (
-    sensitiveTerms.some((term) => path.includes(term)) ||
-    name === ".env" ||
-    name === ".env.example" ||
-    name === "dockerfile"
+    sensitiveTerms.some((term) => path.includes(term)) || name === ".env" || name === ".env.example"
   );
 }
 
@@ -333,6 +330,7 @@ function isAutomationSensitivePath(path: string, name: string): boolean {
   return (
     path.startsWith(".github/workflows/") ||
     path.startsWith(".github/actions/") ||
+    name === "dockerfile" ||
     name === "action.yml" ||
     name === "action.yaml"
   );

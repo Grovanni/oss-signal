@@ -25,4 +25,6 @@ If GitHub reports failed or pending CI for the PR head commit, OSS Signal recomm
 
 Workflow and GitHub Action files use `automation_sensitive_file_changed`. They can affect CI, releases, permissions and supply chain behavior, but OSS Signal avoids presenting workflow-only PRs as generic security-sensitive changes.
 
+Dockerfile changes also use automation/build attention rather than app security-sensitive wording by default. They can affect runtime image and supply chain behavior, but should not trigger `security_review` unless the path also directly references auth, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
+
 CI-green workflow-only PRs can still proceed to `normal_review`.
