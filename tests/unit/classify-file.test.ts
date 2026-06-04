@@ -33,6 +33,7 @@ describe("classifyChangedFile", () => {
 
   it("classifies documentation, tests, migrations and generated files", () => {
     expect(classifyChangedFile(file("docs/guide.md")).categories).toEqual(["documentation"]);
+    expect(classifyChangedFile(file("AUTHORS")).categories).toEqual(["documentation"]);
     expect(classifyChangedFile(file("tests/unit/parser.test.ts")).categories).toEqual(["tests"]);
     expect(classifyChangedFile(file("testing/test_assertrewrite.py")).categories).toEqual([
       "tests"
@@ -53,6 +54,17 @@ describe("classifyChangedFile", () => {
     ]);
   });
 
+  it("classifies common database schema and rake task paths as migrations", () => {
+    expect(
+      classifyChangedFile(file("activerecord/lib/active_record/railties/databases.rake")).categories
+    ).toEqual(["migrations", "code"]);
+    expect(classifyChangedFile(file("db/schema.rb")).categories).toEqual(["migrations", "code"]);
+    expect(classifyChangedFile(file("db/fixtures/users.yml")).categories).toEqual([
+      "configuration",
+      "migrations"
+    ]);
+  });
+
   it("does not classify localization catalogs under auth as app security-sensitive", () => {
     expect(
       classifyChangedFile(file("django/contrib/auth/locale/en/LC_MESSAGES/django.po")).categories
@@ -70,6 +82,31 @@ describe("classifyChangedFile", () => {
       "security",
       "code"
     ]);
+  });
+
+  it("requires strong context before treating key paths as secrets", () => {
+    expect(classifyChangedFile(file("AUTHORS")).categories).not.toContain("security");
+    expect(
+      classifyChangedFile(
+        file(
+          "packages/client/src/__tests__/integration/errors/referentialActions-onDelete-default-foreign-key-error-mysql/prisma.config.ts"
+        )
+      ).categories
+    ).toEqual(["tests", "configuration", "migrations"]);
+    expect(classifyChangedFile(file("pandas/tests/io/pytables/test_keys.py")).categories).toEqual([
+      "tests"
+    ]);
+    expect(classifyChangedFile(file("src/security/api-key.ts")).categories).toEqual([
+      "security",
+      "code"
+    ]);
+  });
+
+  it("classifies test requirements and uv lockfiles as dependency files", () => {
+    expect(classifyChangedFile(file("requirements-tests.txt")).categories).toEqual([
+      "dependencies"
+    ]);
+    expect(classifyChangedFile(file("uv.lock")).categories).toEqual(["dependencies"]);
   });
 });
 

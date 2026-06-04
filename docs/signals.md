@@ -15,6 +15,8 @@ Examples:
 - `ci_status_unavailable`
 - `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
+- `localization_catalog_change`
+- `dominant_database_change`
 - `release_version_update`
 - `persistence_data_format_change`
 - `mixed_concerns`
@@ -46,7 +48,13 @@ Files can have more than one category. For example, `.github/workflows/ci.yml` i
 
 Localization catalogs such as `.po`, `.pot` and `.mo` files are treated as documentation or generated artifacts, even when they live below an `auth` or `session` path. This avoids routing translation-only PRs to application security review.
 
+Large localization/catalog refreshes can emit `localization_catalog_change` without escalating to `large_pr`, `short_description_for_large_pr` or `request_split` when the changed files are predominantly catalogs.
+
 Documentation pages about migration guides remain documentation. Database/schema migration attention is reserved for code or repository paths that indicate runtime migrations, schemas or database migration tooling.
+
+Database/schema paths include common migration directories, `db/schema.rb`, `structure.sql`, Rails database rake tasks, database fixtures, Prisma schema files, and foreign-key fixtures. When these paths dominate the file evidence, OSS Signal emits `dominant_database_change` and prefers migration review unless there is direct auth-sensitive evidence.
+
+Security-sensitive matching is token-based, not substring-based. For example, `AUTHORS` is documentation, not auth. `key` only contributes to secret-sensitive routing with strong surrounding context such as secret, credential, token, env, API, private/public key, crypto or security.
 
 Repository-specific path patterns can add category matches through `docs/configuration.md`. Built-in rules still apply, and configured `ignore_paths` only remove matching files from classification and signal analysis.
 
@@ -76,7 +84,9 @@ The Phase 3 implementation can emit these deterministic signals:
 - `security_sensitive_file_changed`
 - `auth_related_change`
 - `secret_related_change`
+- `localization_catalog_change`
 - `migration_changed`
+- `dominant_database_change`
 - `configuration_changed`
 - `empty_description`
 - `release_version_update`
@@ -113,6 +123,8 @@ Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_ch
 Coherent release/version bumps can emit `release_version_update`. That signal is informational and can suppress generic missing-test or mixed-concern noise when the title and file mix indicate a version update rather than feature code.
 
 `persistence_data_format_change` is a cautious medium signal for paths or PR text that mention persisted data, serialization or file formats. It is intended to focus review attention on compatibility questions, not to imply a bug or security issue.
+
+`mixed_concerns` is intentionally conservative. Small cohesive changes that combine implementation, tests, documentation, package metadata or release notes should not trigger split guidance unless additional independent surfaces such as CI/automation, database/schema or security are also present.
 
 Bad:
 

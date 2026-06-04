@@ -12,6 +12,11 @@ The format should follow clear release notes. The project uses semantic versioni
 - Reported cancelled/skipped/neutral-only CI items as informational instead of routing to `wait_for_ci`.
 - Added informational release/version bump detection and a cautious persistence/data-format signal.
 - Recognized additional test path conventions such as `testing/` and `__tests_dts__`.
+- Tightened token-based security path matching so `AUTHORS`, foreign keys and storage/test keys do not route to security review without stronger context.
+- Added localization catalog and dominant database/schema signals for more precise review orientation.
+- Reduced `request_split` on small cohesive code/test/docs/package updates and large translation catalog refreshes.
+- Rendered cancelled/skipped/neutral-only CI summaries as non-critical instead of failed in human-facing output.
+- Recognized Rails database rake tasks, DB fixtures, test requirements files and `uv.lock`.
 
 ## 0.2.0 - 2026-06-04
 

@@ -74,6 +74,8 @@ Required top-level fields:
 
 New signal IDs, optional fields and additional object members are additive in `review-brief.v1` when existing field names and types stay valid. Consumers should route on the signal IDs they understand and ignore the rest.
 
+For example, adding `localization_catalog_change` or `dominant_database_change` does not require a new schema version because signal IDs are data values, not a closed enum in the JSON Schema.
+
 Do not remove fields, rename fields or change field types inside the same `schema_version`.
 
 If a breaking change is needed, use a new major schema version such as `review-brief.v2`.

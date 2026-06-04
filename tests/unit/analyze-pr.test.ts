@@ -102,22 +102,44 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("request_split");
   });
 
-  it("detects mixed concerns and limits questions", () => {
+  it("detects truly mixed independent concerns and limits questions", () => {
     const analysis = analyzePullRequestData(
       dataWith({
-        body: "Update dependency and tests.",
+        body: "Update code, database schema, dependencies and workflow.",
         files: [
           changedFile("src/app.ts", 30),
           changedFile("tests/app.test.ts", 12),
           changedFile("docs/usage.md", 4),
-          changedFile("package.json", 6)
-        ]
+          changedFile("package.json", 6),
+          changedFile("db/schema.rb", 8),
+          changedFile(".github/workflows/ci.yml", 5)
+        ],
+        ci: ciWith("success")
       })
     );
 
     expect(signalIds(analysis.signals)).toContain("mixed_concerns");
     expect(analysis.recommended_action).toBe("request_split");
     expect(analysis.questions.length).toBeLessThanOrEqual(5);
+  });
+
+  it("does not request split for a small cohesive code test docs and package update", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update ESLint rule, matching tests and package metadata.",
+        files: [
+          changedFile("src/rules/no-example.ts", 16),
+          changedFile("tests/rules/no-example.test.ts", 20),
+          changedFile("docs/rules/no-example.md", 4),
+          changedFile("package.json", 2),
+          changedFile("CHANGELOG.md", 2)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).not.toContain("mixed_concerns");
+    expect(analysis.recommended_action).not.toBe("request_split");
   });
 
   it("routes CI-only workflow changes to wait_for_ci instead of security review", () => {
@@ -222,6 +244,27 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("normal_review");
   });
 
+  it("keeps large localization catalog refreshes low attention when CI passed", () => {
+    const files = Array.from({ length: 13 }, (_, index) =>
+      changedFile(`django/contrib/auth/locale/lang-${index}/LC_MESSAGES/django.po`, 120)
+    );
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "[6.1.x] Updated source translation catalogs.",
+        body: "Updated translations.",
+        files,
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("localization_catalog_change");
+    expect(signalIds(analysis.signals)).not.toContain("large_pr");
+    expect(signalIds(analysis.signals)).not.toContain("short_description_for_large_pr");
+    expect(analysis.categories.security).toBe(0);
+    expect(analysis.attention).toBe("low");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
   it("does not treat documentation migration guides as database migrations", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -235,11 +278,73 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("normal_review");
   });
 
+  it("routes Rails database rake tasks to migration review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Add support for multiple databases to rails db:abort_if_pending_migrations",
+        body: "Update the database rake task and tests.",
+        files: [
+          changedFile("activerecord/lib/active_record/railties/databases.rake", 26),
+          changedFile("railties/test/application/rake/multi_dbs_test.rb", 26),
+          changedFile("activerecord/CHANGELOG.md", 4)
+        ]
+      })
+    );
+
+    expect(analysis.categories.migrations).toBe(1);
+    expect(signalIds(analysis.signals)).toContain("migration_changed");
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("migration_review");
+  });
+
+  it("prefers migration review over security when database fixtures dominate", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Remove experimental JS migrations",
+        body: "Update migration fixtures and schema config.",
+        files: [
+          changedFile("db/schema.rb", 10),
+          changedFile("db/fixtures/users.yml", 10),
+          changedFile(
+            "packages/client/src/__tests__/integration/errors/default-foreign-key-error-mysql/prisma.config.ts",
+            10
+          ),
+          changedFile("packages/migrate/src/SchemaEngineCLI.ts", 10),
+          changedFile("packages/client/tests/e2e/env-var-security/prisma.config.ts", 10)
+        ]
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("dominant_database_change");
+    expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
+    expect(analysis.recommended_action).toBe("migration_review");
+  });
+
+  it("does not treat AUTHORS or storage key tests as security-sensitive", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        body: "Update tests and authors.",
+        files: [
+          changedFile("AUTHORS", 1),
+          changedFile("pandas/tests/io/pytables/test_keys.py", 12),
+          changedFile("testing/test_config.py", 10)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
+    expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
   it("does not wait for only cancelled or skipped CI items", () => {
     const analysis = analyzePullRequestData(
       dataWith({
         body: "Update tests.",
-        files: [changedFile("pandas/tests/io/pytables/test_append.py", 10)],
+        files: [changedFile("tests/unit/test_append.py", 10)],
         ci: ciWithItems("failure", [
           {
             kind: "check_run",
@@ -281,6 +386,25 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toContain("persistence_data_format_change");
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("normal_review");
+  });
+
+  it("detects HDF/PyTables persistence context in tests-only changes", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "TST: add legacy file generation and tests for HDF5",
+        body: "Add legacy storage compatibility tests.",
+        files: [
+          changedFile("pandas/tests/io/pytables/test_keys.py", 12),
+          changedFile("pandas/tests/io/pytables/generate_legacy_storage_files.py", 8)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("persistence_data_format_change");
+    expect(signalIds(analysis.signals)).not.toContain("secret_related_change");
     expect(analysis.attention).toBe("medium");
     expect(analysis.recommended_action).toBe("normal_review");
   });

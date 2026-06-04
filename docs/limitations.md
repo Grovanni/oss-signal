@@ -20,6 +20,10 @@ GitHub diff data may also be unavailable for large PRs or transient GitHub error
 
 Persistence and data-format detection is intentionally conservative. It looks for known path or text indicators such as HDF5, PyTables, serialization and file-format terms, but it cannot prove backward compatibility or find every storage-related change.
 
+Security-sensitive path matching is token-based and intentionally avoids bare storage/test words such as `key` without stronger surrounding context. This reduces false positives but can miss project-specific secret naming conventions unless configured paths are added.
+
+OSS Signal does not currently emit dedicated backport, public API or workflow-hardening signals. Those may be added later when they can be detected precisely without increasing generic noise.
+
 It can:
 
 - classify changed files;

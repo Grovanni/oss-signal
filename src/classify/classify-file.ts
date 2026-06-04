@@ -39,6 +39,7 @@ const codeExtensions = new Set([
   ".ex",
   ".exs",
   ".erl",
+  ".rake",
   ".fs",
   ".fsx",
   ".lua",
@@ -68,22 +69,49 @@ const dependencyLockfiles = new Set([
   "cargo.lock",
   "go.sum",
   "gemfile.lock",
-  "composer.lock"
+  "composer.lock",
+  "uv.lock"
 ]);
 
-const sensitiveTerms = [
+const authPathTerms = new Set([
   "auth",
+  "authn",
+  "authz",
+  "authentication",
+  "authorization",
+  "authorize",
+  "authorized",
   "login",
+  "logins",
   "session",
+  "sessions",
   "token",
+  "tokens",
   "jwt",
   "oauth",
+  "oauth2"
+]);
+
+const secretPathTerms = new Set([
   "password",
+  "passwords",
   "passwd",
   "secret",
+  "secrets",
+  "credential",
+  "credentials",
+  "env"
+]);
+
+const securityPathTerms = new Set([
   "crypto",
+  "cryptography",
   "encrypt",
+  "encrypted",
+  "encryption",
   "decrypt",
+  "decrypted",
+  "decryption",
   "permission",
   "permissions",
   "role",
@@ -91,10 +119,38 @@ const sensitiveTerms = [
   "rbac",
   "acl",
   "policy",
+  "policies",
   "security",
+  "secure"
+]);
+
+const keyContextTerms = new Set([
+  "api",
+  "access",
+  "private",
+  "public",
+  "secret",
+  "secrets",
   "credential",
-  "key"
-];
+  "credentials",
+  "token",
+  "tokens",
+  "jwt",
+  "oauth",
+  "oauth2",
+  "env",
+  "security",
+  "secure",
+  "password",
+  "passwd",
+  "crypto",
+  "encrypt",
+  "encrypted",
+  "encryption",
+  "decrypt",
+  "decrypted",
+  "decryption"
+]);
 
 export function classifyChangedFile(
   file: GitHubChangedFileSummary,
@@ -283,6 +339,31 @@ export function isLocalizationCatalogPath(
   );
 }
 
+export function hasAuthSensitivePathTerm(path: string): boolean {
+  return hasAnyPathToken(path, authPathTerms);
+}
+
+export function hasSecretSensitivePathTerm(path: string): boolean {
+  const normalized = normalizePath(path);
+  const name = basename(normalized);
+  const tokens = pathTokens(normalized);
+
+  return (
+    name === ".env" ||
+    name.startsWith(".env.") ||
+    hasAnyToken(tokens, secretPathTerms) ||
+    hasContextualKeyToken(tokens)
+  );
+}
+
+export function hasSecuritySensitivePathTerm(path: string): boolean {
+  return (
+    hasAuthSensitivePathTerm(path) ||
+    hasSecretSensitivePathTerm(path) ||
+    hasAnyPathToken(path, securityPathTerms)
+  );
+}
+
 function normalizePath(path: string): string {
   return path.replace(/\\/g, "/").toLowerCase();
 }
@@ -296,10 +377,30 @@ function extension(name: string): string {
   return index > 0 ? name.slice(index) : "";
 }
 
+function pathTokens(path: string): string[] {
+  return normalizePath(path)
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+function hasAnyPathToken(path: string, terms: Set<string>): boolean {
+  return hasAnyToken(pathTokens(path), terms);
+}
+
+function hasAnyToken(tokens: string[], terms: Set<string>): boolean {
+  return tokens.some((token) => terms.has(token));
+}
+
+function hasContextualKeyToken(tokens: string[]): boolean {
+  return (
+    (tokens.includes("key") || tokens.includes("keys")) && hasAnyToken(tokens, keyContextTerms)
+  );
+}
+
 function isDocumentationPath(path: string, name: string): boolean {
   return (
     path.startsWith("docs/") ||
-    ["readme", "changelog", "contributing"].some((prefix) => name.startsWith(prefix)) ||
+    ["readme", "changelog", "contributing", "authors"].some((prefix) => name.startsWith(prefix)) ||
     [".md", ".rst", ".adoc"].includes(extension(name))
   );
 }
@@ -365,20 +466,7 @@ function isSecuritySensitivePath(path: string, name: string): boolean {
     return false;
   }
 
-  return hasSensitivePathTerm(path) || name === ".env" || name === ".env.example";
-}
-
-function hasSensitivePathTerm(path: string): boolean {
-  const normalized = normalizePath(path);
-  const segments = normalized.split(/[^a-z0-9]+/).filter(Boolean);
-
-  return sensitiveTerms.some((term) => {
-    if (term === "acl" || term === "key") {
-      return segments.includes(term) || segments.includes(`${term}s`);
-    }
-
-    return normalized.includes(term);
-  });
+  return hasSecuritySensitivePathTerm(path) || name === ".env.example";
 }
 
 function isAutomationSensitivePath(path: string, name: string): boolean {
@@ -392,7 +480,7 @@ function isAutomationSensitivePath(path: string, name: string): boolean {
 }
 
 function isMigrationPath(path: string, name: string): boolean {
-  if (isDocumentationPath(path, name)) {
+  if (isDocumentationPath(path, name) || isLocalizationCatalogPath(path, name)) {
     return false;
   }
 
@@ -400,9 +488,32 @@ function isMigrationPath(path: string, name: string): boolean {
     path.includes("migration") ||
     path.includes("migrations") ||
     path.includes("schema") ||
+    path.includes("database") ||
+    path.includes("databases") ||
     path.includes("db/migrate") ||
+    path.startsWith("db/") ||
+    path.includes("/db/fixtures/") ||
     path.includes("prisma/migrations") ||
-    path.includes("alembic")
+    path.includes("alembic") ||
+    isDatabaseSchemaPath(path, name)
+  );
+}
+
+function isDatabaseSchemaPath(path: string, name: string): boolean {
+  const tokens = pathTokens(path);
+
+  return (
+    name === "schema.rb" ||
+    name === "structure.sql" ||
+    name.endsWith(".prisma") ||
+    tokens.includes("datasource") ||
+    tokens.includes("datasources") ||
+    (tokens.includes("foreign") && (tokens.includes("key") || tokens.includes("keys"))) ||
+    (name.endsWith(".rake") &&
+      hasAnyToken(
+        tokens,
+        new Set(["db", "database", "databases", "migration", "migrations", "schema", "schemas"])
+      ))
   );
 }
 
@@ -440,7 +551,11 @@ function isGeneratedPath(path: string, name: string): boolean {
 }
 
 function isDependencyManifestName(name: string): boolean {
-  return dependencyManifests.has(name);
+  return (
+    dependencyManifests.has(name) ||
+    /^requirements[-_.].+\.txt$/.test(name) ||
+    /^.+[-_.]requirements\.txt$/.test(name)
+  );
 }
 
 function isDependencyLockfileName(name: string): boolean {

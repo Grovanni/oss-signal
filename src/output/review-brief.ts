@@ -104,7 +104,10 @@ export function renderReviewBriefMarkdown(result: GitHubPullRequestOutput): stri
     "",
     "## Why",
     ...(topSignals.length > 0
-      ? topSignals.flatMap((signal) => [`- ${signal.title}: ${signal.message}`, ...formatEvidence(signal.evidence)])
+      ? topSignals.flatMap((signal) => [
+          `- ${signal.title}: ${signal.message}`,
+          ...formatEvidence(signal.evidence)
+        ])
       : ["- No notable deterministic signal beyond normal review context."]),
     "",
     "## Areas Touched",
@@ -114,7 +117,9 @@ export function renderReviewBriefMarkdown(result: GitHubPullRequestOutput): stri
     ...(priorityLines.length > 0 ? priorityLines : ["No priority file identified."]),
     "",
     "## Questions",
-    ...(questionLines.length > 0 ? questionLines : ["No specific question generated from detected signals."]),
+    ...(questionLines.length > 0
+      ? questionLines
+      : ["No specific question generated from detected signals."]),
     "",
     "## Limitations",
     ...brief.limitations.map((limitation) => `- ${limitation}`),
@@ -176,19 +181,40 @@ function formatCiSummary(ci: GitHubPullRequestOutput["ci"]): string {
     return `${ci.state} (no GitHub CI items found)`;
   }
 
+  const nonCriticalFailedItems = ci.items.filter(isNonCriticalFailedCiItem);
+  const actionableFailedItems = ci.items.filter(isActionableFailedCiItem);
+
+  if (
+    ci.state === "failure" &&
+    actionableFailedItems.length === 0 &&
+    nonCriticalFailedItems.length > 0
+  ) {
+    return `non-critical (${ci.total} checks/statuses: ${ci.successful} successful, ${nonCriticalFailedItems.length} cancelled/skipped/neutral, ${ci.pending} pending)`;
+  }
+
   return `${ci.state} (${ci.total} checks/statuses: ${ci.successful} successful, ${ci.failed} failed, ${ci.pending} pending)`;
 }
 
 function formatCiSection(ci: GitHubPullRequestOutput["ci"]): string[] {
   const lines = [`- State: ${formatCiSummary(ci)}`];
-  const attentionItems = ci.items
-    .filter((item) => item.state === "failure" || item.state === "pending")
-    .slice(0, 5);
+  const attentionItems = ci.items.filter(isActionableAttentionCiItem).slice(0, 5);
 
   if (attentionItems.length > 0) {
     lines.push(
       ...attentionItems.map(
         (item) => `- ${item.name}: ${item.state} (${item.status}/${item.conclusion ?? "none"})`
+      )
+    );
+    return lines;
+  }
+
+  const nonCriticalFailedItems = ci.items.filter(isNonCriticalFailedCiItem).slice(0, 5);
+
+  if (nonCriticalFailedItems.length > 0) {
+    lines.push("- Only cancelled, skipped or neutral GitHub CI items were reported.");
+    lines.push(
+      ...nonCriticalFailedItems.map(
+        (item) => `- ${item.name}: ${item.conclusion ?? "non-critical"} (${item.status})`
       )
     );
     return lines;
@@ -201,6 +227,23 @@ function formatCiSection(ci: GitHubPullRequestOutput["ci"]): string[] {
   }
 
   return lines;
+}
+
+function isActionableAttentionCiItem(
+  item: GitHubPullRequestOutput["ci"]["items"][number]
+): boolean {
+  return item.state === "pending" || isActionableFailedCiItem(item);
+}
+
+function isActionableFailedCiItem(item: GitHubPullRequestOutput["ci"]["items"][number]): boolean {
+  return item.state === "failure" && !isNonCriticalFailedCiItem(item);
+}
+
+function isNonCriticalFailedCiItem(item: GitHubPullRequestOutput["ci"]["items"][number]): boolean {
+  return (
+    item.state === "failure" &&
+    ["cancelled", "skipped", "neutral"].includes(item.conclusion?.toLowerCase() ?? "")
+  );
 }
 
 function formatAction(action: RecommendedAction): string {

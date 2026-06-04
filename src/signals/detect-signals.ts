@@ -1,9 +1,10 @@
 import {
   hasCategory,
+  hasAuthSensitivePathTerm,
+  hasSecretSensitivePathTerm,
   isDependencyLockfile,
   isDependencyManifest,
   isLocalizationCatalogPath,
-  normalizedPathIncludes,
   type ClassifiedFile
 } from "../classify/classify-file.js";
 import { strongFileCategories, type FileCategory } from "../classify/categories.js";
@@ -19,8 +20,6 @@ export type SignalInput = {
   config: OssSignalConfig;
 };
 
-const authTerms = ["auth", "login", "session", "token", "jwt", "oauth"];
-const secretTerms = ["secret", "credential", "credentials", "key"];
 const ciDescriptionTerms = ["ci", "workflow", "workflows", "build", "action", "actions"];
 const dependencyDescriptionTerms = [
   "dependency",
@@ -62,6 +61,13 @@ export function detectSignals(input: SignalInput): Signal[] {
   const testFiles = input.files.filter((file) => hasCategory(file, "tests"));
   const codeFiles = input.files.filter((file) => hasCategory(file, "code"));
   const releaseFiles = input.files.filter((file) => hasCategory(file, "release"));
+  const localizationCatalogFiles = input.files.filter((file) =>
+    isLocalizationCatalogPath(file.path)
+  );
+  const localizationCatalogRefresh = isLocalizationCatalogRefresh(
+    input.files,
+    localizationCatalogFiles
+  );
   const persistenceFiles = input.files.filter((file) => isPersistenceDataFormatPath(file.path));
   const releaseVersionUpdate = isReleaseVersionUpdate(
     input.files,
@@ -79,8 +85,9 @@ export function detectSignals(input: SignalInput): Signal[] {
   const actionableFailedCiItems = failedCiItems.filter(isActionableCiFailure);
   const nonActionableFailedCiItems = failedCiItems.filter((item) => !isActionableCiFailure(item));
   const strongCategoriesTouched = mixedConcernCategories(input.files);
+  const dominantDatabaseChange = isDominantDatabaseChange(input.files, migrationFiles);
 
-  if (largePr) {
+  if (largePr && !localizationCatalogRefresh) {
     signals.push(
       signal("large_pr", "high", "Large pull request", "This PR changes many files or lines.", [
         metadataEvidence(
@@ -89,7 +96,7 @@ export function detectSignals(input: SignalInput): Signal[] {
         )
       ])
     );
-  } else if (mediumPr) {
+  } else if (mediumPr || (largePr && localizationCatalogRefresh)) {
     signals.push(
       signal(
         "medium_pr",
@@ -121,7 +128,7 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (fileCount > thresholds.large_files_changed) {
+  if (fileCount > thresholds.large_files_changed && !localizationCatalogRefresh) {
     signals.push(
       signal(
         "many_files_changed",
@@ -129,6 +136,22 @@ export function detectSignals(input: SignalInput): Signal[] {
         "Many files changed",
         "The number of changed files is high.",
         [metadataEvidence(String(fileCount), `> ${thresholds.large_files_changed} files changed`)]
+      )
+    );
+  }
+
+  if (localizationCatalogFiles.length > 0) {
+    signals.push(
+      signal(
+        "localization_catalog_change",
+        "info",
+        localizationCatalogRefresh
+          ? "Localization catalog refresh"
+          : "Localization catalog changed",
+        localizationCatalogRefresh
+          ? "Changed files are predominantly localization catalogs."
+          : "At least one localization catalog changed.",
+        fileEvidence(localizationCatalogFiles, "localization catalog")
       )
     );
   }
@@ -266,7 +289,7 @@ export function detectSignals(input: SignalInput): Signal[] {
       signal(
         "ci_checks_noncritical",
         "info",
-        "Only non-critical CI items reported",
+        "Cancelled/skipped CI items reported",
         "GitHub only reports cancelled, skipped or neutral CI items for the PR head commit.",
         ciEvidence(nonActionableFailedCiItems, "non-critical CI item")
       )
@@ -379,6 +402,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (dominantDatabaseChange) {
+    signals.push(
+      signal(
+        "dominant_database_change",
+        "medium",
+        "Database/schema-dominant change",
+        "Migration, schema or database paths dominate the changed-file evidence.",
+        fileEvidence(migrationFiles, "dominant migration/schema/database path")
+      )
+    );
+  }
+
   if (reportsPersistenceDataFormat) {
     signals.push(
       signal(
@@ -411,7 +446,7 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (largePr && body.length < 120) {
+  if (largePr && !localizationCatalogRefresh && body.length < 120) {
     signals.push(
       signal(
         "short_description_for_large_pr",
@@ -458,9 +493,12 @@ export function detectSignals(input: SignalInput): Signal[] {
   }
 
   if (
-    strongCategoriesTouched.length >= 4 &&
-    hasCoreReviewConcern(strongCategoriesTouched) &&
-    !releaseVersionUpdate
+    shouldReportMixedConcerns(
+      strongCategoriesTouched,
+      largePr,
+      releaseVersionUpdate,
+      localizationCatalogRefresh
+    )
   ) {
     signals.push(
       signal(
@@ -628,14 +666,25 @@ function mentionsReleaseOrVersion(text: string): boolean {
   return /\b(v?\d+\.\d+(?:\.\d+)?|release|version|bump|changelog)\b/.test(text);
 }
 
+function isLocalizationCatalogRefresh(
+  files: ClassifiedFile[],
+  localizationCatalogFiles: ClassifiedFile[]
+): boolean {
+  if (files.length === 0 || localizationCatalogFiles.length === 0) {
+    return false;
+  }
+
+  return localizationCatalogFiles.length / files.length >= 0.8;
+}
+
 function shouldReportPersistenceDataFormatChange(
   codeFiles: ClassifiedFile[],
   persistenceFiles: ClassifiedFile[],
   titleAndBody: string
 ): boolean {
   return (
-    codeFiles.length > 0 &&
-    (persistenceFiles.length > 0 || mentionsPersistenceDataFormat(titleAndBody))
+    persistenceFiles.length > 0 ||
+    (codeFiles.length > 0 && mentionsPersistenceDataFormat(titleAndBody))
   );
 }
 
@@ -647,11 +696,17 @@ function isPersistenceDataFormatPath(path: string): boolean {
 function mentionsPersistenceDataFormat(text: string): boolean {
   return [
     "hdf5",
+    "hdf",
+    "hdfstore",
     "pytables",
     "parquet",
     "pickle",
+    "feather",
+    "orc",
     "serialization",
+    "serialized",
     "deserialization",
+    "deserialized",
     "persisted",
     "persistence",
     "storage",
@@ -669,6 +724,85 @@ function isActionableCiFailure(item: { conclusion: string | null }): boolean {
   return !conclusion || !["cancelled", "skipped", "neutral"].includes(conclusion);
 }
 
+function isDominantDatabaseChange(
+  files: ClassifiedFile[],
+  migrationFiles: ClassifiedFile[]
+): boolean {
+  if (files.length === 0 || migrationFiles.length === 0) {
+    return false;
+  }
+
+  return migrationFiles.length >= 3 && migrationFiles.length / files.length >= 0.1;
+}
+
+function shouldReportMixedConcerns(
+  categories: FileCategory[],
+  largePr: boolean,
+  releaseVersionUpdate: boolean,
+  localizationCatalogRefresh: boolean
+): boolean {
+  if (
+    categories.length < 4 ||
+    !hasCoreReviewConcern(categories) ||
+    releaseVersionUpdate ||
+    localizationCatalogRefresh
+  ) {
+    return false;
+  }
+
+  if (largePr) {
+    return true;
+  }
+
+  if (isCohesiveCodeSupportChange(categories)) {
+    return false;
+  }
+
+  return independentReviewSurfaceCount(categories) >= 3;
+}
+
+function isCohesiveCodeSupportChange(categories: FileCategory[]): boolean {
+  const cohesiveSupportCategories = new Set<FileCategory>([
+    "code",
+    "tests",
+    "documentation",
+    "dependencies",
+    "release"
+  ]);
+
+  return (
+    categories.includes("code") &&
+    categories.includes("tests") &&
+    categories.every((category) => cohesiveSupportCategories.has(category))
+  );
+}
+
+function independentReviewSurfaceCount(categories: FileCategory[]): number {
+  let surfaces = 0;
+
+  if (categories.includes("code")) {
+    surfaces += 1;
+  }
+
+  if (categories.includes("migrations")) {
+    surfaces += 1;
+  }
+
+  if (categories.includes("security")) {
+    surfaces += 1;
+  }
+
+  if (categories.includes("ci") || categories.includes("automation")) {
+    surfaces += 1;
+  }
+
+  if (categories.includes("dependencies") || categories.includes("configuration")) {
+    surfaces += 1;
+  }
+
+  return surfaces;
+}
+
 function hasCoreReviewConcern(categories: FileCategory[]): boolean {
   return categories.some(
     (category) => category === "code" || category === "migrations" || category === "security"
@@ -680,18 +814,9 @@ function isSecurityConcernPath(path: string): boolean {
 }
 
 function isAuthRelatedPath(path: string): boolean {
-  return !isLocalizationCatalogPath(path) && normalizedPathIncludes(path, authTerms);
+  return !isLocalizationCatalogPath(path) && hasAuthSensitivePathTerm(path);
 }
 
 function isSecretRelatedPath(path: string): boolean {
-  const normalized = path.replace(/\\/g, "/").toLowerCase();
-  const segments = normalized.split("/");
-  const filename = segments.at(-1) ?? normalized;
-
-  return (
-    filename === ".env" ||
-    filename.startsWith(".env.") ||
-    segments.includes("env") ||
-    secretTerms.some((term) => normalized.includes(term))
-  );
+  return !isLocalizationCatalogPath(path) && hasSecretSensitivePathTerm(path);
 }

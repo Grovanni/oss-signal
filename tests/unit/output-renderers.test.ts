@@ -48,11 +48,7 @@ describe("output renderers", () => {
         includeAgentContext: true
       });
 
-      expect(written.files.map((file) => file.kind)).toEqual([
-        "markdown",
-        "json",
-        "agent-context"
-      ]);
+      expect(written.files.map((file) => file.kind)).toEqual(["markdown", "json", "agent-context"]);
       await expect(readFile(join(outDir, "review-brief.md"), "utf8")).resolves.toContain(
         "# PR Brief"
       );
@@ -66,6 +62,38 @@ describe("output renderers", () => {
     } finally {
       await rm(outDir, { force: true, recursive: true });
     }
+  });
+
+  it("does not render cancelled-only CI as failed in human summaries", async () => {
+    const result = await fixtureResult();
+    result.ci = {
+      head_sha: "1111111111111111111111111111111111111111",
+      state: "failure",
+      total: 1,
+      successful: 0,
+      failed: 1,
+      pending: 0,
+      skipped: 0,
+      items: [
+        {
+          kind: "check_run",
+          name: "publish",
+          state: "failure",
+          status: "completed",
+          conclusion: "cancelled",
+          url: null
+        }
+      ]
+    };
+
+    const markdown = renderReviewBriefMarkdown(result);
+    const terminal = renderTerminalSummary(result, { directory: "out", files: [] });
+
+    expect(markdown).toContain("non-critical");
+    expect(markdown).toContain("publish: cancelled");
+    expect(markdown).not.toContain("failed");
+    expect(terminal).toContain("non-critical");
+    expect(terminal).not.toContain("failed");
   });
 
   it("respects json-only output and --no-agent behavior", async () => {

@@ -6,6 +6,10 @@ export function chooseRecommendedAction(
 ): RecommendedAction {
   const ids = new Set(signals.map((signal) => signal.id));
 
+  if (ids.has("dominant_database_change") && !ids.has("auth_related_change")) {
+    return "migration_review";
+  }
+
   if (
     attention === "high" &&
     (ids.has("auth_related_change") || ids.has("secret_related_change"))
