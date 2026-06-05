@@ -84,6 +84,8 @@ Decision: GO.
 | Attention too low rate | 4.8% |
 | Pass rate | 85.4% |
 
+The pass rate is the strict clean-pass rate under the rubric. Briefs outside `pass` can still be useful for maintainers and agents, which is why the human and agent useful rates are higher.
+
 ## Cumulative Result
 
 The cumulative validation total is 1,382 public PR evaluations across calibration, holdout and main validation phases.

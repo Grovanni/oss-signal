@@ -36,6 +36,8 @@ The current deterministic core was validated on a main run of 1,000 public PRs a
 | Attention too low rate | 4.8% |
 | Pass rate | 85.4% |
 
+The pass rate is the strict clean-pass rate. Briefs outside `pass` can still be useful, which is reflected by the higher human and agent useful rates.
+
 A cumulative validation over 1,382 public PR evaluations also reached GO status. This is product validation, not a scientific proof of correctness.
 
 Methodology and limitations are documented in [docs/evaluation.md](docs/evaluation.md).

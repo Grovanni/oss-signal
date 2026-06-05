@@ -6,6 +6,10 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+No changes yet.
+
+## 0.3.0 - 2026-06-05 - validated release candidate
+
 - Documented the validated release-candidate status, public evaluation methodology and main 1,000 PR GO metrics.
 - Refreshed the README to describe OSS Signal as a deterministic, no-AI-runtime PR intake brief and clarify current local CLI/GitHub Action usage.
 - Kept PR brief generation usable when GitHub changed-files responses are unavailable or unexpectedly shaped.

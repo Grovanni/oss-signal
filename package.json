@@ -1,6 +1,6 @@
 {
   "name": "oss-signal",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A deterministic PR intake brief for maintainers and coding agents.",
   "type": "module",
   "bin": {
