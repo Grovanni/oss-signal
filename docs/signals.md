@@ -15,12 +15,15 @@ Examples:
 - `ci_status_unavailable`
 - `automation_sensitive_file_changed`
 - `security_sensitive_file_changed`
+- `strong_security_context_changed`
+- `explicit_security_advisory`
 - `localization_catalog_change`
 - `dominant_database_change`
 - `release_version_update`
 - `persistence_data_format_change`
 - `source_wording_change`
 - `container_image_update`
+- `cohesive_mechanical_batch`
 - `mixed_concerns`
 - `short_description_for_large_pr`
 
@@ -58,7 +61,7 @@ Database/schema paths include common migration directories, `db/schema.rb`, `str
 
 Security-sensitive matching is token-based, not substring-based. For example, `AUTHORS` is documentation, not auth. `key` only contributes to secret-sensitive routing with strong surrounding context such as secret, credential, token, env, API, private/public key, crypto or security.
 
-Security-sensitive routing is also context-aware. Test, fixture, documentation, example, data, compiler, protocol, QUIC, HTTP/2 or query-language paths that only mention generic auth/session/token/security words do not automatically route to security review. Product code or sensitive configuration paths for auth, sessions, tokens, real env files, secrets, credentials, signing, crypto, permissions or policy remain security-sensitive.
+Security-sensitive routing is also context-aware. Test, fixture, documentation, example, data, compiler, protocol, QUIC, HTTP/2, query-language, UI/CSS, parser, snapshot, slide, asset, path, context or memory paths that only mention generic auth/session/token/policy/security words do not automatically route to security review. Product code or sensitive configuration paths for auth, sessions, tokens, real env files, secrets, credentials, signing, crypto, TLS/SSL, permissions or access-control remain security-sensitive.
 
 Example env files such as `.env.example`, `.env.sample`, test fixture env files, third-party license files and dependency manifests under packages named `security` are not treated as direct security-review evidence by default.
 
@@ -95,6 +98,8 @@ The Phase 3 implementation can emit these deterministic signals:
 - `security_sensitive_file_changed`
 - `auth_related_change`
 - `secret_related_change`
+- `strong_security_context_changed`
+- `explicit_security_advisory`
 - `localization_catalog_change`
 - `migration_changed`
 - `dominant_database_change`
@@ -103,6 +108,7 @@ The Phase 3 implementation can emit these deterministic signals:
 - `release_version_update`
 - `persistence_data_format_change`
 - `container_image_update`
+- `cohesive_mechanical_batch`
 - `short_description_for_large_pr`
 - `description_missing_ci_context`
 - `description_missing_dependency_context`
@@ -130,7 +136,11 @@ Questions are limited to five and are only generated from detected signals.
 
 GitHub CI status/check signals are emitted when GitHub reports failed, errored, pending or in-progress items for the PR head commit, or when CI files changed but GitHub exposes no status/check data. Cancelled, skipped or neutral CI items are reported as `ci_checks_noncritical` when they are the only non-successful items; they do not trigger `wait_for_ci` by themselves. Passing CI is shown in the output summary but does not emit a signal by itself.
 
-Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
+Workflow, GitHub Action and Dockerfile changes use `automation_sensitive_file_changed`, not `security_sensitive_file_changed`. `security_sensitive_file_changed` is reserved for paths that directly reference authentication, product session/token handling, real env files, secrets, credentials, crypto, TLS/SSL, permissions, access-control or security implementation.
+
+`strong_security_context_changed` is the stronger path-based security signal used for crypto, TLS/SSL, permissions, access-control or security implementation context. Generic `session`, `token`, `policy`, `path`, `context`, `memory`, UI/CSS, docs, snapshots, generated files and asset names should not become `security_review` by themselves.
+
+`explicit_security_advisory` can be emitted from the PR title or description when it explicitly mentions strong advisory/vulnerability terms such as CVE, GHSA, Snyk security upgrade, vulnerability, Zip Slip, auth bypass, privilege escalation, XSS, CSRF, SSRF or RCE. The wording orients review attention without claiming exploitability.
 
 Coherent release/version bumps can emit `release_version_update`. That signal is informational and can suppress generic missing-test or mixed-concern noise when the title and file mix indicate a version update rather than feature code.
 
@@ -140,7 +150,9 @@ Small source changes whose title clearly points to docs, comments, docstrings, t
 
 `container_image_update` is a medium orientation signal for container image, HelmRelease, Helm chart or deployment image version updates. When no stronger action applies, it routes to `dependency_review`.
 
-`mixed_concerns` is intentionally conservative. Small cohesive changes that combine implementation, tests, documentation, package metadata or release notes should not trigger split guidance unless additional independent surfaces such as CI/automation, database/schema or security are also present.
+`cohesive_mechanical_batch` is a medium signal for large-by-volume PRs that still look like one mechanical update: dependency manifest plus lockfile, generated output, docs-heavy updates, asset/image optimization batches, release/version bumps, or archive/data refreshes. These should not trigger `request_split` solely because they are large.
+
+`mixed_concerns` is intentionally conservative. Small cohesive changes that combine implementation, tests, documentation, package metadata or release notes should not trigger split guidance unless additional independent surfaces such as CI/automation, database/schema or strong security evidence are also present.
 
 Bad:
 

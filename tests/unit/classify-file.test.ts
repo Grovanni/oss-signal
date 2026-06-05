@@ -166,7 +166,24 @@ describe("classifyChangedFile", () => {
     expect(classifyChangedFile(file("src/protocol/quic/session.ts")).categories).toEqual([
       "code"
     ]);
+    expect(classifyChangedFile(file("src/ui/session-panel.tsx")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("src/parser/token.ts")).categories).toEqual(["code"]);
+    expect(classifyChangedFile(file("slides/security-policy.pptx")).categories).toEqual([
+      "unknown"
+    ]);
+    expect(classifyChangedFile(file("assets/security-token-icon.svg")).categories).toEqual([
+      "unknown"
+    ]);
+    expect(classifyChangedFile(file("src/security/context.ts")).categories).toEqual(["code"]);
     expect(classifyChangedFile(file("src/auth/hashers.py")).categories).toEqual([
+      "security",
+      "code"
+    ]);
+    expect(classifyChangedFile(file("src/tls/handshake.ts")).categories).toEqual([
+      "security",
+      "code"
+    ]);
+    expect(classifyChangedFile(file("src/signature/verifier.ts")).categories).toEqual([
       "security",
       "code"
     ]);

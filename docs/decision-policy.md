@@ -5,9 +5,9 @@ OSS Signal recommends the first review action from deterministic signals. The ac
 The current priority order is:
 
 1. `migration_review` for dominant database/schema/migration changes when there is no direct auth-sensitive evidence.
-2. `security_review` for direct auth, session, token, secret, credential, signing, crypto, permission or security paths, except tiny wording-only edits.
+2. `security_review` for explicit security advisory text or strong direct auth, session-management, secret, credential, signing, crypto, TLS/SSL, permission, access-control or security implementation paths, except tiny wording-only edits.
 3. `wait_for_ci` when GitHub reports actionable failed/pending checks, or when CI files changed but CI status is unavailable.
-4. `request_split` for large PRs or genuinely mixed independent concerns.
+4. `request_split` for large PRs or genuinely mixed independent concerns, except large cohesive mechanical batches.
 5. `ask_for_clarification` when the description is empty and the change touches automation-sensitive files without dependency manifest or lockfile evidence.
 6. `ask_for_tests` when code changed and no tests were detected, except for small source wording/comment/docstring/release-note/help/type metadata changes.
 7. `dependency_review` when dependency manifests, lockfiles, dependency-only files or container/deployment image updates changed.
@@ -20,6 +20,8 @@ The current priority order is:
 A dependency PR with a manifest, lockfile or dependency-only file normally recommends `dependency_review`.
 
 If GitHub reports failed or pending CI for the PR head commit, OSS Signal recommends `wait_for_ci` first. This keeps the brief actionable: the maintainer can inspect CI before spending review attention on dependency details that may already be invalidated by failed checks.
+
+If the only security evidence is weak lexical vocabulary such as `session`, `token`, `policy`, `path`, `context` or `memory` in UI, CSS, docs, snapshots, generated files, assets or parser contexts, actionable failed CI remains the first recommendation. Explicit advisory text such as CVE, GHSA, Snyk security upgrade, vulnerability, auth bypass, privilege escalation, XSS, CSRF, SSRF or RCE can still keep security orientation while the CI failure is listed as a gate.
 
 Cancelled, skipped or neutral CI items are reported as `ci_checks_noncritical` when they are the only non-successful items. That signal is informational and does not trigger `wait_for_ci` by itself.
 
@@ -45,13 +47,13 @@ It can still recommend clarification when the missing context affects orientatio
 
 ## Security and automation wording
 
-`security_sensitive_file_changed` is reserved for direct security-sensitive paths such as auth, session, token, secret, credential, crypto, permission and security paths.
+`security_sensitive_file_changed` is reserved for direct security-sensitive paths such as auth, product session/token handling, real env files, secret, credential, crypto, TLS/SSL, permission, access-control and security implementation paths.
 
 Workflow and GitHub Action files use `automation_sensitive_file_changed`. They can affect CI, releases, permissions and supply chain behavior, but OSS Signal avoids presenting workflow-only PRs as generic security-sensitive changes.
 
 Dockerfile changes also use automation/build attention rather than app security-sensitive wording by default. They can affect runtime image and supply chain behavior, but should not trigger `security_review` unless the path also directly references auth, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
 
-Generic `env` path terms, env sample files, fixture/example data, third-party license files, protocol/compiler/session test paths, and dependency manifests under a package named `security` are not enough by themselves to recommend `security_review`.
+Generic `env` path terms, env sample files, fixture/example data, third-party license files, protocol/compiler/session test paths, UI/CSS/session paths, parser/token paths, path/context/memory names, policy docs or slides, assets with security-looking names, and dependency manifests under a package named `security` are not enough by themselves to recommend `security_review`.
 
 CI-green workflow-only PRs can still proceed to `normal_review`.
 
@@ -62,3 +64,5 @@ Container image, HelmRelease, Helm chart and related deployment image version ch
 `request_split` is reserved for large PRs or genuinely independent review surfaces. Small cohesive changes that combine code, tests, docs, package metadata or release notes should not be split solely because several support categories appear together.
 
 Predominantly localization/catalog refreshes are treated as cohesive catalog updates, even when they touch many lines.
+
+Large cohesive mechanical batches also avoid split guidance when the file evidence points to one review surface: dependency manifest plus lockfile, generated output, docs-heavy updates, asset/image optimization batches, release/version bumps, or archive/data refreshes. These can still carry medium attention because volume affects review time, but the preferred action stays dependency, normal or clarification review instead of asking for a split.

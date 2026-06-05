@@ -6,7 +6,9 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
-No changes yet.
+- Made `request_split` more conservative for large but cohesive mechanical batches such as dependency manifest plus lockfile updates, generated output, docs-heavy changes, asset/image optimization, release/version bumps and archive/data refreshes.
+- Narrowed `security_review` routing so weak lexical terms such as session, token or policy in UI/CSS/docs/snapshots/generated/assets/parser contexts do not outrank failed CI or normal review by themselves.
+- Added explicit title/body security advisory detection for strong terms such as CVE, GHSA, Snyk security upgrades, vulnerability, Zip Slip, auth bypass, privilege escalation, XSS, CSRF, SSRF and RCE.
 
 ## 0.3.0 - 2026-06-05 - validated release candidate
 

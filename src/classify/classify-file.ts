@@ -130,7 +130,50 @@ const securityPathTerms = new Set([
   "policy",
   "policies",
   "security",
-  "secure"
+  "secure",
+  "tls",
+  "ssl",
+  "signing",
+  "signature",
+  "signatures"
+]);
+
+const strongSecurityAnchorTerms = new Set([
+  "auth",
+  "authn",
+  "authz",
+  "authentication",
+  "authorization",
+  "authorize",
+  "authorized",
+  "login",
+  "logins",
+  "jwt",
+  "oauth",
+  "oauth2",
+  "password",
+  "passwords",
+  "passwd",
+  "secret",
+  "secrets",
+  "credential",
+  "credentials",
+  "crypto",
+  "cryptography",
+  "encrypt",
+  "encrypted",
+  "encryption",
+  "decrypt",
+  "decrypted",
+  "decryption",
+  "permission",
+  "permissions",
+  "rbac",
+  "acl",
+  "tls",
+  "ssl",
+  "signing",
+  "signature"
 ]);
 
 const keyContextTerms = new Set([
@@ -536,6 +579,10 @@ function isSecuritySensitivePath(path: string, name: string): boolean {
     return false;
   }
 
+  if (isWeakSecurityReviewContext(path, name) && !hasStrongSecurityAnchor(path)) {
+    return false;
+  }
+
   if (isRealEnvFileName(name)) {
     return true;
   }
@@ -638,6 +685,55 @@ function isGeneratedPath(path: string, name: string): boolean {
     path.startsWith("snapshots/") ||
     name.endsWith(".snap")
   );
+}
+
+function isWeakSecurityReviewContext(path: string, name: string): boolean {
+  const tokens = pathTokens(path);
+
+  return (
+    [".css", ".scss", ".sass", ".less", ".svg", ".png", ".jpg", ".jpeg", ".webp", ".gif", ".ico", ".snap"].includes(
+      extension(name)
+    ) ||
+    hasAnyToken(
+      tokens,
+      new Set([
+        "ui",
+        "css",
+        "style",
+        "styles",
+        "theme",
+        "themes",
+        "asset",
+        "assets",
+        "image",
+        "images",
+        "icon",
+        "icons",
+        "snapshot",
+        "snapshots",
+        "path",
+        "paths",
+        "context",
+        "contexts",
+        "memory",
+        "memories",
+        "parser",
+        "parsers",
+        "lexer",
+        "lexers",
+        "slide",
+        "slides",
+        "presentation",
+        "presentations"
+      ])
+    )
+  );
+}
+
+function hasStrongSecurityAnchor(path: string): boolean {
+  const tokens = pathTokens(path);
+
+  return hasAnyToken(tokens, strongSecurityAnchorTerms);
 }
 
 function isDependencyManifestName(name: string): boolean {

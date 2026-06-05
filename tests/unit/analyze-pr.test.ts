@@ -102,6 +102,54 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).toBe("request_split");
   });
 
+  it("keeps large cohesive dependency manifest and lockfile updates out of request_split", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update dependency lockfile",
+        body: "Refresh dependency versions.",
+        files: [changedFile("package.json", 20), changedFile("package-lock.json", 1200)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("cohesive_mechanical_batch");
+    expect(signalIds(analysis.signals)).not.toContain("large_pr");
+    expect(analysis.attention).toBe("medium");
+    expect(analysis.recommended_action).toBe("dependency_review");
+  });
+
+  it("keeps docs-heavy asset and archive refresh batches out of request_split", () => {
+    const docs = Array.from({ length: 22 }, (_, index) =>
+      changedFile(`docs/reference/page-${index}.md`, 50)
+    );
+    const assets = Array.from({ length: 22 }, (_, index) =>
+      changedFile(`assets/icons/icon-${index}.svg`, 3)
+    );
+    const archiveData = Array.from({ length: 22 }, (_, index) =>
+      changedFile(`data/archive/snapshot-${index}.json`, 4)
+    );
+
+    for (const [title, files] of [
+      ["Update reference documentation", docs],
+      ["Optimize image assets", assets],
+      ["Refresh archive data", archiveData]
+    ] as const) {
+      const analysis = analyzePullRequestData(
+        dataWith({
+          title,
+          body: title,
+          files,
+          ci: ciWith("success")
+        })
+      );
+
+      expect(signalIds(analysis.signals)).toContain("cohesive_mechanical_batch");
+      expect(signalIds(analysis.signals)).not.toContain("large_pr");
+      expect(analysis.attention).toBe("medium");
+      expect(analysis.recommended_action).not.toBe("request_split");
+    }
+  });
+
   it("detects truly mixed independent concerns and limits questions", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -348,6 +396,29 @@ describe("analyzePullRequestData", () => {
     expect(analysis.recommended_action).not.toBe("security_review");
   });
 
+  it("does not route weak session token policy or asset wording to security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update session UI token parser policy slides and assets",
+        body: "Update UI text, parser naming, slides and icons.",
+        files: [
+          changedFile("src/ui/session-panel.tsx", 2),
+          changedFile("src/parser/token.ts", 2),
+          changedFile("src/security/context.ts", 2),
+          changedFile("src/security/memory.ts", 2),
+          changedFile("slides/security-policy.pptx", 2),
+          changedFile("assets/security-token-icon.svg", 2)
+        ],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(analysis.categories.security).toBe(0);
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).not.toContain("auth_related_change");
+    expect(analysis.recommended_action).not.toBe("security_review");
+  });
+
   it("keeps real env and credential configuration security-sensitive", () => {
     const analysis = analyzePullRequestData(
       dataWith({
@@ -412,7 +483,53 @@ describe("analyzePullRequestData", () => {
     );
 
     expect(signalIds(analysis.signals)).toContain("security_sensitive_file_changed");
+    expect(signalIds(analysis.signals)).toContain("strong_security_context_changed");
     expect(analysis.attention).toBe("high");
+    expect(analysis.recommended_action).toBe("security_review");
+  });
+
+  it("routes explicit vulnerability text from title or body to security review", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Snyk security upgrade for CVE-2026-1234",
+        body: "Fix vulnerable transitive dependency.",
+        files: [changedFile("package.json", 8), changedFile("package-lock.json", 120)],
+        ci: ciWith("success")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("explicit_security_advisory");
+    expect(analysis.attention).toBe("high");
+    expect(analysis.recommended_action).toBe("security_review");
+  });
+
+  it("keeps failed CI ahead of weak lexical security vocabulary", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Update session UI copy",
+        body: "Adjust session panel wording.",
+        files: [changedFile("src/ui/session-panel.tsx", 3)],
+        ci: ciWith("failure")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("ci_checks_failed");
+    expect(signalIds(analysis.signals)).not.toContain("security_sensitive_file_changed");
+    expect(analysis.recommended_action).toBe("wait_for_ci");
+  });
+
+  it("keeps explicit security context visible when CI also failed", () => {
+    const analysis = analyzePullRequestData(
+      dataWith({
+        title: "Fix GHSA-abcd-1234-wxyz auth bypass",
+        body: "Security advisory follow-up.",
+        files: [changedFile("package.json", 8), changedFile("package-lock.json", 120)],
+        ci: ciWith("failure")
+      })
+    );
+
+    expect(signalIds(analysis.signals)).toContain("explicit_security_advisory");
+    expect(signalIds(analysis.signals)).toContain("ci_checks_failed");
     expect(analysis.recommended_action).toBe("security_review");
   });
 

@@ -14,7 +14,8 @@ export function chooseRecommendedAction(
     attention === "high" &&
     (ids.has("auth_related_change") ||
       ids.has("secret_related_change") ||
-      ids.has("security_sensitive_file_changed")) &&
+      ids.has("strong_security_context_changed") ||
+      ids.has("explicit_security_advisory")) &&
     !ids.has("source_wording_change")
   ) {
     return "security_review";

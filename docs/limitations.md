@@ -20,7 +20,7 @@ GitHub changed-file data or diff data may also be unavailable for large PRs, tra
 
 Persistence and data-format detection is intentionally conservative. It looks for known path or text indicators such as HDF5, PyTables, serialization and file-format terms, but it cannot prove backward compatibility or find every storage-related change.
 
-Security-sensitive path matching is token-based and intentionally avoids bare storage/test words such as `key` without stronger surrounding context. It also suppresses generic auth/session/token/security/env words in tests, docs, fixtures, examples, data files, compiler internals, protocol paths and third-party license files. This reduces false positives but can miss project-specific secret naming conventions unless configured paths are added.
+Security-sensitive path matching is token-based and intentionally avoids bare storage/test words such as `key` without stronger surrounding context. It also suppresses generic auth/session/token/policy/security/env/path/context/memory words in tests, docs, fixtures, examples, data files, compiler internals, protocol paths, UI/CSS paths, parser paths, snapshots, slides, assets and third-party license files. This reduces false positives but can miss project-specific secret or access-control naming conventions unless configured paths are added.
 
 Database migration detection is intentionally narrower than a generic `schema` keyword match. JSON schemas, generated fixtures and tests-only migration folders may be reported through persistence/data-format or normal review instead of `migration_review` unless the path contains clearer runtime database or migration-tooling evidence.
 
@@ -36,7 +36,7 @@ The public validation runs showed strong aggregate usefulness, but a few familie
 
 - auth/security changes can be under-prioritized when the sensitive behavior is visible only from project-specific semantics rather than paths or titles;
 - migration, schema and persistence changes can be under-prioritized or over-prioritized when repository naming does not distinguish database schema from data-format schema;
-- token, policy, session or credential terms can still be noisy in unusual non-security contexts;
+- token, policy, session or credential terms can still be noisy or too quiet in unusual project-specific contexts;
 - dependency, vendor and fixture-heavy PRs can sometimes be routed to dependency or normal review when a human would prefer a more specific first pass;
 - generated files and large test fixtures can make priority-file ordering less precise.
 

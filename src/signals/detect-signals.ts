@@ -20,6 +20,10 @@ export type SignalInput = {
   config: OssSignalConfig;
 };
 
+type ExplicitSecurityContext = {
+  label: string;
+};
+
 const ciDescriptionTerms = ["ci", "workflow", "workflows", "build", "action", "actions"];
 const dependencyDescriptionTerms = [
   "dependency",
@@ -47,6 +51,7 @@ export function detectSignals(input: SignalInput): Signal[] {
       linesChanged >= thresholds.medium_lines_changed);
   const body = input.data.pull_request.body.trim();
   const titleAndBody = `${input.data.pull_request.title} ${body}`.toLowerCase();
+  const explicitSecurityContext = detectExplicitSecurityContext(titleAndBody);
   const dependencyManifestFiles = input.files.filter(isDependencyManifest);
   const dependencyLockfiles = input.files.filter(isDependencyLockfile);
   const dependencyFiles = input.files.filter((file) => hasCategory(file, "dependencies"));
@@ -55,12 +60,15 @@ export function detectSignals(input: SignalInput): Signal[] {
   const securityFiles = input.files.filter((file) => hasCategory(file, "security"));
   const authFiles = securityFiles.filter((file) => isAuthRelatedPath(file.path));
   const secretFiles = securityFiles.filter((file) => isSecretRelatedPath(file.path));
-  const directSecurityFiles = securityFiles.filter((file) => isDirectSecurityReviewPath(file.path));
+  const strongSecurityFiles = securityFiles.filter((file) =>
+    isStrongDirectSecurityReviewPath(file.path)
+  );
   const migrationFiles = input.files.filter((file) => hasCategory(file, "migrations"));
   const configurationFiles = input.files.filter((file) => hasCategory(file, "configuration"));
   const documentationFiles = input.files.filter((file) => hasCategory(file, "documentation"));
   const testFiles = input.files.filter((file) => hasCategory(file, "tests"));
   const codeFiles = input.files.filter((file) => hasCategory(file, "code"));
+  const generatedFiles = input.files.filter((file) => hasCategory(file, "generated"));
   const releaseFiles = input.files.filter((file) => hasCategory(file, "release"));
   const localizationCatalogFiles = input.files.filter((file) =>
     isLocalizationCatalogPath(file.path)
@@ -94,6 +102,18 @@ export function detectSignals(input: SignalInput): Signal[] {
     input.data.ci.state
   );
   const containerImageUpdate = isContainerImageUpdate(input.files, titleAndBody);
+  const cohesiveMechanicalBatch = isCohesiveMechanicalBatch(
+    input.files,
+    dependencyManifestFiles,
+    dependencyLockfiles,
+    dependencyFiles,
+    documentationFiles,
+    generatedFiles,
+    releaseFiles,
+    titleAndBody,
+    releaseVersionUpdate,
+    localizationCatalogRefresh
+  );
   const reportsPersistenceDataFormat = shouldReportPersistenceDataFormatChange(
     codeFiles,
     persistenceFiles,
@@ -105,7 +125,7 @@ export function detectSignals(input: SignalInput): Signal[] {
   const strongCategoriesTouched = mixedConcernCategories(input.files);
   const dominantDatabaseChange = isDominantDatabaseChange(input.files, migrationFiles);
 
-  if (largePr && !localizationCatalogRefresh) {
+  if (largePr && !localizationCatalogRefresh && !cohesiveMechanicalBatch) {
     signals.push(
       signal("large_pr", "high", "Large pull request", "This PR changes many files or lines.", [
         metadataEvidence(
@@ -114,7 +134,7 @@ export function detectSignals(input: SignalInput): Signal[] {
         )
       ])
     );
-  } else if (mediumPr || (largePr && localizationCatalogRefresh)) {
+  } else if (mediumPr || (largePr && (localizationCatalogRefresh || cohesiveMechanicalBatch))) {
     signals.push(
       signal(
         "medium_pr",
@@ -146,7 +166,11 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (fileCount > thresholds.large_files_changed && !localizationCatalogRefresh) {
+  if (
+    fileCount > thresholds.large_files_changed &&
+    !localizationCatalogRefresh &&
+    !cohesiveMechanicalBatch
+  ) {
     signals.push(
       signal(
         "many_files_changed",
@@ -154,6 +178,18 @@ export function detectSignals(input: SignalInput): Signal[] {
         "Many files changed",
         "The number of changed files is high.",
         [metadataEvidence(String(fileCount), `> ${thresholds.large_files_changed} files changed`)]
+      )
+    );
+  }
+
+  if (largePr && cohesiveMechanicalBatch) {
+    signals.push(
+      signal(
+        "cohesive_mechanical_batch",
+        "medium",
+        "Cohesive mechanical batch",
+        "This PR is large by volume, but the changed files look like one mechanical update rather than independent review surfaces.",
+        fileEvidence(input.files, "cohesive mechanical batch evidence")
       )
     );
   }
@@ -397,9 +433,21 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
+  if (explicitSecurityContext) {
+    signals.push(
+      signal(
+        "explicit_security_advisory",
+        "high",
+        "Explicit security advisory context",
+        "The PR title or description explicitly references a vulnerability or security advisory. Review the security impact without assuming exploitability.",
+        [descriptionEvidence(explicitSecurityContext.label, "explicit security term in title/body")]
+      )
+    );
+  }
+
   if (securityFiles.length > 0) {
     const securityLevel =
-      authFiles.length > 0 || secretFiles.length > 0 || directSecurityFiles.length > 0
+      authFiles.length > 0 || secretFiles.length > 0 || strongSecurityFiles.length > 0
         ? "high"
         : "medium";
     signals.push(
@@ -436,6 +484,18 @@ export function detectSignals(input: SignalInput): Signal[] {
         "Secret-related path changed",
         "A path references secrets, env files, credentials or keys.",
         fileEvidence(secretFiles, "path contains secret/env/credential/key")
+      )
+    );
+  }
+
+  if (strongSecurityFiles.length > 0) {
+    signals.push(
+      signal(
+        "strong_security_context_changed",
+        "high",
+        "Sensitive security implementation path changed",
+        "A path references crypto, TLS/SSL, permissions, access control or security implementation context.",
+        fileEvidence(strongSecurityFiles, "path contains crypto/TLS/SSL/permission/access-control/security")
       )
     );
   }
@@ -496,7 +556,7 @@ export function detectSignals(input: SignalInput): Signal[] {
     );
   }
 
-  if (largePr && !localizationCatalogRefresh && body.length < 120) {
+  if (largePr && !localizationCatalogRefresh && !cohesiveMechanicalBatch && body.length < 120) {
     signals.push(
       signal(
         "short_description_for_large_pr",
@@ -547,7 +607,8 @@ export function detectSignals(input: SignalInput): Signal[] {
       strongCategoriesTouched,
       largePr,
       releaseVersionUpdate,
-      localizationCatalogRefresh
+      localizationCatalogRefresh,
+      cohesiveMechanicalBatch
     )
   ) {
     signals.push(
@@ -637,6 +698,31 @@ function descriptionEvidence(value: string, reason: string): Evidence {
     value,
     reason
   };
+}
+
+function detectExplicitSecurityContext(text: string): ExplicitSecurityContext | null {
+  const patterns: Array<[RegExp, string]> = [
+    [/\bcve-\d{4}-\d{4,}\b/, "CVE"],
+    [/\bghsa-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}\b/, "GHSA"],
+    [/\bsnyk security upgrade\b/, "Snyk security upgrade"],
+    [/\bvulnerabilit(?:y|ies)\b|\bvulnerable\b/, "vulnerability"],
+    [/\bzip slip\b/, "Zip Slip"],
+    [/\buser enumeration\b/, "user enumeration"],
+    [/\b(?:auth|authentication|authorization) bypass\b/, "auth bypass"],
+    [/\bprivilege escalation\b/, "privilege escalation"],
+    [/\bxss\b|\bcross-site scripting\b/, "XSS"],
+    [/\bcsrf\b/, "CSRF"],
+    [/\bssrf\b/, "SSRF"],
+    [/\brce\b|\bremote code execution\b/, "RCE"]
+  ];
+
+  for (const [pattern, label] of patterns) {
+    if (pattern.test(text)) {
+      return { label };
+    }
+  }
+
+  return null;
 }
 
 function mixedConcernCategories(files: ClassifiedFile[]): FileCategory[] {
@@ -733,6 +819,97 @@ function isLocalizationCatalogRefresh(
   }
 
   return localizationCatalogFiles.length / files.length >= 0.8;
+}
+
+function isCohesiveMechanicalBatch(
+  files: ClassifiedFile[],
+  dependencyManifestFiles: ClassifiedFile[],
+  dependencyLockfiles: ClassifiedFile[],
+  dependencyFiles: ClassifiedFile[],
+  documentationFiles: ClassifiedFile[],
+  generatedFiles: ClassifiedFile[],
+  releaseFiles: ClassifiedFile[],
+  titleAndBody: string,
+  releaseVersionUpdate: boolean,
+  localizationCatalogRefresh: boolean
+): boolean {
+  if (files.length === 0 || localizationCatalogRefresh) {
+    return false;
+  }
+
+  const pathText = files.map((file) => file.path.replace(/\\/g, "/").toLowerCase()).join(" ");
+  const dependencyBatch =
+    dependencyFiles.length / files.length >= 0.8 &&
+    dependencyManifestFiles.length > 0 &&
+    dependencyLockfiles.length > 0;
+  const generatedBatch = generatedFiles.length / files.length >= 0.8;
+  const docsHeavy = documentationFiles.length / files.length >= 0.8;
+  const assetFiles = files.filter((file) => isAssetPath(file.path));
+  const assetBatch =
+    assetFiles.length / files.length >= 0.8 && mentionsAssetOptimization(`${titleAndBody} ${pathText}`);
+  const releaseBatch =
+    releaseVersionUpdate &&
+    files.filter(
+      (file) =>
+        hasCategory(file, "release") ||
+        hasCategory(file, "dependencies") ||
+        hasCategory(file, "documentation") ||
+        hasCategory(file, "generated")
+    ).length /
+      files.length >=
+      0.8;
+  const archiveDataFiles = files.filter((file) => isArchiveDataRefreshPath(file.path));
+  const archiveDataBatch =
+    archiveDataFiles.length / files.length >= 0.8 &&
+    mentionsArchiveDataRefresh(`${titleAndBody} ${pathText}`);
+
+  return (
+    dependencyBatch ||
+    generatedBatch ||
+    docsHeavy ||
+    assetBatch ||
+    releaseBatch ||
+    archiveDataBatch
+  );
+}
+
+function isAssetPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+  const name = normalized.split("/").at(-1) ?? normalized;
+
+  return (
+    normalized.includes("/asset/") ||
+    normalized.includes("/assets/") ||
+    normalized.includes("/image/") ||
+    normalized.includes("/images/") ||
+    normalized.includes("/icon/") ||
+    normalized.includes("/icons/") ||
+    /\.(png|jpe?g|gif|webp|svg|ico|avif|bmp|tiff|woff2?|ttf|otf)$/.test(name)
+  );
+}
+
+function mentionsAssetOptimization(text: string): boolean {
+  return /\b(optimi[sz]e|compress|minify|resize|regenerate|update|refresh)\b.*\b(asset|assets|image|images|icon|icons|sprite|sprites|font|fonts)\b|\b(asset|assets|image|images|icon|icons|sprite|sprites|font|fonts)\b.*\b(optimi[sz]e|compress|minify|resize|regenerate|update|refresh)\b/.test(
+    text
+  );
+}
+
+function isArchiveDataRefreshPath(path: string): boolean {
+  const normalized = path.replace(/\\/g, "/").toLowerCase();
+  const name = normalized.split("/").at(-1) ?? normalized;
+
+  return (
+    normalized.includes("/archive/") ||
+    normalized.includes("/archives/") ||
+    normalized.includes("/data/") ||
+    normalized.includes("/datasets/") ||
+    normalized.includes("/dataset/") ||
+    /\.(json|jsonl|csv|tsv|txt|yaml|yml|toml|xml|parquet|hdf5?|zip|gz)$/.test(name)
+  );
+}
+
+function mentionsArchiveDataRefresh(text: string): boolean {
+  return /\b(update|refresh|regenerate|sync|snapshot|archive|data|dataset|fixtures?)\b/.test(text);
 }
 
 function shouldReportPersistenceDataFormatChange(
@@ -942,13 +1119,15 @@ function shouldReportMixedConcerns(
   categories: FileCategory[],
   largePr: boolean,
   releaseVersionUpdate: boolean,
-  localizationCatalogRefresh: boolean
+  localizationCatalogRefresh: boolean,
+  cohesiveMechanicalBatch: boolean
 ): boolean {
   if (
     categories.length < 4 ||
     !hasCoreReviewConcern(categories) ||
     releaseVersionUpdate ||
-    localizationCatalogRefresh
+    localizationCatalogRefresh ||
+    cohesiveMechanicalBatch
   ) {
     return false;
   }
@@ -1013,7 +1192,11 @@ function hasCoreReviewConcern(categories: FileCategory[]): boolean {
 }
 
 function isSecurityConcernPath(path: string): boolean {
-  return isAuthRelatedPath(path) || isSecretRelatedPath(path) || isDirectSecurityReviewPath(path);
+  return (
+    isAuthRelatedPath(path) ||
+    isSecretRelatedPath(path) ||
+    isStrongDirectSecurityReviewPath(path)
+  );
 }
 
 function isAuthRelatedPath(path: string): boolean {
@@ -1024,10 +1207,10 @@ function isSecretRelatedPath(path: string): boolean {
   return !isLocalizationCatalogPath(path) && hasSecretSensitivePathTerm(path);
 }
 
-function isDirectSecurityReviewPath(path: string): boolean {
+function isStrongDirectSecurityReviewPath(path: string): boolean {
   const normalized = path.replace(/\\/g, "/").toLowerCase();
 
-  return /(^|[^a-z0-9])(crypto|cryptography|encrypt|encrypted|encryption|decrypt|decrypted|decryption|permission|permissions|policy|policies|rbac|acl|security|secure)([^a-z0-9]|$)/.test(
+  return /(^|[^a-z0-9])(crypto|cryptography|encrypt|encrypted|encryption|decrypt|decrypted|decryption|permission|permissions|rbac|acl|access-control|access_control|tls|ssl|signing|signature|security|secure)([^a-z0-9]|$)/.test(
     normalized
   );
 }
