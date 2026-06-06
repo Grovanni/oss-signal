@@ -81,12 +81,17 @@ The two evaluations answer different questions and should not be merged. Evaluat
 
 ## Current Usage
 
-The CLI is available from this repository. Node.js 20 or newer is required.
+The CLI is available on npm. Node.js 20 or newer is required.
 
 ```bash
-npm install
-npm run build
-node dist/cli/index.js pr https://github.com/org/repo/pull/123
+npx pr-signal pr https://github.com/org/repo/pull/123
+```
+
+You can also install it globally:
+
+```bash
+npm install -g pr-signal
+pr-signal pr https://github.com/org/repo/pull/123
 ```
 
 Set `GITHUB_TOKEN` or `GH_TOKEN` for private repositories or a higher GitHub rate limit. The token is only sent as an Authorization header and is never included in output.
@@ -94,26 +99,26 @@ Set `GITHUB_TOKEN` or `GH_TOKEN` for private repositories or a higher GitHub rat
 Useful options:
 
 ```bash
-node dist/cli/index.js pr <url> --out ./brief
-node dist/cli/index.js pr <url> --format md
-node dist/cli/index.js pr <url> --format json --no-agent
-node dist/cli/index.js pr <url> --config pr-signal.yml
-node dist/cli/index.js pr <url> --quiet
+pr-signal pr <url> --out ./brief
+pr-signal pr <url> --format md
+pr-signal pr <url> --format json --no-agent
+pr-signal pr <url> --config pr-signal.yml
+pr-signal pr <url> --quiet
 ```
 
 Use `--dry-run` to validate URL parsing without network access:
 
 ```bash
-node dist/cli/index.js pr https://github.com/org/repo/pull/123 --dry-run
+pr-signal pr https://github.com/org/repo/pull/123 --dry-run
 ```
 
-Use `--fixture` to run against local fixture files instead of the network:
+When working from a local checkout, you can still build and run the repository directly:
 
 ```bash
-node dist/cli/index.js pr https://github.com/org/repo/pull/123 --fixture tests/fixtures/github-basic
+npm install
+npm run build
+node dist/cli/index.js pr https://github.com/org/repo/pull/123
 ```
-
-The package metadata is ready for npm-style CLI usage, but npm publication is a separate release step. Do not assume an npm package is available unless a published release says so.
 
 ## Outputs
 

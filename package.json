@@ -1,10 +1,10 @@
 {
   "name": "pr-signal",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A deterministic PR intake brief for maintainers and coding agents.",
   "type": "module",
   "bin": {
-    "pr-signal": "./dist/cli/index.js"
+    "pr-signal": "dist/cli/index.js"
   },
   "files": [
     "dist",

@@ -8,6 +8,12 @@ The format should follow clear release notes. The project uses semantic versioni
 
 _No unreleased changes yet._
 
+## 0.3.2 - 2026-06-07 - npm publication
+
+- Published the `pr-signal` CLI package to npm for `npx pr-signal ...` and `npm install -g pr-signal` usage.
+- Fixed the npm `bin` entry so the `pr-signal` executable is preserved in the published package.
+- Updated README usage instructions for npm-first CLI installation while keeping local checkout usage documented.
+
 ## 0.3.1 - 2026-06-06 - GitHub Action integration polish
 
 - Added optional `upload-artifact`, `step-summary` and `fail-on-error` inputs for more flexible workflow integration.
