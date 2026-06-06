@@ -34,6 +34,44 @@ inputs:
     description: GitHub Actions artifact name.
     required: false
     default: pr-signal-brief
+  upload-artifact:
+    description: Upload generated brief files as a GitHub Actions artifact.
+    required: false
+    default: "true"
+  step-summary:
+    description: Write review-brief.md to the GitHub Actions step summary when available.
+    required: false
+    default: "true"
+  fail-on-error:
+    description: Fail the workflow step if PR Signal cannot generate a brief. This is not a review policy gate.
+    required: false
+    default: "true"
+
+outputs:
+  output-directory:
+    description: Directory containing generated PR Signal files.
+    value: ${{ steps.generate.outputs.output-directory }}
+  review-brief-path:
+    description: Path to review-brief.md when generated.
+    value: ${{ steps.generate.outputs.review-brief-path }}
+  review-json-path:
+    description: Path to review-brief.json when generated.
+    value: ${{ steps.generate.outputs.review-json-path }}
+  agent-context-path:
+    description: Path to agent-context.md when generated.
+    value: ${{ steps.generate.outputs.agent-context-path }}
+  attention:
+    description: PR Signal attention level from review-brief.json when available.
+    value: ${{ steps.generate.outputs.attention }}
+  recommended-action:
+    description: PR Signal recommended action from review-brief.json when available.
+    value: ${{ steps.generate.outputs.recommended-action }}
+  generated:
+    description: Whether PR Signal generated the requested brief files.
+    value: ${{ steps.generate.outputs.generated }}
+  error-message:
+    description: Runtime error message when generation failed and fail-on-error is false.
+    value: ${{ steps.generate.outputs.error-message }}
 
 runs:
   using: composite
@@ -49,6 +87,7 @@ runs:
       working-directory: ${{ github.action_path }}
 
     - name: Generate PR brief
+      id: generate
       shell: bash
       run: node scripts/github-action/run.mjs
       working-directory: ${{ github.action_path }}
@@ -58,11 +97,14 @@ runs:
         INPUT_FORMAT: ${{ inputs.format }}
         INPUT_AGENT_CONTEXT: ${{ inputs.agent-context }}
         INPUT_CONFIG: ${{ inputs.config }}
+        INPUT_STEP_SUMMARY: ${{ inputs.step-summary }}
+        INPUT_FAIL_ON_ERROR: ${{ inputs.fail-on-error }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_TOKEN: ${{ inputs.github-token }}
         PR_SIGNAL_WORKSPACE: ${{ github.workspace }}
 
     - name: Upload PR brief artifact
+      if: ${{ inputs.upload-artifact == 'true' && steps.generate.outputs.generated == 'true' }}
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact-name }}

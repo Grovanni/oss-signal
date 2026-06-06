@@ -8,6 +8,13 @@ The format should follow clear release notes. The project uses semantic versioni
 
 _No unreleased changes yet._
 
+## 0.3.1 - 2026-06-06 - GitHub Action integration polish
+
+- Added optional `upload-artifact`, `step-summary` and `fail-on-error` inputs for more flexible workflow integration.
+- Added Action outputs for generated file paths, `attention`, `recommended-action`, generation status and runtime error messages.
+- Documented JSON-only, artifact-free and output-consuming GitHub Actions usage patterns.
+- Kept PR Signal non-blocking as a review tool: `fail-on-error` only controls runtime failures, not PR signals or recommended actions.
+
 ## 0.3.0 - 2026-06-06 - PR Signal public validation release
 
 - Renamed the project to PR Signal with the package and CLI slug `pr-signal`.

@@ -142,7 +142,7 @@ PR Signal does not print or write the full diff. Reports contain facts, signals,
 
 ## GitHub Action
 
-This repository includes a non-intrusive GitHub Action. It writes a step summary and uploads brief artifacts. It does not comment on PRs and does not support `fail-on`.
+This repository includes a non-intrusive GitHub Action. It writes a step summary and uploads brief artifacts by default, exposes useful workflow outputs, and can be configured for JSON-only or artifact-free integration. It does not comment on PRs and does not support `fail-on` review policies.
 
 See [docs/github-action.md](docs/github-action.md).
 
