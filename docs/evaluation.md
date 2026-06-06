@@ -18,7 +18,7 @@ The evaluated product claim is:
 
 PR Signal was evaluated on two separate 10,000-PR public GitHub datasets.
 
-The first dataset is a usage-realistic sample intended to approximate ordinary public OSS PR traffic. It answers: "What should users expect when running PR Signal on normal GitHub PRs?"
+The first dataset is a broad usage-realistic public GitHub PR sample intended to approximate realistic PR Signal usage. It answers: "What should users expect when running PR Signal on a broad public PR stream?"
 
 The second dataset is a stratified stress test. It intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes, and normal code changes. It answers: "Does PR Signal stay useful and sober on harder PR surfaces?"
 
@@ -50,7 +50,7 @@ The strict pass rate is the clean-pass rate. Briefs outside strict pass can stil
 
 ## Usage-Realistic 10k Result
 
-This run is intended to approximate ordinary public OSS PR traffic.
+This run uses a broad public PR sample intended to approximate realistic PR Signal usage.
 
 | Metric | Result |
 |---|---:|
@@ -101,6 +101,8 @@ PR Signal did not simply default to normal review. In the usage-realistic run, i
 
 In this public GitHub sample, non-trivial orientation was common because many PRs had missing tests, failed CI, dependency changes, empty descriptions, large diffs, configuration changes, or explicit security-advisory metadata.
 
+Security-oriented signals were common in this public sample. The `security_review` action appeared on 17.75% of PRs and `explicit_security_advisory` appeared on 10.87%. These figures should not be read as the average rate of real security problems on GitHub; they reflect the sampled public PR stream, including dependency/security-advisory metadata, bot updates, CI/config changes, and security-looking maintenance work.
+
 ## Stratified Stress Test 10k Result
 
 This run intentionally increased the share of difficult PR surfaces:
@@ -142,7 +144,7 @@ This run intentionally increased the share of difficult PR surfaces:
 | docs_only | 800 |
 | migrations_schema_database | 700 |
 
-The stress test is not intended to represent average GitHub traffic. It intentionally increases the share of difficult PR surfaces to test whether PR Signal becomes brittle, noisy, or alarmist under pressure.
+The stress test is not intended to represent overall GitHub traffic. It intentionally increases the share of difficult PR surfaces to test whether PR Signal becomes brittle, noisy, or alarmist under pressure.
 
 ## Validity Limits
 

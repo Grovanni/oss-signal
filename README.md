@@ -25,7 +25,7 @@ The recommended action is review orientation, not a verdict.
 
 The current deterministic core was evaluated on two separate 10,000-PR public GitHub datasets at commit `f79678e`.
 
-The usage-realistic run approximates ordinary public OSS PR traffic. It answers: "What should users expect when running PR Signal on normal GitHub PRs?"
+The usage-realistic run uses a broad public PR sample intended to approximate realistic PR Signal usage. It answers: "What should users expect when running PR Signal on a broad public PR stream?"
 
 | Metric | Usage-realistic 10k |
 |---|---:|
@@ -55,6 +55,8 @@ PR Signal did not simply default to normal review. In the usage-realistic run, i
 | migration_review | 0.50% |
 
 The most common usage-realistic signals were missing tests, configuration changes, tests changed, dependency manifests, large PRs, docs changes, empty descriptions and failed CI.
+
+Security-oriented signals were common in this public sample. The `security_review` action appeared on 17.75% of PRs and `explicit_security_advisory` appeared on 10.87%. These figures should not be read as the average rate of real security problems on GitHub; they reflect the sampled public PR stream, including dependency/security-advisory metadata, bot updates, CI/config changes, and security-looking maintenance work.
 
 The stratified stress test intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes and normal code changes.
 

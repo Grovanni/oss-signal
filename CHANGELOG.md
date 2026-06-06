@@ -7,6 +7,7 @@ The format should follow clear release notes. The project uses semantic versioni
 ## Unreleased
 
 - Renamed the project to PR Signal with the package and CLI slug `pr-signal`.
+- Clarified usage-realistic validation wording so the public sample is not presented as a perfect proxy for GitHub-wide traffic or real security-problem frequency.
 - Promoted the final 10,000-PR validation result tables into the README and specified the external evaluator as ChatGPT 5.5 with xhigh reasoning effort.
 - Documented the final usage-realistic 10,000-PR validation and stratified stress-test 10,000-PR validation as separate public evaluation results.
 - Added public action-distribution and top-signal tables for the usage-realistic run.
