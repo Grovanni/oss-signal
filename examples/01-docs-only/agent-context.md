@@ -31,4 +31,4 @@ Use this context to decide where human review attention should go first. Do not 
 
 ## Data Limits
 - This brief is based on GitHub metadata, changed files and diff data. It does not replace code review.
-- OSS Signal does not execute code, install dependencies, approve, reject or score the PR.
+- PR Signal does not execute code, install dependencies, approve, reject or score the PR.

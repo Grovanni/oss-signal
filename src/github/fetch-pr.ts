@@ -456,7 +456,7 @@ async function requestGitHub(
 function buildHeaders(accept: string, token?: string): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: accept,
-    "User-Agent": "oss-signal",
+    "User-Agent": "pr-signal",
     "X-GitHub-Api-Version": "2022-11-28"
   };
 

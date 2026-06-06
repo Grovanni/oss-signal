@@ -5,7 +5,7 @@ import {
   type ClassifiedFile
 } from "../classify/classify-file.js";
 import type { FileCategory } from "../classify/categories.js";
-import { defaultOssSignalConfig, isIgnoredPath, type OssSignalConfig } from "../config/config.js";
+import { defaultPrSignalConfig, isIgnoredPath, type PrSignalConfig } from "../config/config.js";
 import type { GitHubPullRequestData } from "../github/types.js";
 import { computeAttentionLevel } from "../signals/attention-level.js";
 import { detectSignals } from "../signals/detect-signals.js";
@@ -31,7 +31,7 @@ export type PullRequestAnalysis = {
 
 export function analyzePullRequestData(
   data: GitHubPullRequestData,
-  config: OssSignalConfig = defaultOssSignalConfig
+  config: PrSignalConfig = defaultPrSignalConfig
 ): PullRequestAnalysis {
   const filesForAnalysis = data.files.filter((file) => !isIgnoredPath(config, file.path));
   const classifiedFiles = classifyChangedFiles(filesForAnalysis, config);

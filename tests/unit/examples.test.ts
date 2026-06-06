@@ -25,7 +25,7 @@ describe("public examples", () => {
       const agentContext = await readFile(join(dir, "agent-context.md"), "utf8");
 
       expect(source).toContain("Why this example");
-      expect(terminal).toContain("OSS Signal:");
+      expect(terminal).toContain("PR Signal:");
       expect(markdown).toContain("# PR Brief");
       expect(json.schema_version).toBe("review-brief.v1");
       expect(json.signals?.length).toBeGreaterThan(0);

@@ -1,11 +1,12 @@
 # Changelog
 
-All notable changes to OSS Signal will be documented in this file.
+All notable changes to PR Signal will be documented in this file.
 
 The format should follow clear release notes. The project uses semantic versioning after the first public release.
 
 ## Unreleased
 
+- Renamed the project to PR Signal with the package and CLI slug `pr-signal`.
 - Documented the final usage-realistic 10,000-PR validation and stratified stress-test 10,000-PR validation as separate public evaluation results.
 - Added public action-distribution and top-signal tables for the usage-realistic run.
 - Made `request_split` more conservative for large but cohesive mechanical batches such as dependency manifest plus lockfile updates, generated output, docs-heavy changes, asset/image optimization, release/version bumps and archive/data refreshes.
@@ -15,7 +16,7 @@ The format should follow clear release notes. The project uses semantic versioni
 ## 0.3.0 - 2026-06-05 - validated release candidate
 
 - Documented the validated release-candidate status, public evaluation methodology and main 1,000 PR GO metrics.
-- Refreshed the README to describe OSS Signal as a deterministic, no-AI-runtime PR intake brief and clarify current local CLI/GitHub Action usage.
+- Refreshed the README to describe PR Signal as a deterministic, no-AI-runtime PR intake brief and clarify current local CLI/GitHub Action usage.
 - Kept PR brief generation usable when GitHub changed-files responses are unavailable or unexpectedly shaped.
 - Reduced remaining security false positives for generic `env` filenames, env samples, fixtures/examples, protocol/compiler session paths, third-party licenses and dependency manifests under `security` package paths.
 - Expanded Java and QA test detection for `*IT.java`, `*ITCase.java`, `*TestCase.java`, `qa/`, `src/test/`, `internalClusterTest`, `muted-tests`, `testfixtures`, `test-fixtures` and `fixtures`.
@@ -44,7 +45,7 @@ The format should follow clear release notes. The project uses semantic versioni
 - Added `schemas/review-brief.v1.schema.json` and tests that validate generated examples against it.
 - Documented the recommended action priority policy.
 - Added a non-intrusive GitHub Action that writes a step summary and uploads brief artifacts.
-- Added optional `oss-signal.yml` / JSON configuration for size thresholds, path categories and ignored paths.
+- Added optional `pr-signal.yml` / JSON configuration for size thresholds, path categories and ignored paths.
 - Kept PR brief generation usable when GitHub diff retrieval is unavailable.
 - Routed dependency-only manifest or lockfile PRs to `dependency_review` when no stronger action applies.
 - Clarified workflow sensitivity wording: GitHub workflow files are now automation-sensitive instead of generic security-sensitive.
@@ -60,7 +61,7 @@ The format should follow clear release notes. The project uses semantic versioni
 ## 0.1.0 - 2026-06-04
 
 - Initial project planning.
-- Added TypeScript CLI skeleton with `oss-signal pr <url> --dry-run`.
+- Added TypeScript CLI skeleton with `pr-signal pr <url> --dry-run`.
 - Added deterministic GitHub Pull Request URL parser with unit tests.
 - Added GitHub PR metadata, changed files and diff fetching with optional token support.
 - Added local GitHub PR fixtures for network-free tests.

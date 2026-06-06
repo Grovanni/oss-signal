@@ -1,4 +1,4 @@
-name: OSS Signal
+name: PR Signal
 description: Generate deterministic GitHub Pull Request intake briefs.
 
 inputs:
@@ -13,9 +13,9 @@ inputs:
   out:
     description: Output directory for generated brief files.
     required: false
-    default: oss-signal-output
+    default: pr-signal-output
   format:
-    description: Output format passed to oss-signal. Use md, json or all.
+    description: Output format passed to pr-signal. Use md, json or all.
     required: false
     default: all
   agent-context:
@@ -23,23 +23,23 @@ inputs:
     required: false
     default: "true"
   config:
-    description: Optional OSS Signal config path, relative to the workflow workspace.
+    description: Optional PR Signal config path, relative to the workflow workspace.
     required: false
     default: ""
   artifact-name:
     description: GitHub Actions artifact name.
     required: false
-    default: oss-signal-brief
+    default: pr-signal-brief
 
 runs:
   using: composite
   steps:
-    - name: Install OSS Signal dependencies
+    - name: Install PR Signal dependencies
       shell: bash
       run: npm ci
       working-directory: ${{ github.action_path }}
 
-    - name: Build OSS Signal CLI
+    - name: Build PR Signal CLI
       shell: bash
       run: npm run build
       working-directory: ${{ github.action_path }}

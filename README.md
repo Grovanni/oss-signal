@@ -1,6 +1,6 @@
-# OSS Signal
+# PR Signal
 
-OSS Signal turns a GitHub Pull Request into a deterministic intake brief that tells maintainers and coding agents where to look first.
+PR Signal turns a GitHub Pull Request into a deterministic intake brief that tells maintainers and coding agents where to look first.
 
 It is not an AI reviewer. It does not use AI at runtime, does not send code to external APIs, does not decide whether a PR should be merged, and does not comment on PRs by default.
 
@@ -8,7 +8,7 @@ It is not an AI reviewer. It does not use AI at runtime, does not send code to e
 
 ## What It Does
 
-OSS Signal fetches GitHub Pull Request metadata, changed files, diff metadata and GitHub CI status/checks when available. It then classifies the PR with deterministic rules and writes a compact brief.
+PR Signal fetches GitHub Pull Request metadata, changed files, diff metadata and GitHub CI status/checks when available. It then classifies the PR with deterministic rules and writes a compact brief.
 
 The brief highlights observable review context:
 
@@ -29,7 +29,7 @@ The usage-realistic run approximates ordinary public OSS PR traffic. It produced
 
 The stratified stress test intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes and normal code changes. It produced 97.37% human-useful briefs, 96.88% agent-useful briefs, a 3.62% wrong-action rate, a 1.17% security false-positive rate and a 56.17% non-trivial orientation rate.
 
-These metrics measure review guidance quality, not merge correctness. OSS Signal does not decide whether a PR should be merged, and these results do not mean OSS Signal found bugs or proved PR correctness.
+These metrics measure review guidance quality, not merge correctness. PR Signal does not decide whether a PR should be merged, and these results do not mean PR Signal found bugs or proved PR correctness.
 
 The two evaluations answer different questions and should not be merged. Full methodology, action distribution, top signals and limitations are documented in [docs/evaluation.md](docs/evaluation.md).
 
@@ -51,7 +51,7 @@ Useful options:
 node dist/cli/index.js pr <url> --out ./brief
 node dist/cli/index.js pr <url> --format md
 node dist/cli/index.js pr <url> --format json --no-agent
-node dist/cli/index.js pr <url> --config oss-signal.yml
+node dist/cli/index.js pr <url> --config pr-signal.yml
 node dist/cli/index.js pr <url> --quiet
 ```
 
@@ -71,10 +71,10 @@ The package metadata is ready for npm-style CLI usage, but npm publication is a 
 
 ## Outputs
 
-OSS Signal writes:
+PR Signal writes:
 
 ```text
-oss-signal-output/
+pr-signal-output/
   review-brief.md
   review-brief.json
   agent-context.md
@@ -83,16 +83,16 @@ oss-signal-output/
 Terminal output is intentionally short:
 
 ```text
-OSS Signal: org/repo#123
+PR Signal: org/repo#123
 Attention: high
 Action: request_split
 Size: 5 files, +920 / -140
 CI: pending (0 failed, 2 pending)
 Signals: large_pr, tests_changed, docs_changed
-Outputs: oss-signal-output/review-brief.md, oss-signal-output/review-brief.json, oss-signal-output/agent-context.md
+Outputs: pr-signal-output/review-brief.md, pr-signal-output/review-brief.json, pr-signal-output/agent-context.md
 ```
 
-OSS Signal does not print or write the full diff. Reports contain facts, signals, GitHub CI state when available and evidence references.
+PR Signal does not print or write the full diff. Reports contain facts, signals, GitHub CI state when available and evidence references.
 
 ## GitHub Action
 
@@ -124,7 +124,7 @@ Each example includes `source.md`, terminal output, `review-brief.md`, `review-b
 
 ## Non-Goals
 
-OSS Signal does not:
+PR Signal does not:
 
 - review code for you;
 - prove correctness;

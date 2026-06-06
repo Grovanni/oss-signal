@@ -5,15 +5,15 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
-  loadOssSignalConfig,
+  loadPrSignalConfig,
   matchesAnyPathPattern,
-  mergeOssSignalConfig
+  mergePrSignalConfig
 } from "../../src/config/config.js";
 
-describe("OSS Signal config", () => {
+describe("PR Signal config", () => {
   it("loads a minimal YAML config", async () => {
-    const dir = await mkdtemp(join(tmpdir(), "oss-signal-config-"));
-    const path = join(dir, "oss-signal.yml");
+    const dir = await mkdtemp(join(tmpdir(), "pr-signal-config-"));
+    const path = join(dir, "pr-signal.yml");
 
     await writeFile(
       path,
@@ -33,7 +33,7 @@ describe("OSS Signal config", () => {
       "utf8"
     );
 
-    const loaded = await loadOssSignalConfig(path);
+    const loaded = await loadPrSignalConfig(path);
 
     expect(loaded.path).toBe(path);
     expect(loaded.config.attention_thresholds.medium_files_changed).toBe(8);
@@ -50,6 +50,6 @@ describe("OSS Signal config", () => {
   });
 
   it("rejects unknown config keys", () => {
-    expect(() => mergeOssSignalConfig({ score: true })).toThrow("Unsupported config key");
+    expect(() => mergePrSignalConfig({ score: true })).toThrow("Unsupported config key");
   });
 });

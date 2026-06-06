@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://grovanni.github.io/oss-signal/schemas/review-brief.v1.schema.json",
-  "title": "OSS Signal review brief",
+  "$id": "https://grovanni.github.io/pr-signal/schemas/review-brief.v1.schema.json",
+  "title": "PR Signal review brief",
   "type": "object",
   "additionalProperties": true,
   "required": [

@@ -16,11 +16,11 @@ describe("parseGitHubPullRequestUrl", () => {
   });
 
   it("normalizes query strings, hashes, and trailing slashes", () => {
-    expect(parseGitHubPullRequestUrl("https://github.com/Grovanni/oss-signal/pull/7/?x=1#diff")).toEqual({
+    expect(parseGitHubPullRequestUrl("https://github.com/Grovanni/pr-signal/pull/7/?x=1#diff")).toEqual({
       owner: "Grovanni",
-      repo: "oss-signal",
+      repo: "pr-signal",
       pullNumber: 7,
-      htmlUrl: "https://github.com/Grovanni/oss-signal/pull/7"
+      htmlUrl: "https://github.com/Grovanni/pr-signal/pull/7"
     });
   });
 

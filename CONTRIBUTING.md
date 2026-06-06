@@ -1,8 +1,8 @@
-# Contributing to OSS Signal
+# Contributing to PR Signal
 
 Thanks for considering a contribution.
 
-OSS Signal is intentionally narrow: it creates deterministic PR intake briefs. It does not review code, use AI, or post automatic comments by default.
+PR Signal is intentionally narrow: it creates deterministic PR intake briefs. It does not review code, use AI, or post automatic comments by default.
 
 ## Good contributions
 

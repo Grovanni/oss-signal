@@ -8,7 +8,7 @@ describe("buildPrResult", () => {
   it("summarizes fixture data without printing full diff text", async () => {
     const result = await buildPrResult("https://github.com/org/repo/pull/123", {
       fixture: join("tests", "fixtures", "github-basic"),
-      out: "./oss-signal-output",
+      out: "./pr-signal-output",
       format: "all"
     });
 

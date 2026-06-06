@@ -1,8 +1,8 @@
 import { GitHubPullRequestUrlError, parseGitHubPullRequestUrl } from "../../github/parse-url.js";
 import {
-  loadOssSignalConfig,
-  OssSignalConfigError,
-  type OssSignalConfig
+  loadPrSignalConfig,
+  PrSignalConfigError,
+  type PrSignalConfig
 } from "../../config/config.js";
 import { fetchGitHubPullRequest, getGitHubToken, GitHubFetchError } from "../../github/fetch-pr.js";
 import { GitHubFixtureError, loadGitHubPullRequestFixture } from "../../github/fixtures.js";
@@ -17,7 +17,7 @@ export type PrCommandOptions = {
   dryRun?: boolean;
   fixture?: string;
   config?: string;
-  analysisConfig?: OssSignalConfig;
+  analysisConfig?: PrSignalConfig;
   out: string;
   format: OutputFormat;
   quiet?: boolean;
@@ -92,7 +92,7 @@ export async function runPrCommand(url: string, options: PrCommandOptions): Prom
       throw new Error(error.message, { cause: error });
     }
 
-    if (error instanceof OssSignalConfigError) {
+    if (error instanceof PrSignalConfigError) {
       throw new Error(error.message, { cause: error });
     }
 
@@ -108,5 +108,5 @@ async function resolveConfig(options: PrCommandOptions) {
     };
   }
 
-  return loadOssSignalConfig(options.config);
+  return loadPrSignalConfig(options.config);
 }

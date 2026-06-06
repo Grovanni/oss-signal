@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 
 const actionPath = process.cwd();
 const workspace = process.env.OSS_SIGNAL_WORKSPACE || process.env.GITHUB_WORKSPACE || actionPath;
-const outDir = process.env.INPUT_OUT || "oss-signal-output";
+const outDir = process.env.INPUT_OUT || "pr-signal-output";
 const outputPath = resolve(workspace, outDir);
 const format = process.env.INPUT_FORMAT || "all";
 const includeAgentContext = (process.env.INPUT_AGENT_CONTEXT || "true").toLowerCase() !== "false";
@@ -69,7 +69,7 @@ async function resolvePullRequestUrl() {
   const eventUrl = event?.pull_request?.html_url;
 
   if (typeof eventUrl !== "string" || eventUrl.length === 0) {
-    throw new Error("OSS Signal requires a pull_request event or an explicit pr-url input.");
+    throw new Error("PR Signal requires a pull_request event or an explicit pr-url input.");
   }
 
   return eventUrl;
@@ -84,7 +84,7 @@ async function appendStepSummary(outputPath) {
 
   const briefPath = join(outputPath, "review-brief.md");
   const brief = await readSummaryBrief(briefPath);
-  await appendFile(summaryPath, ["## OSS Signal", "", brief, ""].join("\n"));
+  await appendFile(summaryPath, ["## PR Signal", "", brief, ""].join("\n"));
 }
 
 async function readSummaryBrief(briefPath) {
@@ -92,7 +92,7 @@ async function readSummaryBrief(briefPath) {
     return await readFile(briefPath, "utf8");
   } catch (error) {
     if (error?.code === "ENOENT") {
-      return "OSS Signal completed. `review-brief.md` was not generated for this output format.";
+      return "PR Signal completed. `review-brief.md` was not generated for this output format.";
     }
 
     throw error;

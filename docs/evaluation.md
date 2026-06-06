@@ -1,14 +1,14 @@
 # Evaluation Methodology
 
-OSS Signal is evaluated as a product tool: the question is whether the brief helps maintainers and coding agents orient review attention before reading the full diff.
+PR Signal is evaluated as a product tool: the question is whether the brief helps maintainers and coding agents orient review attention before reading the full diff.
 
-These evaluations measure review guidance quality, not merge correctness. OSS Signal does not decide whether a PR should be merged, and these results do not mean OSS Signal found bugs or proved PR correctness.
+These evaluations measure review guidance quality, not merge correctness. PR Signal does not decide whether a PR should be merged, and these results do not mean PR Signal found bugs or proved PR correctness.
 
 The documented deterministic core was evaluated at commit `f79678e`.
 
 ## Objective
 
-The evaluation checks whether OSS Signal can generate useful, sober briefs for real public Pull Requests without crashing, over-routing to the wrong action, or overusing security/attention signals.
+The evaluation checks whether PR Signal can generate useful, sober briefs for real public Pull Requests without crashing, over-routing to the wrong action, or overusing security/attention signals.
 
 The evaluated product claim is:
 
@@ -16,11 +16,11 @@ The evaluated product claim is:
 
 ## Two Separate 10,000-PR Evaluations
 
-OSS Signal was evaluated on two separate 10,000-PR public GitHub datasets.
+PR Signal was evaluated on two separate 10,000-PR public GitHub datasets.
 
-The first dataset is a usage-realistic sample intended to approximate ordinary public OSS PR traffic. It answers: "What should users expect when running OSS Signal on normal GitHub PRs?"
+The first dataset is a usage-realistic sample intended to approximate ordinary public OSS PR traffic. It answers: "What should users expect when running PR Signal on normal GitHub PRs?"
 
-The second dataset is a stratified stress test. It intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes, and normal code changes. It answers: "Does OSS Signal stay useful and sober on harder PR surfaces?"
+The second dataset is a stratified stress test. It intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes, and normal code changes. It answers: "Does PR Signal stay useful and sober on harder PR surfaces?"
 
 The metrics from these two datasets should not be merged. They answer different product questions.
 
@@ -28,7 +28,7 @@ The metrics from these two datasets should not be merged. They answer different 
 
 Evaluation used an external GPT-based evaluator as a consistency aid. The evaluator reviewed the generated brief against public PR context and assigned structured outcomes such as pass, noisy, wrong action, missed signal or crash.
 
-The evaluator did not change OSS Signal behavior at runtime. OSS Signal itself remains deterministic and does not call an LLM.
+The evaluator did not change PR Signal behavior at runtime. PR Signal itself remains deterministic and does not call an LLM.
 
 Human interpretation is still required when using the metrics. The evaluator is useful for repeatable product validation, not as an absolute authority.
 
@@ -82,7 +82,7 @@ The strict pass rate is the clean-pass rate. Briefs outside strict pass can stil
 | ask_for_clarification | 162 | 1.62% |
 | migration_review | 50 | 0.50% |
 
-OSS Signal did not simply default to normal review. In the usage-realistic run, it produced a non-trivial review orientation on 71.60% of PRs.
+PR Signal did not simply default to normal review. In the usage-realistic run, it produced a non-trivial review orientation on 71.60% of PRs.
 
 ### Usage-Realistic Top Signals
 
@@ -142,16 +142,16 @@ This run intentionally increased the share of difficult PR surfaces:
 | docs_only | 800 |
 | migrations_schema_database | 700 |
 
-The stress test is not intended to represent average GitHub traffic. It intentionally increases the share of difficult PR surfaces to test whether OSS Signal becomes brittle, noisy, or alarmist under pressure.
+The stress test is not intended to represent average GitHub traffic. It intentionally increases the share of difficult PR surfaces to test whether PR Signal becomes brittle, noisy, or alarmist under pressure.
 
 ## Validity Limits
 
-The validation does not prove that OSS Signal understands code semantics. It evaluates brief usefulness and routing quality from metadata, changed-file paths, GitHub CI state and deterministic signals.
+The validation does not prove that PR Signal understands code semantics. It evaluates brief usefulness and routing quality from metadata, changed-file paths, GitHub CI state and deterministic signals.
 
 Known limits:
 
 - evaluation uses an external GPT-based evaluator outside the product;
-- OSS Signal runtime remains deterministic and does not use AI;
+- PR Signal runtime remains deterministic and does not use AI;
 - results measure brief usefulness, not code correctness;
 - public GitHub PRs do not perfectly represent all private repositories or team workflows;
 - project-specific naming can still hide or exaggerate auth/security intent;
@@ -161,4 +161,4 @@ Known limits:
 - the evaluator itself can drift, so aggregate metrics should be interpreted with the methodology and representative examples;
 - raw evaluation artifacts are not published in this repository to avoid noise, volume and unnecessary data exposure.
 
-OSS Signal should be treated as an intake aid. It helps decide where to start reviewing; it does not replace human review.
+PR Signal should be treated as an intake aid. It helps decide where to start reviewing; it does not replace human review.

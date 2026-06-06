@@ -13,7 +13,7 @@ export function renderTerminalSummary(
   const outputs = written.files.map((file) => file.path).join(", ");
 
   return [
-    `OSS Signal: ${result.repository.full_name}#${result.pull_request.number}`,
+    `PR Signal: ${result.repository.full_name}#${result.pull_request.number}`,
     `Attention: ${result.analysis.attention}`,
     `Action: ${result.analysis.recommended_action}`,
     `Size: ${result.files.count} files, +${result.pull_request.additions} / -${result.pull_request.deletions}`,

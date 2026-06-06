@@ -13,26 +13,26 @@ export type ReviewThresholds = {
 
 export type ConfigurableFileCategory = Exclude<FileCategory, "unknown">;
 
-export type OssSignalConfig = {
+export type PrSignalConfig = {
   attention_thresholds: ReviewThresholds;
   paths: Partial<Record<ConfigurableFileCategory, string[]>>;
   ignore_paths: string[];
 };
 
-export type LoadedOssSignalConfig = {
-  config: OssSignalConfig;
+export type LoadedPrSignalConfig = {
+  config: PrSignalConfig;
   path: string | null;
 };
 
 type RawConfig = Record<string, unknown>;
 
 const defaultConfigNames = [
-  "oss-signal.yml",
-  "oss-signal.yaml",
-  ".oss-signal.yml",
-  ".oss-signal.yaml",
-  "oss-signal.json",
-  ".oss-signal.json"
+  "pr-signal.yml",
+  "pr-signal.yaml",
+  ".pr-signal.yml",
+  ".pr-signal.yaml",
+  "pr-signal.json",
+  ".pr-signal.json"
 ];
 
 const configurableCategories = new Set<ConfigurableFileCategory>([
@@ -71,7 +71,7 @@ const pathAliasSections = new Map<string, ConfigurableFileCategory>([
   ["generated_paths", "generated"]
 ]);
 
-export const defaultOssSignalConfig: OssSignalConfig = {
+export const defaultPrSignalConfig: PrSignalConfig = {
   attention_thresholds: {
     medium_files_changed: 6,
     medium_lines_changed: 201,
@@ -82,23 +82,23 @@ export const defaultOssSignalConfig: OssSignalConfig = {
   ignore_paths: []
 };
 
-export class OssSignalConfigError extends Error {
+export class PrSignalConfigError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "OssSignalConfigError";
+    this.name = "PrSignalConfigError";
   }
 }
 
-export async function loadOssSignalConfig(
+export async function loadPrSignalConfig(
   configPath?: string,
   cwd = process.cwd()
-): Promise<LoadedOssSignalConfig> {
+): Promise<LoadedPrSignalConfig> {
   if (configPath) {
     const resolvedPath = resolve(cwd, configPath);
     const raw = await readConfigFile(resolvedPath);
 
     return {
-      config: mergeOssSignalConfig(parseConfigContent(resolvedPath, raw)),
+      config: mergePrSignalConfig(parseConfigContent(resolvedPath, raw)),
       path: resolvedPath
     };
   }
@@ -110,7 +110,7 @@ export async function loadOssSignalConfig(
       const raw = await readConfigFile(candidate);
 
       return {
-        config: mergeOssSignalConfig(parseConfigContent(candidate, raw)),
+        config: mergePrSignalConfig(parseConfigContent(candidate, raw)),
         path: candidate
       };
     }
@@ -122,9 +122,9 @@ export async function loadOssSignalConfig(
   };
 }
 
-export function mergeOssSignalConfig(raw: unknown): OssSignalConfig {
+export function mergePrSignalConfig(raw: unknown): PrSignalConfig {
   if (!isRecord(raw)) {
-    throw new OssSignalConfigError("Config root must be an object.");
+    throw new PrSignalConfigError("Config root must be an object.");
   }
 
   const config = cloneDefaultConfig();
@@ -137,7 +137,7 @@ export function mergeOssSignalConfig(raw: unknown): OssSignalConfig {
 
   for (const key of Object.keys(raw)) {
     if (!allowedTopLevel.has(key)) {
-      throw new OssSignalConfigError(`Unsupported config key: ${key}.`);
+      throw new PrSignalConfigError(`Unsupported config key: ${key}.`);
     }
   }
 
@@ -145,12 +145,12 @@ export function mergeOssSignalConfig(raw: unknown): OssSignalConfig {
 
   if (thresholds !== undefined) {
     if (!isRecord(thresholds)) {
-      throw new OssSignalConfigError("attention_thresholds must be an object.");
+      throw new PrSignalConfigError("attention_thresholds must be an object.");
     }
 
     for (const [key, value] of Object.entries(thresholds)) {
       if (!isThresholdKey(key)) {
-        throw new OssSignalConfigError(`Unsupported threshold: ${key}.`);
+        throw new PrSignalConfigError(`Unsupported threshold: ${key}.`);
       }
 
       config.attention_thresholds[key] = readPositiveInteger(value, `attention_thresholds.${key}`);
@@ -161,12 +161,12 @@ export function mergeOssSignalConfig(raw: unknown): OssSignalConfig {
 
   if (paths !== undefined) {
     if (!isRecord(paths)) {
-      throw new OssSignalConfigError("paths must be an object.");
+      throw new PrSignalConfigError("paths must be an object.");
     }
 
     for (const [category, value] of Object.entries(paths)) {
       if (!isConfigurableCategory(category)) {
-        throw new OssSignalConfigError(`Unsupported paths category: ${category}.`);
+        throw new PrSignalConfigError(`Unsupported paths category: ${category}.`);
       }
 
       appendConfiguredPaths(config, category, readStringList(value, `paths.${category}`));
@@ -189,14 +189,14 @@ export function mergeOssSignalConfig(raw: unknown): OssSignalConfig {
 }
 
 export function matchesConfiguredPath(
-  config: OssSignalConfig,
+  config: PrSignalConfig,
   category: ConfigurableFileCategory,
   path: string
 ): boolean {
   return matchesAnyPathPattern(path, config.paths[category] ?? []);
 }
 
-export function isIgnoredPath(config: OssSignalConfig, path: string): boolean {
+export function isIgnoredPath(config: PrSignalConfig, path: string): boolean {
   return matchesAnyPathPattern(path, config.ignore_paths);
 }
 
@@ -212,16 +212,16 @@ function parseConfigContent(path: string, text: string): RawConfig {
       const parsed = JSON.parse(text) as unknown;
 
       if (!isRecord(parsed)) {
-        throw new OssSignalConfigError("JSON config root must be an object.");
+        throw new PrSignalConfigError("JSON config root must be an object.");
       }
 
       return parsed;
     } catch (error) {
-      if (error instanceof OssSignalConfigError) {
+      if (error instanceof PrSignalConfigError) {
         throw error;
       }
 
-      throw new OssSignalConfigError(`Invalid JSON config ${path}: ${errorMessage(error)}.`);
+      throw new PrSignalConfigError(`Invalid JSON config ${path}: ${errorMessage(error)}.`);
     }
   }
 
@@ -327,7 +327,7 @@ async function readConfigFile(path: string): Promise<string> {
   try {
     return await readFile(path, "utf8");
   } catch (error) {
-    throw new OssSignalConfigError(`Could not read config ${path}: ${errorMessage(error)}.`);
+    throw new PrSignalConfigError(`Could not read config ${path}: ${errorMessage(error)}.`);
   }
 }
 
@@ -340,16 +340,16 @@ async function fileExists(path: string): Promise<boolean> {
   }
 }
 
-function cloneDefaultConfig(): OssSignalConfig {
+function cloneDefaultConfig(): PrSignalConfig {
   return {
-    attention_thresholds: { ...defaultOssSignalConfig.attention_thresholds },
+    attention_thresholds: { ...defaultPrSignalConfig.attention_thresholds },
     paths: {},
     ignore_paths: []
   };
 }
 
 function appendConfiguredPaths(
-  config: OssSignalConfig,
+  config: PrSignalConfig,
   category: ConfigurableFileCategory,
   paths: string[]
 ): void {
@@ -359,7 +359,7 @@ function appendConfiguredPaths(
 
 function readPositiveInteger(value: unknown, key: string): number {
   if (typeof value !== "number" || !Number.isInteger(value) || value < 1) {
-    throw new OssSignalConfigError(`${key} must be a positive integer.`);
+    throw new PrSignalConfigError(`${key} must be a positive integer.`);
   }
 
   return value;
@@ -367,12 +367,12 @@ function readPositiveInteger(value: unknown, key: string): number {
 
 function readStringList(value: unknown, key: string): string[] {
   if (!Array.isArray(value)) {
-    throw new OssSignalConfigError(`${key} must be a list of path patterns.`);
+    throw new PrSignalConfigError(`${key} must be a list of path patterns.`);
   }
 
   return value.map((entry, index) => {
     if (typeof entry !== "string" || entry.trim().length === 0) {
-      throw new OssSignalConfigError(`${key}[${index}] must be a non-empty string.`);
+      throw new PrSignalConfigError(`${key}[${index}] must be a non-empty string.`);
     }
 
     return normalizePattern(entry);
@@ -381,13 +381,13 @@ function readStringList(value: unknown, key: string): string[] {
 
 function validateThresholdOrder(thresholds: ReviewThresholds): void {
   if (thresholds.medium_files_changed > thresholds.large_files_changed) {
-    throw new OssSignalConfigError(
+    throw new PrSignalConfigError(
       "attention_thresholds.medium_files_changed must be <= large_files_changed."
     );
   }
 
   if (thresholds.medium_lines_changed > thresholds.large_lines_changed) {
-    throw new OssSignalConfigError(
+    throw new PrSignalConfigError(
       "attention_thresholds.medium_lines_changed must be <= large_lines_changed."
     );
   }
@@ -509,8 +509,8 @@ function countIndent(line: string): number {
   return line.length - line.trimStart().length;
 }
 
-function yamlError(path: string, lineNumber: number, message: string): OssSignalConfigError {
-  return new OssSignalConfigError(`Invalid YAML config ${path}:${lineNumber}: ${message}`);
+function yamlError(path: string, lineNumber: number, message: string): PrSignalConfigError {
+  return new PrSignalConfigError(`Invalid YAML config ${path}:${lineNumber}: ${message}`);
 }
 
 function normalizePattern(pattern: string): string {

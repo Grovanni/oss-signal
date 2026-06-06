@@ -1,4 +1,4 @@
-OSS Signal: prettier/prettier#19201
+PR Signal: prettier/prettier#19201
 Attention: high
 Action: wait_for_ci
 Size: 2 files, +38 / -38

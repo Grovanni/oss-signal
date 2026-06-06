@@ -39,7 +39,7 @@ describe("output renderers", () => {
 
   it("writes all default output files", async () => {
     const result = await fixtureResult();
-    const outDir = join(tmpdir(), `oss-signal-test-${randomUUID()}`);
+    const outDir = join(tmpdir(), `pr-signal-test-${randomUUID()}`);
 
     try {
       const written = await writeReviewOutputs(result, {
@@ -58,7 +58,7 @@ describe("output renderers", () => {
       await expect(readFile(join(outDir, "agent-context.md"), "utf8")).resolves.toContain(
         "# Agent Context"
       );
-      expect(renderTerminalSummary(result, written)).toContain("OSS Signal: org/repo#123");
+      expect(renderTerminalSummary(result, written)).toContain("PR Signal: org/repo#123");
     } finally {
       await rm(outDir, { force: true, recursive: true });
     }
@@ -98,7 +98,7 @@ describe("output renderers", () => {
 
   it("respects json-only output and --no-agent behavior", async () => {
     const result = await fixtureResult();
-    const outDir = join(tmpdir(), `oss-signal-test-${randomUUID()}`);
+    const outDir = join(tmpdir(), `pr-signal-test-${randomUUID()}`);
 
     try {
       const written = await writeReviewOutputs(result, {
@@ -121,7 +121,7 @@ describe("output renderers", () => {
 async function fixtureResult() {
   return buildPrResult("https://github.com/org/repo/pull/123", {
     fixture: join("tests", "fixtures", "github-basic"),
-    out: "./oss-signal-output",
+    out: "./pr-signal-output",
     format: "all"
   });
 }

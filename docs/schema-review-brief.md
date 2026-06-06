@@ -99,7 +99,7 @@ These nested fields are also part of the stable v1 contract:
 
 Some guaranteed fields can be `null` when GitHub does not provide a value, for example PR author, merge time, fork repository names or CI item URLs.
 
-OSS Signal may add new fields inside existing objects without changing `schema_version` as long as existing field names and types stay valid.
+PR Signal may add new fields inside existing objects without changing `schema_version` as long as existing field names and types stay valid.
 
 ## Analysis fields
 

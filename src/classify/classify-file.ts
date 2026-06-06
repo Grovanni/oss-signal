@@ -1,8 +1,8 @@
 import type { GitHubChangedFileSummary } from "../github/types.js";
 import {
-  defaultOssSignalConfig,
+  defaultPrSignalConfig,
   matchesConfiguredPath,
-  type OssSignalConfig
+  type PrSignalConfig
 } from "../config/config.js";
 
 import { createEmptyCategoryCounts, type FileCategory } from "./categories.js";
@@ -206,7 +206,7 @@ const keyContextTerms = new Set([
 
 export function classifyChangedFile(
   file: GitHubChangedFileSummary,
-  config: OssSignalConfig = defaultOssSignalConfig
+  config: PrSignalConfig = defaultPrSignalConfig
 ): ClassifiedFile {
   const path = normalizePath(file.path);
   const name = basename(path);
@@ -342,7 +342,7 @@ export function classifyChangedFile(
 
 export function classifyChangedFiles(
   files: GitHubChangedFileSummary[],
-  config: OssSignalConfig = defaultOssSignalConfig
+  config: PrSignalConfig = defaultPrSignalConfig
 ): ClassifiedFile[] {
   return files.map((file) => classifyChangedFile(file, config));
 }

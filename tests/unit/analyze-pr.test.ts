@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { analyzePullRequestData } from "../../src/analyze/analyze-pr.js";
-import { mergeOssSignalConfig } from "../../src/config/config.js";
+import { mergePrSignalConfig } from "../../src/config/config.js";
 import { loadGitHubPullRequestFixture } from "../../src/github/fixtures.js";
 import { parseGitHubPullRequestUrl } from "../../src/github/parse-url.js";
 import type {
@@ -908,7 +908,7 @@ describe("analyzePullRequestData", () => {
   });
 
   it("uses configured size thresholds without changing default behavior", () => {
-    const config = mergeOssSignalConfig({
+    const config = mergePrSignalConfig({
       attention_thresholds: {
         medium_files_changed: 10,
         medium_lines_changed: 500,
@@ -930,7 +930,7 @@ describe("analyzePullRequestData", () => {
   });
 
   it("uses configured paths for security-sensitive classification", () => {
-    const config = mergeOssSignalConfig({
+    const config = mergePrSignalConfig({
       paths: {
         security: ["app/identity/**"]
       }
@@ -948,7 +948,7 @@ describe("analyzePullRequestData", () => {
   });
 
   it("omits configured ignore paths from signal analysis", () => {
-    const config = mergeOssSignalConfig({
+    const config = mergePrSignalConfig({
       ignore_paths: ["docs/generated/**"]
     });
     const analysis = analyzePullRequestData(

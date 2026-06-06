@@ -1,6 +1,6 @@
 # Decision policy
 
-OSS Signal recommends the first review action from deterministic signals. The action is not a verdict and does not approve, reject, block, close or comment on a PR.
+PR Signal recommends the first review action from deterministic signals. The action is not a verdict and does not approve, reject, block, close or comment on a PR.
 
 The current priority order is:
 
@@ -19,7 +19,7 @@ The current priority order is:
 
 A dependency PR with a manifest, lockfile or dependency-only file normally recommends `dependency_review`.
 
-If GitHub reports failed or pending CI for the PR head commit, OSS Signal recommends `wait_for_ci` first. This keeps the brief actionable: the maintainer can inspect CI before spending review attention on dependency details that may already be invalidated by failed checks.
+If GitHub reports failed or pending CI for the PR head commit, PR Signal recommends `wait_for_ci` first. This keeps the brief actionable: the maintainer can inspect CI before spending review attention on dependency details that may already be invalidated by failed checks.
 
 If the only security evidence is weak lexical vocabulary such as `session`, `token`, `policy`, `path`, `context` or `memory` in UI, CSS, docs, snapshots, generated files, assets or parser contexts, actionable failed CI remains the first recommendation. Explicit advisory text such as CVE, GHSA, Snyk security upgrade, vulnerability, auth bypass, privilege escalation, XSS, CSRF, SSRF or RCE can still keep security orientation while the CI failure is listed as a gate.
 
@@ -29,13 +29,13 @@ Human-facing summaries render those cancelled/skipped/neutral-only cases as non-
 
 ## Database/schema before security noise
 
-When migration, schema or database paths dominate the changed-file evidence, OSS Signal emits `dominant_database_change` and recommends `migration_review` before generic security or split routing, unless a direct auth-sensitive path is present.
+When migration, schema or database paths dominate the changed-file evidence, PR Signal emits `dominant_database_change` and recommends `migration_review` before generic security or split routing, unless a direct auth-sensitive path is present.
 
 This protects cases such as foreign-key fixtures, Rails database rake tasks and runtime schema files from being misrouted through secret/key wording. Tests-only migration folders, generated fixtures, JSON schemas and data-format schemas are not treated as database migration evidence by default.
 
 ## Release/version updates
 
-When the PR title/body and file mix look like a coherent release or version bump, OSS Signal can emit `release_version_update`. This suppresses generic `code_without_tests` and `mixed_concerns` noise for small release/version touch points while still preserving dependency signals such as `dependency_manifest_changed`.
+When the PR title/body and file mix look like a coherent release or version bump, PR Signal can emit `release_version_update`. This suppresses generic `code_without_tests` and `mixed_concerns` noise for small release/version touch points while still preserving dependency signals such as `dependency_manifest_changed`.
 
 Small source edits whose title clearly points to docs, comments, docstrings, typo fixes, wording, help text, type/extension metadata, changelog or release-note text can emit `source_wording_change`. That signal suppresses generic `ask_for_tests` routing for the small low-risk case while keeping the review action normal unless another stronger signal applies.
 
@@ -49,7 +49,7 @@ It can still recommend clarification when the missing context affects orientatio
 
 `security_sensitive_file_changed` is reserved for direct security-sensitive paths such as auth, product session/token handling, real env files, secret, credential, crypto, TLS/SSL, permission, access-control and security implementation paths.
 
-Workflow and GitHub Action files use `automation_sensitive_file_changed`. They can affect CI, releases, permissions and supply chain behavior, but OSS Signal avoids presenting workflow-only PRs as generic security-sensitive changes.
+Workflow and GitHub Action files use `automation_sensitive_file_changed`. They can affect CI, releases, permissions and supply chain behavior, but PR Signal avoids presenting workflow-only PRs as generic security-sensitive changes.
 
 Dockerfile changes also use automation/build attention rather than app security-sensitive wording by default. They can affect runtime image and supply chain behavior, but should not trigger `security_review` unless the path also directly references auth, sessions, tokens, secrets, credentials, crypto, permissions, policy or security.
 
@@ -57,7 +57,7 @@ Generic `env` path terms, env sample files, fixture/example data, third-party li
 
 CI-green workflow-only PRs can still proceed to `normal_review`.
 
-Container image, HelmRelease, Helm chart and related deployment image version changes can emit `container_image_update`. When no stronger action applies, OSS Signal routes them to `dependency_review` because the useful review question is usually about the image/version provenance and deployment impact.
+Container image, HelmRelease, Helm chart and related deployment image version changes can emit `container_image_update`. When no stronger action applies, PR Signal routes them to `dependency_review` because the useful review question is usually about the image/version provenance and deployment impact.
 
 ## Split guidance
 

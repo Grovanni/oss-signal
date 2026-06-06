@@ -1,6 +1,6 @@
 # Limitations
 
-OSS Signal is a PR intake tool, not a code reviewer.
+PR Signal is a PR intake tool, not a code reviewer.
 
 It cannot:
 
@@ -16,7 +16,7 @@ It cannot:
 
 GitHub CI status/check data may be unavailable when GitHub does not expose checks for the PR head commit, permissions are insufficient or the API rate limit is reached. In that case the brief remains usable and records the limitation.
 
-GitHub changed-file data or diff data may also be unavailable for large PRs, transient GitHub errors or unexpected API response shapes. OSS Signal still uses the PR metadata and any partial file/diff data it has, records the limitation, and does not fail the whole run solely because changed files or diff body are missing.
+GitHub changed-file data or diff data may also be unavailable for large PRs, transient GitHub errors or unexpected API response shapes. PR Signal still uses the PR metadata and any partial file/diff data it has, records the limitation, and does not fail the whole run solely because changed files or diff body are missing.
 
 Persistence and data-format detection is intentionally conservative. It looks for known path or text indicators such as HDF5, PyTables, serialization and file-format terms, but it cannot prove backward compatibility or find every storage-related change.
 
@@ -26,9 +26,9 @@ Database migration detection is intentionally narrower than a generic `schema` k
 
 Small source wording and metadata detection uses PR title/body, file metadata and CI state, not diff semantics. It can suppress generic test requests for obvious docstring/comment/typo/help/type metadata changes, but it cannot prove that a source edit is behavior-free.
 
-Container image/deployment detection is orientation only. OSS Signal can flag image tag, HelmRelease, Helm chart or similar deployment image updates, but it does not verify the image provenance, changelog or runtime compatibility.
+Container image/deployment detection is orientation only. PR Signal can flag image tag, HelmRelease, Helm chart or similar deployment image updates, but it does not verify the image provenance, changelog or runtime compatibility.
 
-OSS Signal does not currently emit dedicated backport, public API or workflow-hardening signals. Those may be added later when they can be detected precisely without increasing generic noise.
+PR Signal does not currently emit dedicated backport, public API or workflow-hardening signals. Those may be added later when they can be detected precisely without increasing generic noise.
 
 ## Known Residual Limits From Validation
 

@@ -31,7 +31,7 @@ describe("review-brief.v1 JSON schema", () => {
     const schema = await loadSchema();
     const result = await buildPrResult("https://github.com/org/repo/pull/123", {
       fixture: join("tests", "fixtures", "github-basic"),
-      out: "./oss-signal-output",
+      out: "./pr-signal-output",
       format: "all"
     });
 

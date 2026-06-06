@@ -1,12 +1,12 @@
 # Security Policy
 
-OSS Signal analyzes public Pull Request metadata and diffs to produce a deterministic review intake brief.
+PR Signal analyzes public Pull Request metadata and diffs to produce a deterministic review intake brief.
 
 ## Security principles
 
-- OSS Signal must not execute code from analyzed Pull Requests.
-- OSS Signal must not install dependencies from analyzed Pull Requests.
-- OSS Signal must not write tokens into generated output.
+- PR Signal must not execute code from analyzed Pull Requests.
+- PR Signal must not install dependencies from analyzed Pull Requests.
+- PR Signal must not write tokens into generated output.
 - `GITHUB_TOKEN`, when used, is optional and must stay local.
 - Generated reports should avoid copying secret-looking values from diffs.
 

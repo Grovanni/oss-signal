@@ -1,4 +1,4 @@
-OSS Signal: cli/cli#13491
+PR Signal: cli/cli#13491
 Attention: medium
 Action: normal_review
 Size: 7 files, +31 / -31

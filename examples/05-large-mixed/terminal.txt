@@ -1,4 +1,4 @@
-OSS Signal: vitejs/vite#22471
+PR Signal: vitejs/vite#22471
 Attention: high
 Action: wait_for_ci
 Size: 32 files, +594 / -888

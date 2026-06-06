@@ -8,7 +8,7 @@ It does not replace the review. It helps decide where reviewer attention should 
 
 ## Attention level
 
-OSS Signal uses `low`, `medium` and `high` attention levels.
+PR Signal uses `low`, `medium` and `high` attention levels.
 
 This is not a quality score and not a security risk score.
 

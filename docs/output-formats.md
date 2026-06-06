@@ -1,6 +1,6 @@
 # Output formats
 
-OSS Signal produces three output files.
+PR Signal produces three output files.
 
 ## `review-brief.md`
 

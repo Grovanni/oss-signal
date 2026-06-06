@@ -1,15 +1,15 @@
 # Configuration
 
-OSS Signal works without configuration. A config file only adjusts deterministic thresholds and path classification for repositories whose layout does not match the defaults.
+PR Signal works without configuration. A config file only adjusts deterministic thresholds and path classification for repositories whose layout does not match the defaults.
 
 Default lookup order from the current working directory:
 
-1. `oss-signal.yml`
-2. `oss-signal.yaml`
-3. `.oss-signal.yml`
-4. `.oss-signal.yaml`
-5. `oss-signal.json`
-6. `.oss-signal.json`
+1. `pr-signal.yml`
+2. `pr-signal.yaml`
+3. `.pr-signal.yml`
+4. `.pr-signal.yaml`
+5. `pr-signal.json`
+6. `.pr-signal.json`
 
 Use `--config <path>` to choose a specific file.
 
@@ -98,7 +98,7 @@ test_paths:
 
 ## Contract
 
-Configuration must improve repository fit; it must not change OSS Signal into a policy engine.
+Configuration must improve repository fit; it must not change PR Signal into a policy engine.
 
 The config cannot:
 

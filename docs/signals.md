@@ -1,6 +1,6 @@
 # Signals
 
-OSS Signal uses deterministic signals to route reviewer attention.
+PR Signal uses deterministic signals to route reviewer attention.
 
 Signals do not mean a PR is bad. They mean the reviewer may want to look at something first.
 
@@ -57,7 +57,7 @@ Large localization/catalog refreshes can emit `localization_catalog_change` with
 
 Documentation pages about migration guides remain documentation. Database/schema migration attention is reserved for code or repository paths that indicate runtime migrations, schemas or database migration tooling.
 
-Database/schema paths include common migration directories, `db/schema.rb`, `structure.sql`, Rails database rake tasks, database fixtures, Prisma schema files, and foreign-key fixtures. Tests-only migration folders, generated fixtures and JSON/data-format schemas are not treated as database migrations by default. When database migration paths dominate the file evidence, OSS Signal emits `dominant_database_change` and prefers migration review unless there is direct auth-sensitive evidence.
+Database/schema paths include common migration directories, `db/schema.rb`, `structure.sql`, Rails database rake tasks, database fixtures, Prisma schema files, and foreign-key fixtures. Tests-only migration folders, generated fixtures and JSON/data-format schemas are not treated as database migrations by default. When database migration paths dominate the file evidence, PR Signal emits `dominant_database_change` and prefers migration review unless there is direct auth-sensitive evidence.
 
 Security-sensitive matching is token-based, not substring-based. For example, `AUTHORS` is documentation, not auth. `key` only contributes to secret-sensitive routing with strong surrounding context such as secret, credential, token, env, API, private/public key, crypto or security.
 

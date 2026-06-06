@@ -8,7 +8,7 @@ import {
   type ClassifiedFile
 } from "../classify/classify-file.js";
 import { strongFileCategories, type FileCategory } from "../classify/categories.js";
-import type { OssSignalConfig } from "../config/config.js";
+import type { PrSignalConfig } from "../config/config.js";
 import type { GitHubPullRequestData } from "../github/types.js";
 
 import type { Evidence, Signal } from "./types.js";
@@ -17,7 +17,7 @@ export type SignalInput = {
   data: GitHubPullRequestData;
   files: ClassifiedFile[];
   categoryCounts: Record<FileCategory, number>;
-  config: OssSignalConfig;
+  config: PrSignalConfig;
 };
 
 type ExplicitSecurityContext = {
