@@ -6,7 +6,13 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+_No unreleased changes yet._
+
+## 0.3.0 - 2026-06-06 - PR Signal public validation release
+
 - Renamed the project to PR Signal with the package and CLI slug `pr-signal`.
+- Added GitHub Action Marketplace branding metadata and a public CI workflow that runs `npm ci` and `npm run check`.
+- Ignored generated `pr-signal-output/` directories while keeping the legacy local output ignore entry.
 - Clarified usage-realistic validation wording so the public sample is not presented as a perfect proxy for GitHub-wide traffic or real security-problem frequency.
 - Promoted the final 10,000-PR validation result tables into the README and specified the external evaluator as ChatGPT 5.5 with xhigh reasoning effort.
 - Documented the final usage-realistic 10,000-PR validation and stratified stress-test 10,000-PR validation as separate public evaluation results.
@@ -14,9 +20,6 @@ The format should follow clear release notes. The project uses semantic versioni
 - Made `request_split` more conservative for large but cohesive mechanical batches such as dependency manifest plus lockfile updates, generated output, docs-heavy changes, asset/image optimization, release/version bumps and archive/data refreshes.
 - Narrowed `security_review` routing so weak lexical terms such as session, token or policy in UI/CSS/docs/snapshots/generated/assets/parser contexts do not outrank failed CI or normal review by themselves.
 - Added explicit title/body security advisory detection for strong terms such as CVE, GHSA, Snyk security upgrades, vulnerability, Zip Slip, auth bypass, privilege escalation, XSS, CSRF, SSRF and RCE.
-
-## 0.3.0 - 2026-06-05 - validated release candidate
-
 - Documented the validated release-candidate status, public evaluation methodology and main 1,000 PR GO metrics.
 - Refreshed the README to describe PR Signal as a deterministic, no-AI-runtime PR intake brief and clarify current local CLI/GitHub Action usage.
 - Kept PR brief generation usable when GitHub changed-files responses are unavailable or unexpectedly shaped.

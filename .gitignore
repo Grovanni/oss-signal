@@ -11,6 +11,7 @@ coverage/
 !.env.example
 
 # Generated output
+pr-signal-output/
 oss-signal-output/
 
 # OS/editor noise

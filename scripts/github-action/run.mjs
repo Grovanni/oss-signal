@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { spawnSync } from "node:child_process";
 
 const actionPath = process.cwd();
-const workspace = process.env.OSS_SIGNAL_WORKSPACE || process.env.GITHUB_WORKSPACE || actionPath;
+const workspace = process.env.PR_SIGNAL_WORKSPACE || process.env.GITHUB_WORKSPACE || actionPath;
 const outDir = process.env.INPUT_OUT || "pr-signal-output";
 const outputPath = resolve(workspace, outDir);
 const format = process.env.INPUT_FORMAT || "all";

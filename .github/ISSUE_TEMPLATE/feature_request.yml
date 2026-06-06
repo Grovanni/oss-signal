@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an improvement for OSS Signal
+description: Suggest an improvement for PR Signal
 title: "[Feature]: "
 labels: ["heuristic"]
 body:
@@ -18,7 +18,7 @@ body:
   - type: textarea
     id: evidence
     attributes:
-      label: Evidence available to OSS Signal
+      label: Evidence available to PR Signal
       description: Explain what metadata, file path or diff evidence would trigger this.
     validations:
       required: true
@@ -28,4 +28,3 @@ body:
       label: False positive or noise risk
     validations:
       required: true
-

@@ -1,5 +1,5 @@
 name: Bug report
-description: Report incorrect behavior in OSS Signal
+description: Report incorrect behavior in PR Signal
 title: "[Bug]: "
 labels: ["bug"]
 body:
@@ -31,4 +31,3 @@ body:
       label: Expected behavior
     validations:
       required: true
-

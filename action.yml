@@ -1,6 +1,10 @@
 name: PR Signal
 description: Generate deterministic GitHub Pull Request intake briefs.
 
+branding:
+  icon: git-pull-request
+  color: blue
+
 inputs:
   pr-url:
     description: GitHub Pull Request URL. Defaults to the pull_request event URL.
@@ -56,7 +60,7 @@ runs:
         INPUT_CONFIG: ${{ inputs.config }}
         GITHUB_TOKEN: ${{ inputs.github-token }}
         GH_TOKEN: ${{ inputs.github-token }}
-        OSS_SIGNAL_WORKSPACE: ${{ github.workspace }}
+        PR_SIGNAL_WORKSPACE: ${{ github.workspace }}
 
     - name: Upload PR brief artifact
       uses: actions/upload-artifact@v4
