@@ -26,7 +26,7 @@ The metrics from these two datasets should not be merged. They answer different 
 
 ## Evaluator
 
-Evaluation used an external GPT-based evaluator as a consistency aid. The evaluator reviewed the generated brief against public PR context and assigned structured outcomes such as pass, noisy, wrong action, missed signal or crash.
+Evaluation used an external ChatGPT 5.5 evaluator with xhigh reasoning effort as a consistency aid. The evaluator reviewed the generated brief against public PR context and assigned structured outcomes such as pass, noisy, wrong action, missed signal or crash.
 
 The evaluator did not change PR Signal behavior at runtime. PR Signal itself remains deterministic and does not call an LLM.
 
@@ -150,7 +150,7 @@ The validation does not prove that PR Signal understands code semantics. It eval
 
 Known limits:
 
-- evaluation uses an external GPT-based evaluator outside the product;
+- evaluation uses an external ChatGPT 5.5 evaluator with xhigh reasoning effort outside the product;
 - PR Signal runtime remains deterministic and does not use AI;
 - results measure brief usefulness, not code correctness;
 - public GitHub PRs do not perfectly represent all private repositories or team workflows;

@@ -25,13 +25,57 @@ The recommended action is review orientation, not a verdict.
 
 The current deterministic core was evaluated on two separate 10,000-PR public GitHub datasets at commit `f79678e`.
 
-The usage-realistic run approximates ordinary public OSS PR traffic. It produced 99.23% human-useful briefs, 97.13% agent-useful briefs, a 2.69% wrong-action rate, a 0.00% security false-positive rate and a 71.60% non-trivial orientation rate.
+The usage-realistic run approximates ordinary public OSS PR traffic. It answers: "What should users expect when running PR Signal on normal GitHub PRs?"
 
-The stratified stress test intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes and normal code changes. It produced 97.37% human-useful briefs, 96.88% agent-useful briefs, a 3.62% wrong-action rate, a 1.17% security false-positive rate and a 56.17% non-trivial orientation rate.
+| Metric | Usage-realistic 10k |
+|---|---:|
+| PRs sampled | 10,000 |
+| Crash rate | 0.02% |
+| Strict pass rate | 94.49% |
+| Human-useful briefs | 99.23% |
+| Agent-useful briefs | 97.13% |
+| Wrong-action rate | 2.69% |
+| Security false-positive rate | 0.00% |
+| Attention too high | 0.49% |
+| Attention too low | 2.21% |
+| Non-trivial orientation rate | 71.60% |
+| Useful/action-correct among non-trivial orientations | 95.99% |
+
+PR Signal did not simply default to normal review. In the usage-realistic run, it produced a non-trivial review orientation on 71.60% of PRs.
+
+| Recommended action | Share |
+|---|---:|
+| normal_review | 28.38% |
+| ask_for_tests | 19.25% |
+| security_review | 17.75% |
+| wait_for_ci | 15.78% |
+| request_split | 12.44% |
+| dependency_review | 4.26% |
+| ask_for_clarification | 1.62% |
+| migration_review | 0.50% |
+
+The most common usage-realistic signals were missing tests, configuration changes, tests changed, dependency manifests, large PRs, docs changes, empty descriptions and failed CI.
+
+The stratified stress test intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes and normal code changes.
+
+| Metric | Stratified stress test 10k |
+|---|---:|
+| PRs evaluated | 10,000 |
+| Crash rate | 0.00% |
+| Strict pass rate | 87.32% |
+| Human-useful briefs | 97.37% |
+| Agent-useful briefs | 96.88% |
+| Wrong-action rate | 3.62% |
+| Security false-positive rate | 1.17% |
+| Attention too high | 3.16% |
+| Attention too low | 3.91% |
+| Non-trivial orientation rate | 56.17% |
 
 These metrics measure review guidance quality, not merge correctness. PR Signal does not decide whether a PR should be merged, and these results do not mean PR Signal found bugs or proved PR correctness.
 
-The two evaluations answer different questions and should not be merged. Full methodology, action distribution, top signals and limitations are documented in [docs/evaluation.md](docs/evaluation.md).
+The strict pass rate is the clean-pass rate. Briefs outside strict pass can still be useful, which is reflected by the human-useful and agent-useful rates.
+
+The two evaluations answer different questions and should not be merged. Evaluation used an external ChatGPT 5.5 evaluator with xhigh reasoning effort outside the product; PR Signal itself remains deterministic and does not call an LLM. Full methodology, top signals and limitations are documented in [docs/evaluation.md](docs/evaluation.md).
 
 ## Current Usage
 

@@ -33,14 +33,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: Grovanni/oss-signal@<tag-or-commit>
+      - uses: Grovanni/pr-signal@<tag-or-commit>
         with:
           github-token: ${{ github.token }}
 ```
 
 Replace `<tag-or-commit>` with the release tag, commit SHA or branch you intentionally want to run.
-
-The project is named PR Signal. The GitHub repository slug can be renamed separately; until then, use the repository slug shown on GitHub.
 
 ## Inputs
 
