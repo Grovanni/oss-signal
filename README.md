@@ -21,26 +21,17 @@ The brief highlights observable review context:
 
 The recommended action is review orientation, not a verdict.
 
-## Validated On Public PRs
+## Validation
 
-The current deterministic core was validated on a main run of 1,000 public PRs at commit `d9f586a`.
+The current deterministic core was evaluated on two separate 10,000-PR public GitHub datasets at commit `f79678e`.
 
-| Metric | Result |
-| --- | ---: |
-| Crash rate | 0.0% |
-| Human useful rate | 98.8% |
-| Agent useful rate | 97.8% |
-| Wrong action rate | 2.4% |
-| Security false positive rate | 0.4% |
-| Attention too high rate | 2.1% |
-| Attention too low rate | 4.8% |
-| Pass rate | 85.4% |
+The usage-realistic run approximates ordinary public OSS PR traffic. It produced 99.23% human-useful briefs, 97.13% agent-useful briefs, a 2.69% wrong-action rate, a 0.00% security false-positive rate and a 71.60% non-trivial orientation rate.
 
-The pass rate is the strict clean-pass rate. Briefs outside `pass` can still be useful, which is reflected by the higher human and agent useful rates.
+The stratified stress test intentionally overrepresents difficult review surfaces such as dependencies, CI automation, Docker/build/release changes, auth/security/permissions, migrations/schema/database changes, large mixed PRs, tests-heavy changes, docs-only changes and normal code changes. It produced 97.37% human-useful briefs, 96.88% agent-useful briefs, a 3.62% wrong-action rate, a 1.17% security false-positive rate and a 56.17% non-trivial orientation rate.
 
-A cumulative validation over 1,382 public PR evaluations also reached GO status. This is product validation, not a scientific proof of correctness.
+These metrics measure review guidance quality, not merge correctness. OSS Signal does not decide whether a PR should be merged, and these results do not mean OSS Signal found bugs or proved PR correctness.
 
-Methodology and limitations are documented in [docs/evaluation.md](docs/evaluation.md).
+The two evaluations answer different questions and should not be merged. Full methodology, action distribution, top signals and limitations are documented in [docs/evaluation.md](docs/evaluation.md).
 
 ## Current Usage
 

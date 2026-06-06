@@ -6,6 +6,8 @@ The format should follow clear release notes. The project uses semantic versioni
 
 ## Unreleased
 
+- Documented the final usage-realistic 10,000-PR validation and stratified stress-test 10,000-PR validation as separate public evaluation results.
+- Added public action-distribution and top-signal tables for the usage-realistic run.
 - Made `request_split` more conservative for large but cohesive mechanical batches such as dependency manifest plus lockfile updates, generated output, docs-heavy changes, asset/image optimization, release/version bumps and archive/data refreshes.
 - Narrowed `security_review` routing so weak lexical terms such as session, token or policy in UI/CSS/docs/snapshots/generated/assets/parser contexts do not outrank failed CI or normal review by themselves.
 - Added explicit title/body security advisory detection for strong terms such as CVE, GHSA, Snyk security upgrades, vulnerability, Zip Slip, auth bypass, privilege escalation, XSS, CSRF, SSRF and RCE.
