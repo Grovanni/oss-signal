@@ -1,8 +1,12 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
+
 import { Command, InvalidArgumentError } from "commander";
 
 import { type OutputFormat, runPrCommand } from "./commands/pr.js";
 
+const require = createRequire(import.meta.url);
+const packageJson = require("../../package.json") as { version: string };
 const outputFormats = new Set<OutputFormat>(["md", "json", "all"]);
 
 function parseOutputFormat(value: string): OutputFormat {
@@ -18,7 +22,7 @@ const program = new Command();
 program
   .name("pr-signal")
   .description("Generate deterministic GitHub Pull Request intake briefs.")
-  .version("0.3.0")
+  .version(packageJson.version)
   .showHelpAfterError();
 
 program

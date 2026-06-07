@@ -8,6 +8,11 @@ The format should follow clear release notes. The project uses semantic versioni
 
 _No unreleased changes yet._
 
+## 0.3.3 - 2026-06-07 - CLI version packaging fix
+
+- Made `pr-signal --version` read from `package.json` so the published CLI version matches the npm package version.
+- Added a regression test that executes the compiled CLI and compares `--version` with `package.json`.
+
 ## 0.3.2 - 2026-06-07 - npm publication
 
 - Published the `pr-signal` CLI package to npm for `npx pr-signal ...` and `npm install -g pr-signal` usage.

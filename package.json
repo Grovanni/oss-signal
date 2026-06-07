@@ -1,6 +1,6 @@
 {
   "name": "pr-signal",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "A deterministic PR intake brief for maintainers and coding agents.",
   "type": "module",
   "bin": {
